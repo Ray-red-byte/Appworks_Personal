@@ -4,6 +4,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
+import datetime
 import base64
 import time
 import json
@@ -18,6 +19,7 @@ log_file_path = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/lo
 logger = logging.getLogger(__name__)
 
 logging.basicConfig(filename=log_file_path, level=logging.INFO)
+
 
 
 options = Options()
@@ -73,7 +75,10 @@ def crawl_and_store_data(website_url, driver):
         total = 0
         json_file = "./rent_url.json"
         urls = load_urls_from_json(json_file)
-        print(len(urls))
+        logger.info(f"Previous number : {len(urls)}")
+        timestamp_start = datetime.datetime.now()
+        timestamp_start_stf = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        logger.info(f"-------------Start Crawler {timestamp_start_stf}-------------")
         new_urls = {}
         condition = True
 
@@ -101,8 +106,7 @@ def crawl_and_store_data(website_url, driver):
 
             except Exception as e:
 
-                logger.info("-------------Next page-------------")
-                logger.info(f"{next_page}")
+                logger.info(f"Next page : {next_page}")
 
                 next_page += 1
                 try:
@@ -138,7 +142,12 @@ def crawl_and_store_data(website_url, driver):
             updated_urls = new_urls
         else:
             updated_urls = {**new_urls, **urls}
-        print(len(updated_urls))
+
+        logger.info(f"Total number : {len(updated_urls)}")
+        timestamp_end = datetime.datetime.now()
+        timestamp_end_stf = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        logger.info(f"-------------Time consume {timestamp_end - timestamp_start}-------------")
+        logger.info(f"-------------End Crawler {timestamp_end_stf}-------------")
 
         store_url(updated_urls, json_file)
         # ----------------------------------

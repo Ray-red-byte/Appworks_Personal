@@ -5,14 +5,20 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 import datetime
-import base64
 import time
 import json
 import random
-import requests
 import threading
 import logging
-from bs4 import BeautifulSoup
+import boto3
+from botocore.exceptions import NoCredentialsError
+import os
+
+
+# S3 setting
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
+aws_secret_access_key = os.getenv("S3_SECRET_ACCESS_KEY")
+aws_access_key_id = os.getenv("S3_ACCESS_KEY")
 
 log_filename = 'log_file.log'
 log_file_path = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/log/log_file.log'
@@ -42,6 +48,28 @@ def simulate_human_interaction(driver):
     # Introduce another random delay
     time.sleep(random.uniform(1, 5))
 
+def upload_to_s3(local_file, bucket_name, s3_path):
+    s3 = boto3.client('s3', aws_access_key_id=aws_access_key_id,
+                      aws_secret_access_key=aws_secret_access_key)
+    try:
+        s3.upload_file(local_file, bucket_name, s3_path)
+        print("Upload Successful")
+        return True
+
+    except FileNotFoundError:
+        print("The file was not found")
+        return False
+
+    except NoCredentialsError:
+        print("Credentials not available")
+        return False
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
 
 def load_urls_from_json(json_file):
     try:
@@ -59,7 +87,7 @@ def store_url(urls, json_file):
     print(f"URL stored successfully.")
 
 
-def crawl_and_store_data(website_url, driver):
+def crawl_and_store_data(website_url, driver, first):
 
     simulate_human_interaction(driver)
 
@@ -69,33 +97,48 @@ def crawl_and_store_data(website_url, driver):
         driver.get(website_url)
         time.sleep(5)  # Adjust sleep time as needed for the page to load
 
-        # --------------Rent----------------
+
         count = 1
         next_page = 1
         total = 0
-        json_file = "./rent_url.json"
+        json_file = "/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_url.json"
         urls = load_urls_from_json(json_file)
         logger.info(f"Previous number : {len(urls)}")
         timestamp_start = datetime.datetime.now()
         timestamp_start_stf = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         logger.info(f"-------------Start Crawler {timestamp_start_stf}-------------")
         new_urls = {}
-        condition = True
+        invalid = 0
 
-        while condition:
+        # /html/body/div[8]/div/div[1]/div[4]/div[1]/div[1]/div[2]/div/h6/a
+        # /html/body/div[8]/div/div[1]/div[4]/div[1]/div[2]/div[2]/div/h6/a
+        # /html/body/div[8]/div/div[1]/div[4]/div[2]/div[1]/div[2]/div/h6/a
+        # /html/body/div[8]/div/div[1]/div[4]/div/div[1]/div[2]/div/h6/a
+        # /html/body/div[8]/div/div[1]/div[4]/div[2]/div[4]/div/div/div/div/div/div[2]/div/h6/a
+        # /html/body/div[8]/div/div[1]/div[4]/div[2]/div[2]/div[2]/div/h6/a
+        # /html/body/div[8]/div/div[1]/div[4]/div[2]/div[5]/div[2]/div/h6/a
+        # /html/body/div[8]/div/div[1]/div[4]/div/div[12]/div[2]/div/h6/a
+
+        while True:
+            
+            if invalid >= 2:
+                return True
 
             try:
+                          
+                xpath = f"/html/body/div[8]/div/div[1]/div[4]/div/div[{count}]/div[2]/div/h6/a"
+                if first:
+                    xpath = f'/html/body/div[8]/div/div[1]/div[4]/div[2]/div[{count}]/div[2]/div/h6/a'
+                
                 rent_href = driver.find_element(
-                    By.XPATH, f'//*[@id="rent-list-app"]/div/div[3]/div[1]/section[3]/div/section[{count}]/a').get_attribute('href')
+                    By.XPATH, xpath).get_attribute('href')
 
                 rent_title = driver.find_element(
-                    By.XPATH, f'//*[@id="rent-list-app"]/div/div[3]/div[1]/section[3]/div/section[{count}]/a/div[2]/div[1]/span').text
-                if rent_title is None:
-                    rent_title = driver.find_element(
-                        By.XPATH, f'//*[@id="rent-list-app"]/div/div[3]/div[1]/section[3]/div/section[{count}]/a/div[2]/div[1]/span[1]').text
-
+                    By.XPATH, xpath).text
+                
                 count += 1
                 total += 1
+                invalid = 0
 
                 if rent_href not in urls:
                     new_urls.update({rent_href: rent_title})
@@ -105,30 +148,21 @@ def crawl_and_store_data(website_url, driver):
                     break
 
             except Exception as e:
-
                 logger.info(f"Next page : {next_page}")
 
                 next_page += 1
+                
                 try:
-                    for i in range(6, 16):
-                        try:
-                            next = driver.find_element(
-                                By.XPATH, f'//*[@id="rent-list-app"]/div/div[3]/div[1]/section[4]/div/a[{i}]')
-                            if next.text == "下一頁":
 
-                                # Verify if the class attribute contains "last"
-                                if "last" in next.get_attribute("class").split():
-                                    print(
-                                        "No more pages available. Exiting loop.")
-                                    condition = False
-                                    break
-                                else:
-                                    print(
-                                        "The class of the <a> element is not 'last'")
+                    next = driver.find_element(
+                        By.XPATH, f'/html/body/div[8]/div/div[1]/nav/ul/li[4]/a')
+                                    
+                        
+                    next.click()
 
-                                next.click()
-                        except Exception as e:
-                            continue
+                    # Wait for the page to refresh
+                    WebDriverWait(driver, 10).until(EC.staleness_of(next))
+                    print("Page refreshed.")
 
                     time.sleep(1)
                 except Exception as e:
@@ -150,7 +184,7 @@ def crawl_and_store_data(website_url, driver):
         logger.info(f"-------------End Crawler {timestamp_end_stf}-------------")
 
         store_url(updated_urls, json_file)
-        # ----------------------------------
+
 
     except Exception as e:
         print(f"Error retrieving data: {type(e).__name__} - {e}")
@@ -161,28 +195,13 @@ def crawl_and_store_data(website_url, driver):
 
 def main():
 
-    # Testing
-    rent_url = "https://rent.591.com.tw/?region=1&order=posttime&orderType=desc"
-
+    # 好房網
     driver = webdriver.Chrome(options=options)
-    crawl_and_store_data(rent_url, driver)
-
-    # Create a list to hold thread objects
-    threads = []
-    '''
-    for i in range(1, 100):
-        for j in range(1, 5):
-            driver = webdriver.Chrome(options=options)
-            thread = threading.Thread(
-                target=crawl_and_store_data, args=(website_url, driver, i, j))
-            thread.start()
-            time.sleep(10)
-            threads.append(thread)
-
-        # Wait for all threads to finish
-        for thread in threads:
-            thread.join()
-    '''
+    for i in range(1, 169):
+        rent_url = f"https://www.rakuya.com.tw/search/rent_search/index?display=list&con=eJyrVkrOLKlUsopWMlCK1VFKySwuyEkE8pVyMotLlHSU8pOyMvNSQPJBIPni1MSi5AwQF6wNKFJanJqcn5IKEjIHqrcAYksgNgQaVwsAQwcbJg&tab=def&sort=21&ds=&page={i}"
+        if i == 1:
+            first = True
+        crawl_and_store_data(rent_url, driver, first)
 
 
 if __name__ == "__main__":

@@ -21,7 +21,7 @@ aws_secret_access_key = os.getenv("S3_SECRET_ACCESS_KEY")
 aws_access_key_id = os.getenv("S3_ACCESS_KEY")
 
 log_filename = 'log_file.log'
-log_file_path = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/log/log_file.log'
+log_file_path = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/log/log_file_hap_url.log'
 logger = logging.getLogger(__name__)
 
 logging.basicConfig(filename=log_file_path, level=logging.INFO)
@@ -87,45 +87,35 @@ def store_url(urls, json_file):
     print(f"URL stored successfully.")
 
 
-def crawl_and_store_data(website_url, driver, first):
+def crawl_and_store_data(website_url, driver, first, urls, begin, lock, page):
 
     simulate_human_interaction(driver)
 
     try:
 
-        time.sleep(5)
+        time.sleep(1)
         driver.get(website_url)
-        time.sleep(5)  # Adjust sleep time as needed for the page to load
+        time.sleep(1)  # Adjust sleep time as needed for the page to load
 
 
         count = 1
         next_page = 1
         total = 0
-        json_file = "/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_url.json"
-        urls = load_urls_from_json(json_file)
-        logger.info(f"Previous number : {len(urls)}")
-        timestamp_start = datetime.datetime.now()
-        timestamp_start_stf = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        logger.info(f"-------------Start Crawler {timestamp_start_stf}-------------")
+        
         new_urls = {}
-        invalid = 0
-
-        # /html/body/div[8]/div/div[1]/div[4]/div[1]/div[1]/div[2]/div/h6/a
-        # /html/body/div[8]/div/div[1]/div[4]/div[1]/div[2]/div[2]/div/h6/a
-        # /html/body/div[8]/div/div[1]/div[4]/div[2]/div[1]/div[2]/div/h6/a
-        # /html/body/div[8]/div/div[1]/div[4]/div/div[1]/div[2]/div/h6/a
-        # /html/body/div[8]/div/div[1]/div[4]/div[2]/div[4]/div/div/div/div/div/div[2]/div/h6/a
-        # /html/body/div[8]/div/div[1]/div[4]/div[2]/div[2]/div[2]/div/h6/a
-        # /html/body/div[8]/div/div[1]/div[4]/div[2]/div[5]/div[2]/div/h6/a
-        # /html/body/div[8]/div/div[1]/div[4]/div/div[12]/div[2]/div/h6/a
+        print(len(urls))
 
         while True:
             
-            if invalid >= 2:
-                return True
+            # Next page
+            if first:
+                if count > 11:
+                    break
+            else:
+                if count > 12:
+                    break
 
-            try:
-                          
+            try:    
                 xpath = f"/html/body/div[8]/div/div[1]/div[4]/div/div[{count}]/div[2]/div/h6/a"
                 if first:
                     xpath = f'/html/body/div[8]/div/div[1]/div[4]/div[2]/div[{count}]/div[2]/div/h6/a'
@@ -138,7 +128,6 @@ def crawl_and_store_data(website_url, driver, first):
                 
                 count += 1
                 total += 1
-                invalid = 0
 
                 if rent_href not in urls:
                     new_urls.update({rent_href: rent_title})
@@ -148,43 +137,21 @@ def crawl_and_store_data(website_url, driver, first):
                     break
 
             except Exception as e:
-                logger.info(f"Next page : {next_page}")
-
-                next_page += 1
-                
-                try:
-
-                    next = driver.find_element(
-                        By.XPATH, f'/html/body/div[8]/div/div[1]/nav/ul/li[4]/a')
-                                    
-                        
-                    next.click()
-
-                    # Wait for the page to refresh
-                    WebDriverWait(driver, 10).until(EC.staleness_of(next))
-                    print("Page refreshed.")
-
-                    time.sleep(1)
-                except Exception as e:
-                    print(e)
-                    print("No more pages available. Exiting loop.")
-                    break
-
-                count = 1
+                print("No element found")
+                count += 1
+                continue
 
         if len(urls) == 0:
-            updated_urls = new_urls
+            urls = new_urls
+        elif begin:
+            urls = {**urls, **new_urls}
         else:
-            updated_urls = {**new_urls, **urls}
+            urls = {**new_urls, **urls}
 
-        logger.info(f"Total number : {len(updated_urls)}")
-        timestamp_end = datetime.datetime.now()
-        timestamp_end_stf = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        logger.info(f"-------------Time consume {timestamp_end - timestamp_start}-------------")
-        logger.info(f"-------------End Crawler {timestamp_end_stf}-------------")
-
-        store_url(updated_urls, json_file)
-
+        with lock:
+            logger.info(f"Next page : {page}")
+            store_url(urls, "/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_url.json")
+            return urls
 
     except Exception as e:
         print(f"Error retrieving data: {type(e).__name__} - {e}")
@@ -196,12 +163,33 @@ def crawl_and_store_data(website_url, driver, first):
 def main():
 
     # 好房網
-    driver = webdriver.Chrome(options=options)
+
+    urls = load_urls_from_json("/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_url.json")
+    logger.info(f"Previous number : {len(urls)}")
+    timestamp_start = datetime.datetime.now()
+    timestamp_start_stf = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    logger.info(f"-------------Start Crawler {timestamp_start_stf}-------------")
+
+    begin = True
+
     for i in range(1, 169):
+        driver = webdriver.Chrome(options=options)
         rent_url = f"https://www.rakuya.com.tw/search/rent_search/index?display=list&con=eJyrVkrOLKlUsopWMlCK1VFKySwuyEkE8pVyMotLlHSU8pOyMvNSQPJBIPni1MSi5AwQF6wNKFJanJqcn5IKEjIHqrcAYksgNgQaVwsAQwcbJg&tab=def&sort=21&ds=&page={i}"
-        if i == 1:
-            first = True
-        crawl_and_store_data(rent_url, driver, first)
+        
+        lock = threading.Lock()
+
+        first = i == 1
+
+        urls = crawl_and_store_data(rent_url, driver, first, urls, begin, lock, i)
+
+        
+
+
+    logger.info(f"Total number : {len(urls)}")
+    timestamp_end = datetime.datetime.now()
+    timestamp_end_stf = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    logger.info(f"-------------Time consume {timestamp_end - timestamp_start}-------------")
+    logger.info(f"-------------End Crawler {timestamp_end_stf}-------------")
 
 
 if __name__ == "__main__":

@@ -21,7 +21,7 @@ aws_secret_access_key = os.getenv("S3_SECRET_ACCESS_KEY")
 aws_access_key_id = os.getenv("S3_ACCESS_KEY")
 
 log_filename = 'log_file.log'
-log_file_path = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/log/log_file.log'
+log_file_path = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/log/log_file_good_url.log'
 logger = logging.getLogger(__name__)
 
 logging.basicConfig(filename=log_file_path, level=logging.INFO)
@@ -70,7 +70,6 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-
 def load_urls_from_json(json_file):
     try:
         with open(json_file, 'r') as f:
@@ -101,26 +100,30 @@ def crawl_and_store_data(website_url, driver):
         count = 1
         next_page = 1
         total = 0
-        json_file = "/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_url.json"
+        json_file = "/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_good.json"
         urls = load_urls_from_json(json_file)
-        logger.info(f"Previous number : {len(urls)}")
+        
+        #click_all(driver)
         timestamp_start = datetime.datetime.now()
         timestamp_start_stf = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         logger.info(f"-------------Start Crawler {timestamp_start_stf}-------------")
+        logger.info(f"Previous number : {len(urls)}")
         new_urls = {}
 
         # /html/body/form/div[2]/div[1]/div[2]/div[2]/div/div[3]/div[1]/article[1]/div[1]/h3/a
         # /html/body/form/div[2]/div[1]/div[2]/div[2]/div/div[3]/div[1]/article[2]/div[1]/h3/a
+        # //*[@id="SearchContent"]/article[1]/div[1]/h3/a
+        # //*[@id="SearchContent"]/article[2]/div[1]/h3/a
 
         while True:
 
 
             try:
                 rent_href = driver.find_element(
-                    By.XPATH, f'/html/body/form/div[2]/div[1]/div[2]/div[2]/div/div[3]/div[1]/article[{count}]/div[1]/h3/a').get_attribute('href')
-
+                    By.XPATH, f'//*[@id="SearchContent"]/article[{count}]/div[1]/h3/a').get_attribute('href')
+                
                 rent_title = driver.find_element(
-                    By.XPATH, f'/html/body/form/div[2]/div[1]/div[2]/div[2]/div/div[3]/div[1]/article[{count}]/div[1]/h3/a').text
+                    By.XPATH, f'//*[@id="SearchContent"]/article[{count}]/div[1]/h3/a').text
                 
                 count += 1
                 total += 1
@@ -142,7 +145,7 @@ def crawl_and_store_data(website_url, driver):
 
                     next = driver.find_element(
                         By.XPATH, f'/html/body/form/div[2]/div[1]/div[2]/div[2]/div/div[3]/div[2]/ul/li[13]/a')
-                        
+                    driver.execute_script("arguments[0].scrollIntoView();", next)
                     next.click()
 
                     # Wait for the page to refresh
@@ -177,11 +180,20 @@ def crawl_and_store_data(website_url, driver):
         # Close the Chrome driver
         driver.quit()
 
+def click_all(driver):
+
+    all_button = driver.find_element(By.XPATH, "/html/body/form/div[2]/div[1]/div[2]/div[1]/ul[1]/li[1]")
+    driver.execute_script("arguments[0].scrollIntoView();", all_button)
+    all_button.click()
+
+    print("All click.")
+
 
 def main():
 
     # 好房網
     driver = webdriver.Chrome(options=options)
+    
     rent_url = "https://rent.housefun.com.tw/region/%E5%8F%B0%E5%8C%97%E5%B8%82/?cid=0000&purpid=1,2,3,4"
     
     crawl_and_store_data(rent_url, driver)

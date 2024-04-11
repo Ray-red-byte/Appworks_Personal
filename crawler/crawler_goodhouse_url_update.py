@@ -100,7 +100,7 @@ def crawl_and_store_data(website_url, driver):
         count = 1
         next_page = 1
         total = 0
-        json_file = "/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_good.json"
+        json_file = "/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_good_url.json"
         urls = load_urls_from_json(json_file)
         
         #click_all(driver)
@@ -128,6 +128,7 @@ def crawl_and_store_data(website_url, driver):
                 count += 1
                 total += 1
 
+                
                 if rent_href not in urls:
                     new_urls.update({rent_href: rent_title})
                     print("Success", rent_href, rent_title)
@@ -179,14 +180,6 @@ def crawl_and_store_data(website_url, driver):
     finally:
         # Close the Chrome driver
         driver.quit()
-
-def click_all(driver):
-
-    all_button = driver.find_element(By.XPATH, "/html/body/form/div[2]/div[1]/div[2]/div[1]/ul[1]/li[1]")
-    driver.execute_script("arguments[0].scrollIntoView();", all_button)
-    all_button.click()
-
-    print("All click.")
 
 
 def main():

@@ -150,7 +150,7 @@ def crawl_and_store_data(website_url, driver, first, urls, begin, lock, page):
 
         with lock:
             logger.info(f"Next page : {page}")
-            store_url(urls, "/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_url.json")
+            store_url(urls, "/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_hap_url.json")
             return urls
 
     except Exception as e:
@@ -164,7 +164,7 @@ def main():
 
     # 好房網
 
-    urls = load_urls_from_json("/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_url.json")
+    urls = load_urls_from_json("/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_hap_url.json")
     logger.info(f"Previous number : {len(urls)}")
     timestamp_start = datetime.datetime.now()
     timestamp_start_stf = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')

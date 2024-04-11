@@ -17,6 +17,8 @@ from bs4 import BeautifulSoup
 import boto3
 from botocore.exceptions import NoCredentialsError
 import os
+import re
+import unicodedata
 
 
 # S3 setting
@@ -47,10 +49,10 @@ def simulate_human_interaction(driver):
     # Simulate mouse movements using ActionChains
     actions = ActionChains(driver)
     actions.move_by_offset(random.uniform(
-        1, 5), random.uniform(1, 5)).perform()
+        1, 2), random.uniform(1, 2)).perform()
 
     # Introduce another random delay
-    time.sleep(random.uniform(1, 5))
+    time.sleep(random.uniform(1, 2))
 
 def upload_to_s3(local_file, bucket_name, s3_path):
     s3 = boto3.client('s3', aws_access_key_id=aws_access_key_id,
@@ -119,10 +121,11 @@ def crawl_each_url(website_url, driver):
         # 車位 ：/html/body/form/div[2]/div[2]/section/div[6]/div[2]/table/tbody/tr[4]/td[6]
         # 頂樓加蓋 ：/html/body/form/div[2]/div[2]/section/div[6]/div[2]/table/tbody/tr[5]/td[2]
 
-        # Define XPath expressions
+        # Initialize an empty dictionary to store the extracted information
+        info_dict = {}
         xpaths = {
             "house_code": "/html/body/form/div[2]/div[2]/section/div[1]/div[2]/h2",
-            "rent": "/html/body/form/div[2]/div[2]/section/div[2]/div[2]/ul/li[2]/ul/li[1]/span[2]/span",
+            "price": "/html/body/form/div[2]/div[2]/section/div[2]/div[2]/ul/li[2]/ul/li[1]/span[2]/span",
             "address": "/html/body/form/div[2]/div[2]/section/div[2]/div[2]/ul/li[2]/ul/li[4]/address",
             "size": "/html/body/form/div[2]/div[2]/section/div[2]/div[2]/ul/li[2]/ul/li[5]/span[2]",
             "other_fees": "/html/body/form/div[2]/div[2]/section/div[2]/div[2]/ul/li[2]/ul/li[7]/span[2]",
@@ -130,22 +133,61 @@ def crawl_each_url(website_url, driver):
             "layout": "/html/body/form/div[2]/div[2]/section/div[2]/div[2]/ul/li[2]/ul/li[9]/span[2]",
             "type": "/html/body/form/div[2]/div[2]/section/div[2]/div[2]/ul/li[2]/ul/li[10]/span[2]",
             "move_date": "/html/body/form/div[2]/div[2]/section/div[2]/div[2]/ul/li[2]/ul/li[11]/span[2]",
-            "house_age": "/html/body/form/div[2]/div[2]/section/div[6]/div[2]/table/tbody/tr[1]/td[2]",
-            "min_stay": "/html/body/form/div[2]/div[2]/section/div[6]/div[2]/table/tbody/tr[1]/td[4]",
-            "gender": "/html/body/form/div[2]/div[2]/section/div[6]/div[2]/table/tbody/tr[2]/td[4]",
-            "live_with_landlord": "/html/body/form/div[2]/div[2]/section/div[6]/div[2]/table/tbody/tr[2]/td[6]",
-            "cook": "/html/body/form/div[2]/div[2]/section/div[6]/div[2]/table/tbody/tr[3]/td[2]",
-            "pet": "/html/body/form/div[2]/div[2]/section/div[6]/div[2]/table/tbody/tr[3]/td[4]",
-            "park": "/html/body/form/div[2]/div[2]/section/div[6]/div[2]/table/tbody/tr[4]/td[6]",
-            "roof_top": "/html/body/form/div[2]/div[2]/section/div[6]/div[2]/table/tbody/tr[5]/td[2]"
+            "min_stay": "/html/body/form/div[2]/div[2]/section/div[6]/div[2]/table/tbody/tr[1]/td[4]"
         }
 
-        # Extract text for each XPath expression
+        
         for key, xpath in xpaths.items():
-            element = driver.find_element(
-                    By.XPATH, xpath)
-            text = element.text
-            print(f"{key}: {text}")
+            try:
+                element = driver.find_element(
+                        By.XPATH, xpath)
+                text = element.text
+
+                
+                info_dict.update({key: text})
+
+            except Exception as e:
+                print("element cannot found", website_url)
+                continue
+
+        
+        tbody_element = driver.find_element(By.XPATH, "/html/body/form/div[2]/div[2]/section/div[6]/div[2]/table/tbody")
+        rows = tbody_element.find_elements(By.TAG_NAME, "tr")
+        for id, row in enumerate(rows):
+
+            # Extract the title and value cells (td) in each row
+            title_cells = row.find_elements(By.CLASS_NAME, "title")
+            value_cells = row.find_elements(By.CLASS_NAME, "value")
+
+            if id == 6 or id == 7:
+                value_cells = row.find_elements(By.CLASS_NAME, "values")
+
+                for title_cell, value_cell in zip(title_cells, value_cells):
+                    title = unicodedata.normalize("NFKC", title_cell.text.strip()).replace(' ', '')
+                    span_value = value_cell.find_elements(By.TAG_NAME, "span")
+                    value_list = []
+                    for i in span_value:
+                        if "nohas" not in i.get_attribute("class"):
+                            value_list.append(i.text)
+
+                info_dict[title] = value_list
+                continue
+
+            # Extract and store each key-value pair from the row
+            for title_cell, value_cell in zip(title_cells, value_cells):
+                title = unicodedata.normalize("NFKC", title_cell.text.strip()).replace(' ', '')
+                value = unicodedata.normalize("NFKC", value_cell.text.strip())
+
+                if title == "最短租期":
+                    values_cells = row.find_elements(By.CLASS_NAME, "values")
+
+                    for value_cell in values_cells:
+                        value = unicodedata.normalize("NFKC", value_cell.text.strip())
+                        break
+
+                info_dict[title] = value
+
+        print(info_dict)
         print("--------------------------------------------------------------------------")
 
     except Exception as e:
@@ -155,7 +197,7 @@ def crawl_each_url(website_url, driver):
 def main():
 
     # Testing
-    json_file = "/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_good.json"
+    json_file = "/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_good_url.json"
     rent_urls = load_urls_from_json(json_file)
     driver = webdriver.Chrome(options=options)
 

@@ -124,7 +124,7 @@ def store_url(urls, json_file):
 
 def crawl_and_store_data(website_url, driver, first, urls, begin, page):
 
-    #simulate_human_interaction(driver)
+    simulate_human_interaction(driver)
 
     try:
 

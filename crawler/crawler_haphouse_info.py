@@ -118,7 +118,7 @@ def store_url(infos, json_file):
 
 def crawl_each_url(website_url, rent_info, driver):
 
-    #simulate_human_interaction(driver)
+    simulate_human_interaction(driver)
 
     try:
 

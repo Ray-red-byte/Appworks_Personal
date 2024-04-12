@@ -33,7 +33,7 @@ aws_secret_access_key = os.getenv("S3_SECRET_ACCESS_KEY")
 aws_access_key_id = os.getenv("S3_ACCESS_KEY")
 aws_bucket = os.getenv("S3_BUCKET_NAME")
 s3_good_info_path = 'personal_project/house_detail/good_details/rent_good_info.json'
-s3_good_url_path = 'personal_project/urls/happy_urls/rent_good_url.json'
+s3_good_url_path = 'personal_project/urls/good_urls/rent_good_url.json'
 local_good_info_file = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_good_info.json'
 local_good_url_file = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_good_url.json'
 
@@ -216,6 +216,7 @@ def crawl_each_url(website_url, driver, rent_info):
 
         # Update rent_info
         rent_info.update({website_url: info_dict})
+        print("Success", website_url)
         print("--------------------------------------------------------------------------")
         return False, rent_info
     
@@ -232,7 +233,6 @@ def main():
     try:
         download_from_s3(aws_bucket, s3_good_url_path, local_good_url_file)
     except Exception as e:
-        print(e)
         print("No url file on S3")
         exit()
 
@@ -240,7 +240,6 @@ def main():
     try:
         download_from_s3(aws_bucket, s3_good_info_path, local_good_info_file)
     except Exception as e:
-        print(e)
         print("No info file on S3")
 
 

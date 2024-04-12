@@ -214,7 +214,7 @@ def crawl_each_url(website_url, rent_info, driver):
 
 def main():
 
-    # 樂屋網
+    # ----------------------------------------------------------------樂屋網----------------------------------------------------------------
     # download hap_url from S3
     try:
         download_from_s3(aws_bucket, s3_hap_url_path, local_hap_url_file)
@@ -231,15 +231,18 @@ def main():
         print(e)
         print("No info file on S3")
 
+
     # Download the url and info file
     rent_hap_urls = load_urls_from_json(local_hap_url_file)
     rent_hap_info = load_urls_from_json(local_hap_info_file)
 
 
+    # Log start time
     logger.info(f"Previous number : {len(rent_hap_info)}")
     timestamp_start = datetime.datetime.now()
     timestamp_start_stf = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     logger.info(f"-------------Start Crawler {timestamp_start_stf}-------------")
+
 
     # Create and start threads
     for rent_hap_url, title in rent_hap_urls.items():
@@ -253,11 +256,14 @@ def main():
 
         store_url(rent_info, local_hap_info_file)
 
+
+    # Log end time
     logger.info(f"Total number : {len(rent_hap_info)}")
     timestamp_end = datetime.datetime.now()
     timestamp_end_stf = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     logger.info(f"-------------Time consume {timestamp_end - timestamp_start}-------------")
     logger.info(f"-------------End Crawler {timestamp_end_stf}-------------")
+
 
     # Upload the updated file to S3
     wait_input = input("Do you want to upload the updated info file and delete local to S3? (y/n): ")
@@ -267,6 +273,7 @@ def main():
     wait_input = input("Do you want to upload the updated url file and delete local to S3? (y/n): ")
     if wait_input == 'y':
         upload_to_s3(local_hap_url_file, aws_bucket, s3_hap_url_path)
+        
 
 if __name__ == "__main__":
     main()

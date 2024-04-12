@@ -4,6 +4,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
+from dotenv import load_dotenv
 import datetime
 import time
 import json
@@ -15,10 +16,19 @@ from botocore.exceptions import NoCredentialsError
 import os
 
 
+dotenv_path = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/.env'
+
+# Load environment variables from the specified .env file
+load_dotenv(dotenv_path)
+
+
 # S3 setting
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 aws_secret_access_key = os.getenv("S3_SECRET_ACCESS_KEY")
 aws_access_key_id = os.getenv("S3_ACCESS_KEY")
+aws_bucket = os.getenv("S3_BUCKET_NAME")
+s3_path = 'personal_project/urls/good_urls/rent_good_url.json'
+local_good_url_file = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_good_url.json'
 
 log_filename = 'log_file.log'
 log_file_path = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/log/log_file_good_url.log'
@@ -48,12 +58,17 @@ def simulate_human_interaction(driver):
     # Introduce another random delay
     time.sleep(random.uniform(1, 5))
 
+
 def upload_to_s3(local_file, bucket_name, s3_path):
     s3 = boto3.client('s3', aws_access_key_id=aws_access_key_id,
                       aws_secret_access_key=aws_secret_access_key)
+    
     try:
         s3.upload_file(local_file, bucket_name, s3_path)
         print("Upload Successful")
+
+        os.remove(local_file)
+        print(f"Local file '{local_file}' deleted successfully")
         return True
 
     except FileNotFoundError:
@@ -63,7 +78,23 @@ def upload_to_s3(local_file, bucket_name, s3_path):
     except NoCredentialsError:
         print("Credentials not available")
         return False
+    
+    
+def download_from_s3(bucket_name, s3_path, local_file):
+    s3 = boto3.client('s3', aws_access_key_id=aws_access_key_id,
+                      aws_secret_access_key=aws_secret_access_key)
+    try:
+        s3.download_file(bucket_name, s3_path, local_file)
+        print("Download Successful")
+        return True
 
+    except FileNotFoundError:
+        print("The file was not found")
+        return False
+
+    except NoCredentialsError:
+        print("Credentials not available")
+        return False
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -185,12 +216,24 @@ def crawl_and_store_data(website_url, driver):
 def main():
 
     # 好房網
+
+    # First download the file from S3
+    try:
+        download_from_s3(aws_bucket, s3_path, local_good_url_file)
+    except Exception as e:
+        print("No file on S3")
+    '''
     driver = webdriver.Chrome(options=options)
     
     rent_url = "https://rent.housefun.com.tw/region/%E5%8F%B0%E5%8C%97%E5%B8%82/?cid=0000&purpid=1,2,3,4"
     
     crawl_and_store_data(rent_url, driver)
-
+    
+    # Upload the updated file to S3
+    wait_input = input("Do you want to upload the updated file and delete local to S3? (y/n): ")
+    if wait_input == 'y':
+        upload_to_s3(local_good_url_file, aws_bucket, s3_path)
+    '''
 
 if __name__ == "__main__":
     main()

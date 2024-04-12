@@ -5,6 +5,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from concurrent.futures import ThreadPoolExecutor
+from dotenv import load_dotenv
 import datetime
 import base64
 import time
@@ -18,19 +19,27 @@ import boto3
 from botocore.exceptions import NoCredentialsError
 import os
 
+dotenv_path = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/.env'
+
+# Load environment variables from the specified .env file
+load_dotenv(dotenv_path)
 
 # S3 setting
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 aws_secret_access_key = os.getenv("S3_SECRET_ACCESS_KEY")
 aws_access_key_id = os.getenv("S3_ACCESS_KEY")
+aws_bucket = os.getenv("S3_BUCKET_NAME")
+s3_hap_info_path = 'personal_project/urls/happy_urls/rent_hap_info.json'
+s3_hap_url_path = 'personal_project/urls/happy_urls/rent_hap_url.json'
+local_hap_info_file = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_hap_info.json'
+local_hap_url_file = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_hap_url.json'
+
 
 log_filename = 'log_file.log'
 log_file_path = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/log/log_file_good_info.log'
 logger = logging.getLogger(__name__)
 
 logging.basicConfig(filename=log_file_path, level=logging.INFO)
-
-
 
 options = Options()
 options.add_argument('--headless')  # run in headless mode.
@@ -67,6 +76,22 @@ def upload_to_s3(local_file, bucket_name, s3_path):
     except NoCredentialsError:
         print("Credentials not available")
         return False
+    
+def download_from_s3(bucket_name, s3_path, local_file):
+    s3 = boto3.client('s3', aws_access_key_id=aws_access_key_id,
+                      aws_secret_access_key=aws_secret_access_key)
+    try:
+        s3.download_file(bucket_name, s3_path, local_file)
+        print("Download Successful")
+        return True
+
+    except FileNotFoundError:
+        print("The file was not found")
+        return False
+
+    except NoCredentialsError:
+        print("Credentials not available")
+        return False
 
 
 def allowed_file(filename):
@@ -84,16 +109,16 @@ def load_urls_from_json(json_file):
         return {}
 
 
-def store_url(urls, json_file):
+def store_url(infos, json_file):
 
     with open(json_file, 'w') as f:
-        json.dump(urls, f, ensure_ascii=False)
+        json.dump(infos, f, ensure_ascii=False)
     print(f"URL stored successfully.")
 
 
-def crawl_each_url(website_url, driver):
+def crawl_each_url(website_url, rent_info, driver):
 
-    simulate_human_interaction(driver)
+    #simulate_human_interaction(driver)
 
     try:
 
@@ -142,6 +167,11 @@ def crawl_each_url(website_url, driver):
                 print("element cannot found")
                 continue
 
+        # Check if info have been extracted
+        if website_url in rent_info:
+            print("Already exists", website_url)
+            return True, rent_info
+
         parent_element = driver.find_element(By.CLASS_NAME, "block__info-sub")
         
 
@@ -170,42 +200,73 @@ def crawl_each_url(website_url, driver):
                     else:
                         info_dict["坪數"] = content_text
             
-            # Update the main dictionary with the section's information
-            #info_dict[section_title] = section_info
-
-
-
-
-
-        print(info_dict)
+        # Update rent_info
+        rent_info.update({website_url: info_dict})
+        
         print("--------------------------------------------------------------------------")
+        return False, rent_info
 
     except Exception as e:
         print(e)
         print("Cannot crawl the website", website_url)
+        return False, rent_info
 
 
 def main():
 
-    # Testing
-    json_file = "/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_hap_url.json"
-    rent_urls = load_urls_from_json(json_file)
-    driver = webdriver.Chrome(options=options)
+    # 樂屋網
+    # download hap_url from S3
+    try:
+        download_from_s3(aws_bucket, s3_hap_url_path, local_hap_url_file)
+    except Exception as e:
+        print(e)
+        print("No url file on S3")
+        exit()
 
-    # Testing
-    #crawl_each_url("https://www.rakuya.com.tw/rent_item/info?ehid=01f0df259011855", driver)
 
-    threads = []
-    
+    # download hap_info from S3
+    try:
+        download_from_s3(aws_bucket, s3_hap_info_path, local_hap_info_file)
+    except Exception as e:
+        print(e)
+        print("No info file on S3")
+
+    # Download the url and info file
+    rent_hap_urls = load_urls_from_json(local_hap_url_file)
+    rent_hap_info = load_urls_from_json(local_hap_info_file)
+
+
+    logger.info(f"Previous number : {len(rent_hap_info)}")
+    timestamp_start = datetime.datetime.now()
+    timestamp_start_stf = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    logger.info(f"-------------Start Crawler {timestamp_start_stf}-------------")
+
     # Create and start threads
-    for rent_url, title in rent_urls.items():
+    for rent_hap_url, title in rent_hap_urls.items():
         driver = webdriver.Chrome(options=options)
-        crawl_each_url(rent_url, driver)
-    
-    
+        stop, rent_info = crawl_each_url(rent_hap_url, rent_hap_info, driver)
+        driver.quit()
 
+        if stop:
+            print("Stop crawling, already exists.")
+            break
 
+        store_url(rent_info, local_hap_info_file)
 
+    logger.info(f"Total number : {len(rent_hap_info)}")
+    timestamp_end = datetime.datetime.now()
+    timestamp_end_stf = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    logger.info(f"-------------Time consume {timestamp_end - timestamp_start}-------------")
+    logger.info(f"-------------End Crawler {timestamp_end_stf}-------------")
+
+    # Upload the updated file to S3
+    wait_input = input("Do you want to upload the updated info file and delete local to S3? (y/n): ")
+    if wait_input == 'y':
+        upload_to_s3(local_hap_info_file, aws_bucket, s3_hap_info_path)
+
+    wait_input = input("Do you want to upload the updated url file and delete local to S3? (y/n): ")
+    if wait_input == 'y':
+        upload_to_s3(local_hap_url_file, aws_bucket, s3_hap_url_path)
 
 if __name__ == "__main__":
     main()

@@ -124,14 +124,14 @@ def store_url(urls, json_file):
 
 def crawl_and_store_data(website_url, driver, first, urls, begin, page):
 
-    simulate_human_interaction(driver)
+    
 
     try:
 
-        time.sleep(1)
+        time.sleep(2)
         driver.get(website_url)
-        time.sleep(1)  # Adjust sleep time as needed for the page to load
-
+        time.sleep(3)  # Adjust sleep time as needed for the page to load
+        simulate_human_interaction(driver)
 
         count = 1
         next_page = 1
@@ -212,7 +212,6 @@ def get_total_page(driver, url):
 def main():
 
     # 樂屋網
-
     # First download the file from S3
     try:
         download_from_s3(aws_bucket, s3_path, local_happy_url_file)

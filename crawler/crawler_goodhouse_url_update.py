@@ -120,13 +120,15 @@ def store_url(urls, json_file):
 
 def crawl_and_store_data(website_url, driver):
 
-    #simulate_human_interaction(driver)
+    
 
     try:
 
         time.sleep(5)
         driver.get(website_url)
         time.sleep(5)  # Adjust sleep time as needed for the page to load
+
+        simulate_human_interaction(driver)
 
         # Click on the "By Post" option
         click_by_post(driver)

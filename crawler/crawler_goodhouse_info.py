@@ -64,7 +64,7 @@ def simulate_human_interaction(driver):
         1, 2), random.uniform(1, 2)).perform()
 
     # Introduce another random delay
-    time.sleep(random.uniform(1, 2))
+    time.sleep(random.uniform(1, 5))
 
 def upload_to_s3(local_file, bucket_name, s3_path):
     s3 = boto3.client('s3', aws_access_key_id=aws_access_key_id,
@@ -99,7 +99,7 @@ def allowed_file(filename):
 
 
 
-def load_urls_from_json(json_file):
+def load_from_json(json_file):
     try:
         with open(json_file, 'r') as f:
             return json.load(f)
@@ -115,15 +115,18 @@ def store_url(urls, json_file):
     print(f"URL stored successfully.")
 
 
+
 def crawl_each_url(website_url, driver, rent_info):
 
-    simulate_human_interaction(driver)
+    
 
     try:
 
-        time.sleep(5)
+        time.sleep(2)
         driver.get(website_url)
-        time.sleep(5)  # Adjust sleep time as needed for the page to load
+        time.sleep(3)  # Adjust sleep time as needed for the page to load
+
+        simulate_human_interaction(driver)
 
         # 房屋編號 ：/html/body/form/div[2]/div[2]/section/div[1]/div[2]/h2
         # 租金：/html/body/form/div[2]/div[2]/section/div[2]/div[2]/ul/li[2]/ul/li[1]/span[2]/span
@@ -143,7 +146,7 @@ def crawl_each_url(website_url, driver, rent_info):
         # 車位 ：/html/body/form/div[2]/div[2]/section/div[6]/div[2]/table/tbody/tr[4]/td[6]
         # 頂樓加蓋 ：/html/body/form/div[2]/div[2]/section/div[6]/div[2]/table/tbody/tr[5]/td[2]
 
-        # Initialize an empty dictionary to store the extracted information
+        
         info_dict = {}
         xpaths = {
             "house_code": "/html/body/form/div[2]/div[2]/section/div[1]/div[2]/h2",
@@ -171,6 +174,11 @@ def crawl_each_url(website_url, driver, rent_info):
             except Exception as e:
                 print("element cannot found", website_url)
                 continue
+
+        # img url
+        img_url = driver.find_element(By.XPATH, "/html/body/form/div[2]/div[2]/section/div[2]/div[3]/ul/li[1]/figure/img").get_attribute("src")
+        info_dict.update({"img_url": img_url})
+
         
         # Check if info have been extracted
         if website_url in rent_info:
@@ -213,9 +221,12 @@ def crawl_each_url(website_url, driver, rent_info):
                         break
 
                 info_dict[title] = value
+        
 
         # Update rent_info
         rent_info.update({website_url: info_dict})
+
+        # Success ! 
         print("Success", website_url)
         print("--------------------------------------------------------------------------")
         return False, rent_info
@@ -228,7 +239,6 @@ def crawl_each_url(website_url, driver, rent_info):
 
 def main():
 
-    # Testing
     # download good_url from S3
     try:
         download_from_s3(aws_bucket, s3_good_url_path, local_good_url_file)
@@ -244,9 +254,8 @@ def main():
 
 
     # Download the url and info file
-    rent_good_urls = load_urls_from_json(local_good_url_file)
-    rent_good_info = load_urls_from_json(local_good_info_file)
-
+    rent_good_urls = load_from_json(local_good_url_file)
+    rent_good_info = load_from_json(local_good_info_file)
 
     logger.info(f"Previous number : {len(rent_good_info)}")
     timestamp_start = datetime.datetime.now()
@@ -254,9 +263,17 @@ def main():
     logger.info(f"-------------Start Crawler {timestamp_start_stf}-------------")
 
 
-
     # Create and start threads
+    count = 1
     for rent_good_url, title in rent_good_urls.items():
+        
+        '''
+        if I need to re crawl from pre state
+        if count < 671:
+            count += 1
+            continue
+        '''
+
         driver = webdriver.Chrome(options=options)
         stop, rent_info = crawl_each_url(rent_good_url, driver, rent_good_info)
         driver.quit()
@@ -267,11 +284,13 @@ def main():
 
         store_url(rent_info, local_good_info_file)
     
+    
     logger.info(f"Total number : {len(rent_good_info)}")
     timestamp_end = datetime.datetime.now()
     timestamp_end_stf = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     logger.info(f"-------------Time consume {timestamp_end - timestamp_start}-------------")
     logger.info(f"-------------End Crawler {timestamp_end_stf}-------------")
+    
 
     # Upload the updated file to S3
     wait_input = input("Do you want to upload the updated info file and delete local to S3? (y/n): ")
@@ -281,8 +300,6 @@ def main():
     wait_input = input("Do you want to upload the updated url file and delete local to S3? (y/n): ")
     if wait_input == 'y':
         upload_to_s3(local_good_url_file, aws_bucket, s3_good_url_path)
-
-
 
 
 if __name__ == "__main__":

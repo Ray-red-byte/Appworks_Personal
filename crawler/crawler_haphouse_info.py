@@ -61,6 +61,7 @@ def simulate_human_interaction(driver):
     # Introduce another random delay
     time.sleep(random.uniform(1, 2))
 
+
 def upload_to_s3(local_file, bucket_name, s3_path):
     s3 = boto3.client('s3', aws_access_key_id=aws_access_key_id,
                       aws_secret_access_key=aws_secret_access_key)
@@ -76,6 +77,7 @@ def upload_to_s3(local_file, bucket_name, s3_path):
     except NoCredentialsError:
         print("Credentials not available")
         return False
+    
     
 def download_from_s3(bucket_name, s3_path, local_file):
     s3 = boto3.client('s3', aws_access_key_id=aws_access_key_id,
@@ -100,7 +102,7 @@ def allowed_file(filename):
 
 
 
-def load_urls_from_json(json_file):
+def load_from_json(json_file):
     try:
         with open(json_file, 'r') as f:
             return json.load(f)
@@ -118,13 +120,13 @@ def store_url(infos, json_file):
 
 def crawl_each_url(website_url, rent_info, driver):
 
-    simulate_human_interaction(driver)
-
     try:
 
-        time.sleep(1)
+        time.sleep(2)
         driver.get(website_url)
-        time.sleep(1)  # Adjust sleep time as needed for the page to load
+        time.sleep(3)  # Adjust sleep time as needed for the page to load
+
+        simulate_human_interaction(driver)
 
         # 房屋編號 ：/html/body/div[8]/div[1]/div[2]/h2/span[2]
         # 租金：/html/body/div[8]/div[2]/div[2]/div[1]/div/span
@@ -233,8 +235,8 @@ def main():
 
 
     # Download the url and info file
-    rent_hap_urls = load_urls_from_json(local_hap_url_file)
-    rent_hap_info = load_urls_from_json(local_hap_info_file)
+    rent_hap_urls = load_from_json(local_hap_url_file)
+    rent_hap_info = load_from_json(local_hap_info_file)
 
 
     # Log start time

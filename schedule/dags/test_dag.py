@@ -16,7 +16,7 @@ with DAG(
     dag_id='test',
     description='Extract data from website',
     start_date=pendulum.datetime(2024, 4, 11, tz="UTC"),
-    schedule_interval=timedelta(minutes=30),
+    schedule_interval=timedelta(minutes=120),
 ) as dag:
     
     run_good_house_url_task = BashOperator(

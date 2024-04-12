@@ -3,6 +3,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.by import By
 from dotenv import load_dotenv
 import datetime
@@ -119,7 +120,11 @@ def store_url(urls, json_file):
 
 def crawl_and_store_data(website_url, driver):
 
-    simulate_human_interaction(driver)
+    #simulate_human_interaction(driver)
+
+    # Click on the "By Post" option
+    
+    
 
     try:
 
@@ -127,6 +132,7 @@ def crawl_and_store_data(website_url, driver):
         driver.get(website_url)
         time.sleep(5)  # Adjust sleep time as needed for the page to load
 
+        click_by_post(driver)
 
         count = 1
         next_page = 1
@@ -213,6 +219,28 @@ def crawl_and_store_data(website_url, driver):
         driver.quit()
 
 
+def click_by_post(driver):
+    print(driver.current_url)
+    try:
+        select_element = driver.find_element(
+                        By.XPATH, f"/html/body/form/div[2]/div[1]/div[2]/div[2]/div/div[2]/div[2]/select")
+        select_element.click()
+
+        # Initialize Select object
+        select = Select(select_element)
+
+        # Choose the desired option by value
+        option_value = "ByPost"
+        select.select_by_value(option_value)
+        
+
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "/html/body/form/div[2]/div[1]/div[2]/div[2]/div/div[3]/div[1]/article[1]/div[1]/h3/a")))
+
+        print("Click on the 'By Post' option.")
+    except Exception as e:
+        print(f"Error clicking on the 'By Post' option: {type(e).__name__} - {e}")
+
+
 def main():
 
     # 好房網
@@ -222,7 +250,7 @@ def main():
         download_from_s3(aws_bucket, s3_path, local_good_url_file)
     except Exception as e:
         print("No file on S3")
-    '''
+    
     driver = webdriver.Chrome(options=options)
     
     rent_url = "https://rent.housefun.com.tw/region/%E5%8F%B0%E5%8C%97%E5%B8%82/?cid=0000&purpid=1,2,3,4"
@@ -233,7 +261,7 @@ def main():
     wait_input = input("Do you want to upload the updated file and delete local to S3? (y/n): ")
     if wait_input == 'y':
         upload_to_s3(local_good_url_file, aws_bucket, s3_path)
-    '''
+    
 
 if __name__ == "__main__":
     main()

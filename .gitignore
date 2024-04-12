@@ -1,3 +1,7 @@
 data/
 log/
 .env
+schedule/logs/
+schedule/plugins/
+schedule/.env
+schedule/config/

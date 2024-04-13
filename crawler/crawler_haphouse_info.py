@@ -59,7 +59,7 @@ def simulate_human_interaction(driver):
         1, 2), random.uniform(1, 2)).perform()
 
     # Introduce another random delay
-    time.sleep(random.uniform(1, 2))
+    time.sleep(random.uniform(1, 5))
 
 
 def upload_to_s3(local_file, bucket_name, s3_path):
@@ -122,32 +122,12 @@ def crawl_each_url(website_url, rent_info, driver):
 
     try:
 
-        time.sleep(2)
+        time.sleep(random.uniform(1, 5))
         driver.get(website_url)
-        time.sleep(3)  # Adjust sleep time as needed for the page to load
+        time.sleep(random.uniform(1, 5))  # Adjust sleep time as needed for the page to load
 
         simulate_human_interaction(driver)
 
-        # 房屋編號 ：/html/body/div[8]/div[1]/div[2]/h2/span[2]
-        # 租金：/html/body/div[8]/div[2]/div[2]/div[1]/div/span
-        # 地址：/html/body/div[8]/div[1]/div[2]/h1
-        # 評數：/html/body/div[8]/div[2]/div[2]/div[1]/ul/li[2]
-        # 其他費用：
-        # 樓層 ：/html/body/div[8]/div[2]/div[1]/div[2]/div[1]/ul/li[3]/span[2]
-        # 格局 ：/html/body/div[8]/div[2]/div[2]/div[1]/ul/li[1]
-        # 型太 : /html/body/div[8]/div[2]/div[1]/div[2]/div[1]/ul/li[1]/span[2]
-        # 嵌入日期 ：
-        # 屋齡 ： /html/body/div[8]/div[2]/div[1]/div[2]/div[1]/ul/li[5]/span[2]
-        # 最短租期 ：/html/body/div[8]/div[2]/div[1]/div[2]/div[3]/ul/li[1]/span[2]
-        # 性別 ：/html/body/div[8]/div[2]/div[1]/div[2]/div[3]/ul/li[4]/span[2]
-        # 與房東同住 ： /html/body/div[8]/div[2]/div[1]/div[2]/div[3]/ul/li[7]/span[2]
-        # 開火 ：/html/body/div[8]/div[2]/div[1]/div[2]/div[3]/ul/li[2]/span[2]
-        # 寵物 ：/html/body/div[8]/div[2]/div[1]/div[2]/div[3]/ul/li[3]/span[2]
-        # 車位 ：/html/body/div[8]/div[2]/div[1]/div[2]/div[4]/ul/li/span[2]
-        # 頂樓加蓋 ：
-        
-        # "roof_top": "No define"
-        # "other_fees": "No define",
 
         # Define XPath expressions
         xpaths = {
@@ -169,10 +149,14 @@ def crawl_each_url(website_url, rent_info, driver):
                 print("element cannot found")
                 continue
 
+        # img url
+        img_url = driver.find_element(By.XPATH, "/html/body/div[8]/div[2]/div[1]/div[1]/div/div[1]/div/div/div[1]/img").get_attribute("src")
+        info_dict.update({"img_url": img_url})
+
         # Check if info have been extracted
         if website_url in rent_info:
             print("Already exists", website_url)
-            return True, rent_info
+            return True, rent_info, "success"
 
         parent_element = driver.find_element(By.CLASS_NAME, "block__info-sub")
         
@@ -206,16 +190,16 @@ def crawl_each_url(website_url, rent_info, driver):
         rent_info.update({website_url: info_dict})
         
         print("--------------------------------------------------------------------------")
-        return False, rent_info
+        return False, rent_info, "success"
 
     except Exception as e:
         print(e)
         print("Cannot crawl the website", website_url)
-        return False, rent_info
+        return False, rent_info, "cannot crawl"
 
 
 def main():
-
+    
     # ----------------------------------------------------------------樂屋網----------------------------------------------------------------
     # download hap_url from S3
     try:
@@ -243,18 +227,28 @@ def main():
     logger.info(f"Previous number : {len(rent_hap_info)}")
     timestamp_start = datetime.datetime.now()
     timestamp_start_stf = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    logger.info(f"-------------Start Crawler {timestamp_start_stf}-------------")
+    logger.info(f"---------- ---Start Crawler {timestamp_start_stf}-------------")
 
 
     # Create and start threads
+    server_error = 0
     for rent_hap_url, title in rent_hap_urls.items():
+
+        if server_error > 5:
+            print("Server error more than 5 times, stop crawling. Sorry")
+            break
+
         driver = webdriver.Chrome(options=options)
-        stop, rent_info = crawl_each_url(rent_hap_url, rent_hap_info, driver)
+        stop, rent_info, response = crawl_each_url(rent_hap_url, rent_hap_info, driver)
         driver.quit()
 
         if stop:
             print("Stop crawling, already exists.")
             break
+
+        if response == "cannot crawl":
+            server_error += 1
+            continue
 
         store_url(rent_info, local_hap_info_file)
 
@@ -265,16 +259,11 @@ def main():
     timestamp_end_stf = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     logger.info(f"-------------Time consume {timestamp_end - timestamp_start}-------------")
     logger.info(f"-------------End Crawler {timestamp_end_stf}-------------")
-
+    
 
     # Upload the updated file to S3
-    wait_input = input("Do you want to upload the updated info file and delete local to S3? (y/n): ")
-    if wait_input == 'y':
-        upload_to_s3(local_hap_info_file, aws_bucket, s3_hap_info_path)
-
-    wait_input = input("Do you want to upload the updated url file and delete local to S3? (y/n): ")
-    if wait_input == 'y':
-        upload_to_s3(local_hap_url_file, aws_bucket, s3_hap_url_path)
+    upload_to_s3(local_hap_info_file, aws_bucket, s3_hap_info_path)
+    upload_to_s3(local_hap_url_file, aws_bucket, s3_hap_url_path)
         
 
 if __name__ == "__main__":

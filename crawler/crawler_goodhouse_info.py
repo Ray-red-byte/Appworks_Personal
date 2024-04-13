@@ -183,7 +183,7 @@ def crawl_each_url(website_url, driver, rent_info):
         # Check if info have been extracted
         if website_url in rent_info:
             print("Already exists", website_url)
-            return True, rent_info
+            return True, rent_info, "already exists"
 
         
         tbody_element = driver.find_element(By.XPATH, "/html/body/form/div[2]/div[2]/section/div[6]/div[2]/table/tbody")
@@ -229,16 +229,16 @@ def crawl_each_url(website_url, driver, rent_info):
         # Success ! 
         print("Success", website_url)
         print("--------------------------------------------------------------------------")
-        return False, rent_info
+        return False, rent_info, "success"
     
     except Exception as e:
         print(e)
         print("Cannot crawl the website", website_url)
-        return False, rent_info
+        return False, rent_info, "cannot crawl"
 
 
 def main():
-
+    
     # download good_url from S3
     try:
         download_from_s3(aws_bucket, s3_good_url_path, local_good_url_file)
@@ -265,23 +265,26 @@ def main():
 
     # Create and start threads
     count = 1
+    server_error = 0
     for rent_good_url, title in rent_good_urls.items():
         
-        '''
-        if I need to re crawl from pre state
-        if count < 671:
-            count += 1
-            continue
-        '''
+        if server_error > 5:
+            print("Server error more than 5 times, stop crawling. Sorry")
+            break
 
         driver = webdriver.Chrome(options=options)
-        stop, rent_info = crawl_each_url(rent_good_url, driver, rent_good_info)
+        stop, rent_info, response = crawl_each_url(rent_good_url, driver, rent_good_info)
         driver.quit()
+
+        if response == "cannot crawl":
+            server_error += 1
+            continue
 
         if stop:
             print("Stop crawling, already exists.")
             break
 
+        server_error = 0
         store_url(rent_info, local_good_info_file)
     
     
@@ -293,13 +296,8 @@ def main():
     
 
     # Upload the updated file to S3
-    wait_input = input("Do you want to upload the updated info file and delete local to S3? (y/n): ")
-    if wait_input == 'y':
-        upload_to_s3(local_good_info_file, aws_bucket, s3_good_info_path)
-
-    wait_input = input("Do you want to upload the updated url file and delete local to S3? (y/n): ")
-    if wait_input == 'y':
-        upload_to_s3(local_good_url_file, aws_bucket, s3_good_url_path)
+    upload_to_s3(local_good_info_file, aws_bucket, s3_good_info_path)
+    upload_to_s3(local_good_url_file, aws_bucket, s3_good_url_path)
 
 
 if __name__ == "__main__":

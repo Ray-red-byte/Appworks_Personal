@@ -13,6 +13,7 @@ import logging
 import boto3
 from botocore.exceptions import NoCredentialsError
 import os
+from bs4 import BeautifulSoup
 
 
 # S3 setting
@@ -89,108 +90,22 @@ def store_url(urls, json_file):
 
 def crawl_and_store_data(website_url, driver):
 
-    simulate_human_interaction(driver)
+    
 
     try:
 
         time.sleep(5)
         driver.get(website_url)
         time.sleep(5)  # Adjust sleep time as needed for the page to load
-
+        simulate_human_interaction(driver)
         print(driver.current_url)
 
         
+        
         #//*[@id="vue-container"]/section/ul[1]/li[2]/div[2]/h3/a
         rent_href = driver.find_element(
-                        By.XPATH, f'/html/body/div[8]/div/div[1]/div[4]/div/div[1]/div[2]/div/h6/a').get_attribute('href')
+                        By.XPATH, f'/html/body/div[1]/div/div/div[1]/div[4]/div[2]/div[1]/div[1]/div[1]/div[2]/a')
         print(rent_href)
-
-        '''
-        count = 1
-        next_page = 1
-        total = 0
-        json_file = "/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_url.json"
-        urls = load_urls_from_json(json_file)
-        logger.info(f"Previous number : {len(urls)}")
-        timestamp_start = datetime.datetime.now()
-        timestamp_start_stf = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        logger.info(f"-------------Start Crawler {timestamp_start_stf}-------------")
-        new_urls = {}
-        condition = True
-
-        while condition:
-
-            try:
-                rent_href = driver.find_element(
-                    By.XPATH, f'//*[@id="rent-list-app"]/div/div[3]/div[1]/section[3]/div/section[{count}]/a').get_attribute('href')
-
-                rent_title = driver.find_element(
-                    By.XPATH, f'//*[@id="rent-list-app"]/div/div[3]/div[1]/section[3]/div/section[{count}]/a/div[2]/div[1]/span').text
-                if rent_title is None:
-                    rent_title = driver.find_element(
-                        By.XPATH, f'//*[@id="rent-list-app"]/div/div[3]/div[1]/section[3]/div/section[{count}]/a/div[2]/div[1]/span[1]').text
-
-                count += 1
-                total += 1
-
-                if rent_href not in urls:
-                    new_urls.update({rent_href: rent_title})
-                    print("Success", rent_href, rent_title)
-                else:
-                    print("Already exists", rent_href, rent_title)
-                    break
-
-            except Exception as e:
-
-                logger.info(f"Next page : {next_page}")
-
-                next_page += 1
-                try:
-                    for i in range(6, 16):
-                        try:
-                            next = driver.find_element(
-                                By.XPATH, f'//*[@id="rent-list-app"]/div/div[3]/div[1]/section[4]/div/a[{i}]')
-                            if next.text == "下一頁":
-
-                                # Verify if the class attribute contains "last"
-                                if "last" in next.get_attribute("class").split():
-                                    print("No more pages available. Exiting loop.")
-                                    condition = False
-                                    break
-                                else:
-                                    print("Next page")
-
-                                next.click()
-
-                                # Wait for the page to refresh
-                                WebDriverWait(driver, 10).until(EC.staleness_of(next))
-                                print("Page refreshed.")
-                                break
-
-                        except Exception as e:
-                            continue
-
-                    time.sleep(1)
-                except Exception as e:
-                    print(e)
-                    print("No more pages available. Exiting loop.")
-                    break
-
-                count = 1
-
-        if len(urls) == 0:
-            updated_urls = new_urls
-        else:
-            updated_urls = {**new_urls, **urls}
-
-        logger.info(f"Total number : {len(updated_urls)}")
-        timestamp_end = datetime.datetime.now()
-        timestamp_end_stf = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        logger.info(f"-------------Time consume {timestamp_end - timestamp_start}-------------")
-        logger.info(f"-------------End Crawler {timestamp_end_stf}-------------")
-
-        store_url(updated_urls, json_file)
-    '''
 
     except Exception as e:
         print(f"Error retrieving data: {type(e).__name__} - {e}")
@@ -207,7 +122,7 @@ def main():
     
 
     driver = webdriver.Chrome(options=options)
-    rent_url = "https://www.rakuya.com.tw/search/rent_search/index?display=list&con=eJyrVkrOLKlUsoo2iNVRyk_KysxLUbJSClKqBQBpAQfO&tab=def&sort=21&ds=&upd=1"
+    rent_url = "https://www.dd-room.com/search?category=house&city=%E8%87%BA%E5%8C%97%E5%B8%82&order=recommend&sort=desc&page=1&per_page=20"
     
     crawl_and_store_data(rent_url, driver)
 

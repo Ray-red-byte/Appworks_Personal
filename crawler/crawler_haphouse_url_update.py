@@ -71,8 +71,6 @@ def upload_to_s3(local_file, bucket_name, s3_path):
         s3.upload_file(local_file, bucket_name, s3_path)
         print("Upload Successful")
 
-        os.remove(local_file)
-        print(f"Local file '{local_file}' deleted successfully")
         return True
 
     except FileNotFoundError:
@@ -124,13 +122,21 @@ def store_url(urls, json_file):
 
 def crawl_and_store_data(website_url, driver, first, urls, begin, page):
 
-    
+    '''
+        1. Get in 樂屋網 website
+        2. Get total pages to limit the loop
+        3. Iterate each page to get the urls, use for loop cause I know the page rules
+        4. if urls exist in json file ,         break and stop the whole program
+        5. Change page
+        6. if no more pages available ,         break and stop the whole program
+        6. if encounter problem ,               break and stop the whole program
+    '''
 
     try:
 
-        time.sleep(2)
+        time.sleep(random.uniform(1, 5))
         driver.get(website_url)
-        time.sleep(3)  # Adjust sleep time as needed for the page to load
+        time.sleep(random.uniform(1, 5))  # Adjust sleep time as needed for the page to load
         simulate_human_interaction(driver)
 
         count = 1
@@ -149,14 +155,15 @@ def crawl_and_store_data(website_url, driver, first, urls, begin, page):
                 if count > 12:
                     break
 
-            try:    
-                xpath = f"/html/body/div[8]/div/div[1]/div[4]/div/div[{count}]/div[2]/div/h6/a"
-                if first:
+            try:        
+                try:     
                     xpath = f'/html/body/div[8]/div/div[1]/div[4]/div[2]/div[{count}]/div[2]/div/h6/a'
-                
-                rent_href = driver.find_element(By.XPATH, xpath).get_attribute('href')
-
-                rent_title = driver.find_element(By.XPATH, xpath).text
+                    rent_href = driver.find_element(By.XPATH, xpath).get_attribute('href')
+                    rent_title = driver.find_element(By.XPATH, xpath).text
+                except:
+                    xpath = f"/html/body/div[8]/div/div[1]/div[4]/div/div[{count}]/div[2]/div/h6/a"
+                    rent_href = driver.find_element(By.XPATH, xpath).get_attribute('href')
+                    rent_title = driver.find_element(By.XPATH, xpath).text
                 
                 count += 1
                 total += 1
@@ -166,7 +173,7 @@ def crawl_and_store_data(website_url, driver, first, urls, begin, page):
                     print("Success", rent_href, rent_title)
                 else:
                     print("Already exists", rent_href, rent_title)
-                    break
+                    return True, urls
 
             except Exception as e:
                 print("No element found")
@@ -182,10 +189,12 @@ def crawl_and_store_data(website_url, driver, first, urls, begin, page):
 
         logger.info(f"Next page : {page}")
         store_url(urls, "/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_hap_url.json")
-        return urls
+        return True, urls
 
     except Exception as e:
         print(f"Error retrieving data: {type(e).__name__} - {e}")
+        return True, urls
+    
     finally:
         # Close the Chrome driver
         driver.quit()
@@ -241,10 +250,12 @@ def main():
 
             first = i == 1
 
-            urls = crawl_and_store_data(rent_url, driver, first, urls, begin, i)
+            stop, urls = crawl_and_store_data(rent_url, driver, first, urls, begin, i)
             driver.quit()
 
-        
+            if stop:
+                print("Stop crawling")
+                break
 
 
     logger.info(f"Total number : {len(urls)}")
@@ -256,9 +267,7 @@ def main():
 
 
     # Upload the updated file to S3
-    wait_input = input("Do you want to upload the updated file and delete local to S3? (y/n): ")
-    if wait_input == 'y':
-        upload_to_s3(local_happy_url_file, aws_bucket, s3_path)
+    upload_to_s3(local_happy_url_file, aws_bucket, s3_path)
 
 if __name__ == "__main__":
     main()

@@ -128,24 +128,6 @@ def crawl_each_url(website_url, driver, rent_info):
 
         simulate_human_interaction(driver)
 
-        # 房屋編號 ：/html/body/form/div[2]/div[2]/section/div[1]/div[2]/h2
-        # 租金：/html/body/form/div[2]/div[2]/section/div[2]/div[2]/ul/li[2]/ul/li[1]/span[2]/span
-        # 地址：/html/body/form/div[2]/div[2]/section/div[2]/div[2]/ul/li[2]/ul/li[4]/address/text()
-        # 評數：/html/body/form/div[2]/div[2]/section/div[2]/div[2]/ul/li[2]/ul/li[5]/span[2]
-        # 其他費用：/html/body/form/div[2]/div[2]/section/div[2]/div[2]/ul/li[2]/ul/li[7]/span[2]
-        # 樓層 ：/html/body/form/div[2]/div[2]/section/div[2]/div[2]/ul/li[2]/ul/li[8]/span[2]
-        # 格局 ：/html/body/form/div[2]/div[2]/section/div[2]/div[2]/ul/li[2]/ul/li[9]/span[2]
-        # 型太 : /html/body/form/div[2]/div[2]/section/div[2]/div[2]/ul/li[2]/ul/li[10]/span[2]
-        # 嵌入日期 ：/html/body/form/div[2]/div[2]/section/div[2]/div[2]/ul/li[2]/ul/li[11]/span[2]
-        # 屋齡 ：/html/body/form/div[2]/div[2]/section/div[6]/div[2]/table/tbody/tr[1]/td[2]
-        # 最短租期 ：/html/body/form/div[2]/div[2]/section/div[6]/div[2]/table/tbody/tr[1]/td[4]
-        # 性別 ：/html/body/form/div[2]/div[2]/section/div[6]/div[2]/table/tbody/tr[2]/td[4]
-        # 與房東同住 ：/html/body/form/div[2]/div[2]/section/div[6]/div[2]/table/tbody/tr[2]/td[6]
-        # 開火 ：/html/body/form/div[2]/div[2]/section/div[6]/div[2]/table/tbody/tr[3]/td[2]
-        # 寵物 ：/html/body/form/div[2]/div[2]/section/div[6]/div[2]/table/tbody/tr[3]/td[4]
-        # 車位 ：/html/body/form/div[2]/div[2]/section/div[6]/div[2]/table/tbody/tr[4]/td[6]
-        # 頂樓加蓋 ：/html/body/form/div[2]/div[2]/section/div[6]/div[2]/table/tbody/tr[5]/td[2]
-
         
         info_dict = {}
         xpaths = {
@@ -224,7 +206,9 @@ def crawl_each_url(website_url, driver, rent_info):
         
 
         # Update rent_info
-        rent_info.update({website_url: info_dict})
+        new_rent_info = {website_url: info_dict}
+        new_rent_info.update(rent_info)
+        rent_info = new_rent_info
 
         # Success ! 
         print("Success", website_url)

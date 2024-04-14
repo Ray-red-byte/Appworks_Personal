@@ -187,7 +187,9 @@ def crawl_each_url(website_url, rent_info, driver):
                         info_dict["坪數"] = content_text
             
         # Update rent_info
-        rent_info.update({website_url: info_dict})
+        new_rent_info = {website_url: info_dict}
+        new_rent_info.update(rent_info)
+        rent_info = new_rent_info
         
         print("--------------------------------------------------------------------------")
         return False, rent_info, "success"

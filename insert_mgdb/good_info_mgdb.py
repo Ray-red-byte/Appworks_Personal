@@ -2,7 +2,7 @@ import json
 import pymysql
 import pymongo
 import logging
-from datetime import datetime
+import datetime
 
 from dotenv import load_dotenv
 import os
@@ -77,7 +77,7 @@ def insert_good_info_to_mgdb(good_info_url, info):
             "h_address": info["address"],
             "h_type": info["type"],
             "h_usage": "None",
-            "h_age": int(re.search(r'\d+', info["屋齡"]).group()),
+            "h_age": int(re.search(r'\d+', info["屋齡"]).group()) if info.get("屋齡") else "None",
             "h_face": "None",
             "h_env": info["管理方式"],
             "h_size": float(re.search(r'\d+', info["size"]).group()),
@@ -110,6 +110,7 @@ def insert_good_info_to_mgdb(good_info_url, info):
 
     except Exception as e:
         # Rollback in case of any error
+        print(info)
         print("Error:", e)
 
 

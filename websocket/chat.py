@@ -2,13 +2,15 @@ import asyncio
 import websockets
 
 
-
 # WebSocket server communication
 connected = set()
 
+
 async def chat_server(websocket, path):
+
     # Receive user identifier from client
-    user_identifier = await websocket.recv()
+    user_identifier_data = await websocket.recv()
+    user_identifier = user_identifier_data.split(': ')[1].split(')')[0]
 
     # Register new client with user identifier
     connected.add((websocket, user_identifier))
@@ -29,12 +31,8 @@ async def chat_server(websocket, path):
         connected.remove((websocket, user_identifier))
 
 
-
 async def main():
     async with websockets.serve(chat_server, "localhost", 8765):
         await asyncio.Future()  # Keep the server running indefinitely
 
 asyncio.run(main())
-
-
-

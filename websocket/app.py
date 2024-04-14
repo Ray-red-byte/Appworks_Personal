@@ -1,12 +1,14 @@
-from flask import Flask, render_template
-from flask import request, jsonify, make_response
+from flask import Flask, render_template, request, jsonify, make_response
 import os
+import asyncio
+import threading
 from werkzeug.security import generate_password_hash, check_password_hash
 from function import check_exist_row, validate_email, create_token, authentication
 from flask_cors import CORS
 
+
 app = Flask(__name__)
-CORS(app)
+# CORS(app)
 
 # JWT secret key
 jwt_secret_key = os.getenv('JWT_SECRET_KEY')
@@ -43,10 +45,9 @@ def login_token():
             response_data = {"Error": 'Invalid password'}
             return response_data
         '''
-        
+
         token = create_token(user_name, jwt_secret_key)
         print(token)
-
 
         # Create a response object
         response = make_response()
@@ -58,7 +59,7 @@ def login_token():
     else:
         response_data = {"Error": "Invalid Content-Type"}
         return response_data
-    
+
 
 @app.route('/register')
 def register():
@@ -76,7 +77,6 @@ def register_token():
         form_data = request.get_json()
 
         # Check if email exists
-        
 
         if user_id:
             response_data = {"Error": 'Exist email'}
@@ -89,7 +89,6 @@ def register_token():
 
         # Insert into USER table
         password_hash = generate_password_hash(form_data["password"])
-
 
         del user_data[0]["password"]
         token = create_token(str(user_id), jwt_secret_key)
@@ -109,7 +108,7 @@ def register_token():
     else:
         response_data = {"Error": "Invalid Content-Type"}
         return response_data
-    
+
 
 # Flask routes
 @app.route('/main')
@@ -123,9 +122,6 @@ def main_page():
 
     return render_template('main.html', username=user_id)
 
-    
-
-
 
 @app.route('/search')
 def search():
@@ -133,15 +129,7 @@ def search():
     return "Search results will be displayed here"
 
 
-
-
-
 if __name__ == '__main__':
 
-    # Start WebSocket server in a separate thread
-    # Start Flask server
     app.run(port=5000)
-
-    #start_websocket_server()
-
-    
+    # start_websocket_server()

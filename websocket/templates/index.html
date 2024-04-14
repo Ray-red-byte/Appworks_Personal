@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>House Search and Chat Room</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f2f2f2;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2 {
+            color: #333;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            width: calc(100% - 80px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #searchResults, #chatMessages {
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            overflow-y: auto;
+            max-height: 200px;
+        }
+
+        #chatMessages {
+            max-height: 300px;
+        }
+
+        #chatMessages p {
+            margin: 5px 0;
+        }
+
+        #chatForm {
+            display: flex;
+            margin-top: 10px;
+        }
+
+        #chatInput {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        #chatForm button {
+            flex: 0 0 auto;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>House Search</h1>
+        <!-- House search form and results display -->
+        <form id="searchForm">
+            <input type="text" id="searchInput" placeholder="Search for houses...">
+            <button type="submit">Search</button>
+        </form>
+        <div id="searchResults">
+            <!-- Search results will be displayed here -->
+        </div>
+
+        <hr>
+
+        <h2>Chat Room</h2>
+        <!-- Chat room interface -->
+        <div id="chatMessages">
+            <!-- Chat messages will be displayed here -->
+        </div>
+        <form id="chatForm">
+            <input type="text" id="chatInput" placeholder="Type your message...">
+            <button type="submit">Send</button>
+        </form>
+    </div>
+
+    <script>
+        // WebSocket connection
+        const ws = new WebSocket('ws://localhost:8765');
+
+        // Handle incoming messages
+        ws.onmessage = function(event) {
+            const message = event.data;
+            // Display the incoming message in the chat room
+            document.getElementById('chatMessages').innerHTML += '<p>' + message + '</p>';
+        };
+
+        // Send message when the form is submitted
+        document.getElementById('chatForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const message = document.getElementById('chatInput').value;
+            // Send the message over the WebSocket connection
+            ws.send(message);
+            // Clear the input field
+            document.getElementById('chatInput').value = '';
+        });
+
+        // Handle search form submission
+        document.getElementById('searchForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const searchTerm = document.getElementById('searchInput').value;
+            // Send the search term to the server for processing
+            // You can use fetch or AJAX to send an HTTP request to the Flask server
+            // Example using fetch:
+            fetch('/search', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ search_term: searchTerm })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Display search results on the page
+                // Modify this part according to your application's logic
+                document.getElementById('searchResults').innerHTML = JSON.stringify(data);
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>

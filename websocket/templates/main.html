@@ -110,8 +110,10 @@
     </div>
 
     <script>
+
         // WebSocket connection
         const ws = new WebSocket('ws://localhost:8765');
+
 
         // Handle incoming messages
         ws.onmessage = function(event) {
@@ -120,15 +122,19 @@
             document.getElementById('chatMessages').innerHTML += '<p>' + message + '</p>';
         };
 
+
         // Send message when the form is submitted
         document.getElementById('chatForm').addEventListener('submit', function(event) {
             event.preventDefault();
             const message = document.getElementById('chatInput').value;
-            // Send the message over the WebSocket connection
-            ws.send(message);
+            const username = '{{ username }}'; // Replace 'username' with the actual username of the logged-in user
+            const messageWithIdentity = username + ': ' + message; // Combine username and message
+            // Send the message with user identity over the WebSocket connection
+            ws.send(messageWithIdentity);
             // Clear the input field
             document.getElementById('chatInput').value = '';
         });
+
 
         // Handle search form submission
         document.getElementById('searchForm').addEventListener('submit', function(event) {

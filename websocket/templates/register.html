@@ -60,7 +60,7 @@
 <body>
     <div class="container">
         <h1>Rent Right</h1>
-        <form id="registerForm" action="/register" method="post">
+        <form id="registerForm" action="{{ url_for('register_token') }}" method="post">
             <label for="username">Username</label>
             <input type="text" id="username" name="username" required>
 

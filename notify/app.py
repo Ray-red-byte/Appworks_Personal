@@ -1,12 +1,17 @@
 import requests
 from flask import Flask, request
+import os
+from dotenv import load_dotenv
+
+
+dotenv_path = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/.env'
+load_dotenv(dotenv_path)
 
 app = Flask(__name__)
 
-'''
-使用者訂閱網址：
-https://notify-bot.line.me/oauth/authorize?response_type=code&client_id=bvtTFwMkqG5LiWFJIq3aXb&redirect_uri=https://b2a2e5fe3748.ngrok.io&scope=notify&state=NO_STATE
-'''
+LINE_SUBSCRIBE_URL = os.getenv("LINE_SUBSCRIBE_URL")
+LINE_CLIENT_ID = os.getenv("LINE_CLIENT_ID")
+LINE_CLIENT_SECRET = os.getenv("LINE_CLIENT_SECRET")
 
 
 def getNotifyToken(AuthorizeCode):
@@ -14,8 +19,8 @@ def getNotifyToken(AuthorizeCode):
         "grant_type": "authorization_code",
         "code": AuthorizeCode,
         "redirect_uri": 'https://b2a2e5fe3748.ngrok.io',
-        "client_id": 'KO3a5Ieeg301SDlAa4reD7',
-        "client_secret": 'OUpn0VvMjIBdFfdyB4NysPq09PkYIL0vgtWRgvhGQuU'
+        "client_id": LINE_CLIENT_ID,
+        "client_secret": LINE_CLIENT_SECRET
     }
     r = requests.post("https://notify-bot.line.me/oauth/token", data=body)
     return r.json()["access_token"]
@@ -33,20 +38,13 @@ def lineNotifyMessage(token, msg):
     return r.status_code
 
 
-"""
-小明的token:MXYXpYMZVvQlGa1qBAK6hjc6IG541I3LRUlW4vaUDau
-"""
-
-
 @app.route('/', methods=['POST', 'GET'])
 def hello_world():
     authorizeCode = request.args.get('code')
     token = getNotifyToken(authorizeCode)
-    print(token)
     lineNotifyMessage(token, "恭喜你連動完成")
     return f"恭喜你，連動完成"
 
 
 if __name__ == '__main__':
-    lineNotifyMessage("MXYXpYMZVvQlGa1qBAK6hjc6IG541I3LRUlW4vaUDau", "哈哈哈")
     app.run()

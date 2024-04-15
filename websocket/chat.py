@@ -11,6 +11,7 @@ async def chat_server(websocket, path):
     # Receive user identifier from client
     user_identifier_data = await websocket.recv()
     user_identifier = user_identifier_data.split(': ')[1].split(')')[0]
+    print(user_identifier)
 
     # Register new client with user identifier
     connected.add((websocket, user_identifier))
@@ -22,7 +23,7 @@ async def chat_server(websocket, path):
 
         # Handle messages from client
         async for message in websocket:
-            # Broadcast message to all clients
+
             for client, _ in connected:
                 if client != websocket:  # Don't send the message back to the sender
                     await client.send(f"{user_identifier}: {message}")

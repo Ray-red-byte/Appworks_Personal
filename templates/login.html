@@ -13,12 +13,12 @@
         }
 
         .container {
-            max-width: 400px;
-            margin: 100px auto;
-            padding: 20px;
-            background-color: #fff;
+            background: linear-gradient(to right, #8a2be2, #ff7f50); /* Purple to orange gradient */
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Shadow */
+            width: 400px;
+            margin: 100px auto;
         }
 
         h1 {
@@ -33,10 +33,12 @@
             color: #555;
         }
 
-        input[type="text"], input[type="password"] {
+        input[type="text"], input[type="email"], input[type="password"] {
             width: calc(100% - 20px);
             padding: 10px;
             margin-bottom: 20px;
+            margin-left: auto;
+            margin-right: auto;
             border: 1px solid #ccc;
             border-radius: 5px;
             box-sizing: border-box;
@@ -63,6 +65,9 @@
         <form id="loginForm">
             <label for="username">Username</label>
             <input type="text" id="username" name="username" required>
+            
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required>
 
             <label for="password">Password</label>
             <input type="password" id="password" name="password" required>
@@ -95,15 +100,37 @@
             })
             .then(response => {
                 if (response.ok) {
-                    // If login is successful, redirect to the main page
-                    window.location.href = '/main';
+                    // Extract token from response header
+                    const token = response.headers.get('Authorization').split(' ')[1]; // Assuming token is in the format "Bearer <token>"
+                    // Store token in local storage
+                    localStorage.setItem('token', token);
+                    // Redirect to user information page
+                    window.location.href = '/user/information';
+
+                    // get token from localstorage and set in header
+                    const storedToken = localStorage.getItem('token');
+                    if (storedToken) {
+                        // Set token in request header
+                        fetch('/user/information', {
+                            method: 'GET',
+                            headers: {
+                                'Authorization': `Bearer ${storedToken}`
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log(data); // Handle the response data accordingly
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+                    }
                 } else {
-                    // If login fails, display an error message or handle accordingly
-                    console.error('Login failed');
+                    throw new Error('Login failed');
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
+                console.log('Error:', error);
             });
         });
     </script>

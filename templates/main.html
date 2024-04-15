@@ -109,18 +109,17 @@
         </form>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
     <script>
 
         // WebSocket connection
-        const ws = new WebSocket('ws://localhost:8765');
-
+        const socket = io();
 
         // Handle incoming messages
-        ws.onmessage = function(event) {
-            const message = event.data;
+        socket.on('message', function(message) {
             // Display the incoming message in the chat room
             document.getElementById('chatMessages').innerHTML += '<p>' + message + '</p>';
-        };
+        });
 
 
         // Send message when the form is submitted
@@ -128,9 +127,10 @@
             event.preventDefault();
             const message = document.getElementById('chatInput').value;
             const username = '{{ username }}'; // Replace 'username' with the actual username of the logged-in user
+            console.log(username);
             const messageWithIdentity = username + ': ' + message; // Combine username and message
             // Send the message with user identity over the WebSocket connection
-            ws.send(messageWithIdentity);
+            socket.send(messageWithIdentity);
             // Clear the input field
             document.getElementById('chatInput').value = '';
         });

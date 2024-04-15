@@ -60,7 +60,7 @@
 <body>
     <div class="container">
         <h1>Rent Right</h1>
-        <form id="registerForm" action="{{ url_for('register_token') }}" method="post">
+        <form id="registerForm" method="post">
             <label for="username">Username</label>
             <input type="text" id="username" name="username" required>
 
@@ -76,5 +76,50 @@
             <input type="submit" value="Register">
         </form>
     </div>
+
+    <script>
+        document.getElementById('registerForm').onsubmit = function() {
+            var password = document.getElementById('password').value;
+            var confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (password !== confirmPassword) {
+                alert('Passwords do not match');
+                return false;
+            }
+        };
+        
+        document.getElementById('registerForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+
+            // Convert form data to JSON object
+            const jsonObject = {};
+            formData.forEach((value, key) => {
+                jsonObject[key] = value;
+            });
+
+            // Perform AJAX request to submit login form data as JSON
+            fetch('{{ url_for("register_validate") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(jsonObject)
+            })
+            .then(response => {
+                if (response.ok) {
+                    // If login is successful, redirect to the main page
+                    window.location.href = '/login';
+                } else {
+                    // If login fails, display an error message or handle accordingly
+                    console.error('Register failed');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
 </body>
 </html>

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rent Right</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f2f2f2;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2 {
+            color: #800080;
+            text-align: center;
+        }
+
+        .filter {
+            margin-bottom: 20px;
+        }
+
+        .filter label {
+            display: block;
+            color: #800080;
+            margin-bottom: 5px;
+        }
+
+        .filter select, .filter input[type="range"] {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 20px;
+            background-color: #d3d3e6;
+            color: #800080;
+            font-size: 16px;
+            outline: none;
+            margin-bottom: 10px;
+        }
+
+        .filter select:hover, .filter input[type="range"]:hover {
+            background-color: #b3b3cc;
+        }
+
+        .filter select:focus, .filter input[type="range"]:focus {
+            background-color: #fff;
+        }
+
+        .filter input[type="range"] {
+            appearance: none;
+            height: 10px;
+            background-color: #d3d3e6;
+            border-radius: 10px;
+            outline: none;
+            margin-bottom: 10px;
+        }
+
+        .filter input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background-color: #800080;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .filter input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background-color: #800080;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .houses {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .house {
+            width: calc(50% - 10px);
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .house img {
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .house h3 {
+            color: #800080;
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .house p {
+            color: #333;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .match-list {
+            position: fixed;
+            top: 200px;
+            right: 20px;
+            width: 250px;
+            background-color: #d3c7d3;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .match-list h2 {
+            color: #800080;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .match {
+            margin-bottom: 15px;
+        }
+
+        .match p {
+            color: #333;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Rent Right</h1>
+        <div class="filter">
+            <label for="size">Select Size:</label>
+            <select name="size" id="size">
+                <option value="">Any</option>
+                <option value="small">Small</option>
+                <option value="medium">Medium</option>
+                <option value="large">Large</option>
+            </select>
+            <label for="floor">Floor Range:</label>
+            <input type="range" id="floor" name="floor" min="0" max="10" value="0">
+            <label for="price">Price Range:</label>
+            <input type="range" id="price" name="price" min="0" max="10000" value="0">
+        </div>
+        <div class="houses">
+            <!-- House cards will be displayed here -->
+        </div>
+    </div>
+
+    <div class="match-list">
+        <h2>Match List</h2>
+        <!-- Match list will be displayed here -->
+    </div>
+
+    <script>
+
+        // Sample data for houses and matches (Replace with actual data)
+        const housesData = [
+            { id: 1, image: 'house1.jpg', title: 'House 1', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
+            { id: 2, image: 'house2.jpg', title: 'House 2', description: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.' },
+            { id: 3, image: 'house3.jpg', title: 'House 3', description: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.' },
+            { id: 4, image: 'house4.jpg', title: 'House 4', description: 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.' },
+        ];
+
+        const matchesData = [
+            { id: 1, name: 'John Doe', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
+            { id: 2, name: 'Jane Smith', description: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.' },
+            { id: 3, name: 'Alice Johnson', description: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.' },
+            { id: 4, name: 'Bob Brown', description: 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.' },
+        ];
+
+        // Function to render house cards
+        function renderHouses() {
+            const housesContainer = document.querySelector('.houses');
+            housesContainer.innerHTML = '';
+            housesData.forEach(house => {
+                const houseCard = `
+                    <div class="house">
+                        <img src="${house.image}" alt="${house.title}">
+                        <h3>${house.title}</h3>
+                        <p>${house.description}</p>
+                    </div>
+                `;
+                housesContainer.innerHTML += houseCard;
+            });
+        }
+
+        // Function to render match list
+        function renderMatches() {
+            const matchListContainer = document.querySelector('.match-list');
+            matchListContainer.innerHTML = '<h2>Match List</h2>';
+            matchesData.forEach(match => {
+                const matchCard = `
+                    <div class="match">
+                        <h3>${match.name}</h3>
+                        <p>${match.description}</p>
+                    </div>
+                `;
+                matchListContainer.innerHTML += matchCard;
+            });
+        }
+
+        // Initial render
+        renderHouses();
+        renderMatches();
+    </script>
+</body>
+</html>

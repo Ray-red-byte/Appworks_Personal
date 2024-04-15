@@ -1,10 +1,14 @@
 import jwt
 from datetime import datetime, timedelta
+from dotenv import load_dotenv
 import re
 import os
 from flask import jsonify
 import pymongo
 
+
+dotenv_path = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/.env'
+load_dotenv(dotenv_path)
 
 # Mongo atlas
 CONNECTION_STRING = os.getenv("MONGO_ATLAS_USER")
@@ -12,17 +16,43 @@ client = pymongo.MongoClient(CONNECTION_STRING)
 
 # Select a database and collection
 db = client["personal_project"]
-collection = db["user"]
+user_collection = db["user"]
+house_collection = db["house"]
 
 
-def check_exist_row(table_name, column, search_data):
+def get_user_id(username, email):
+    user = user_collection.find_one({"username": username, "email": email})
     try:
-        product_id = DB.check_exist_row(
-            table_name, column, search_data)[0]["id"]
-    except IndexError:
-        product_id = ""
+        if user:
+            return user["user_id"]
+        return None
+    except Exception as e:
+        print(e)
+        return None
 
-    return product_id
+
+def get_user_password(user_id):
+    user = user_collection.find_one({"user_id": user_id})
+
+    if user:
+        return user["password"]
+    return None
+
+
+def get_user_name(user_id):
+    user = user_collection.find_one({"user_id": user_id})
+
+    if user:
+        return user["username"]
+    return None
+
+
+def check_exist_user(user_id):
+    if user_id:
+        user = user_collection.find_one({"user_id": user_id})
+        if user:
+            return True
+    return False
 
 
 def validate_email(email):

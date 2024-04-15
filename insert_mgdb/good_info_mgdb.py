@@ -34,9 +34,9 @@ aws_secret_access_key = os.getenv("S3_SECRET_ACCESS_KEY")
 aws_access_key_id = os.getenv("S3_ACCESS_KEY")
 aws_bucket = os.getenv("S3_BUCKET_NAME")
 s3_good_info_path = 'personal_project/house_detail/good_details/rent_good_info.json'
-#s3_good_url_path = 'personal_project/urls/good_urls/rent_good_url.json'
+# s3_good_url_path = 'personal_project/urls/good_urls/rent_good_url.json'
 local_good_info_file = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_good_info.json'
-#local_good_url_file = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_good_url.json'
+# local_good_url_file = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_good_url.json'
 
 
 good_json_file_path = "/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_good_info.json"
@@ -49,7 +49,8 @@ def load_from_json(json_file):
     except Exception as e:
         print(e)
         return {}
-    
+
+
 def download_from_s3(bucket_name, s3_path, local_file):
     s3 = boto3.client('s3', aws_access_key_id=aws_access_key_id,
                       aws_secret_access_key=aws_secret_access_key)
@@ -61,46 +62,49 @@ def download_from_s3(bucket_name, s3_path, local_file):
 
     return True
 
+
 def get_all_mgdb_good_info():
     data = collection.find({}, {"h_url": 1})
     if data:
         return data
     return []
 
+
 def insert_good_info_to_mgdb(good_info_url, info):
 
     try:
         transform_info_dict = {
-            "h_url": good_info_url,
-            "h_title": info["house_code"],
-            "h_price": float(info["price"].replace(',', '')),
-            "h_address": info["address"],
-            "h_type": info["type"],
-            "h_usage": "None",
-            "h_age": int(re.search(r'\d+', info["屋齡"]).group()) if info.get("屋齡") else "None",
-            "h_face": "None",
-            "h_env": info["管理方式"],
-            "h_size": float(re.search(r'\d+', info["size"]).group()),
-            "h_short_stay": info["最短租期"],
-            "h_cook": True if info["開伙"] == "可" else False,  # Changed "None" to False
-            "h_move_date": info["move_date"],
-            "h_pet": info["養寵物"],
-            "h_fee_contain": True if info["other_fees"] else False,  # Changed "None" to False
-            "h_gender": info["性別限制"],
-            "h_deposit": -1,
-            "h_identy": info["身分要求"],
-            "h_stay_landlord": True if info["與房東同住"] == "不用與房東同住" else False,
-            "h_park": True if "有" in info["車位"] else False,
-            "h_equip": info["設備"],
-            "h_furniture": info["家具"],
-            "h_floor": info["floor"],
-            "h_corner": True if info["邊間"] == "是" else False,
-            "h_center": True if info["中庭"] == "是" else False,
-            "h_top_add": True if info["頂樓加蓋"] == "是" else False,
-            "h_img_url": info["img_url"],
-            "h_layout": info["layout"]
+            "url": good_info_url,
+            "title": info["house_code"],
+            "price": float(info["price"].replace(',', '')),
+            "address": info["address"],
+            "type": info["type"],
+            "usage": "None",
+            "age": int(re.search(r'\d+', info["屋齡"]).group()) if info.get("屋齡") else "None",
+            "face": "None",
+            "env": info["管理方式"],
+            "size": float(re.search(r'\d+', info["size"]).group()),
+            "short_stay": info["最短租期"],
+            # Changed "None" to False
+            "cook": True if info["開伙"] == "可" else False,
+            "move_date": info["move_date"],
+            "pet": info["養寵物"],
+            # Changed "None" to False
+            "fee_contain": True if info["other_fees"] else False,
+            "gender": info["性別限制"],
+            "deposit": -1,
+            "identy": info["身分要求"],
+            "stay_landlord": True if info["與房東同住"] == "不用與房東同住" else False,
+            "park": True if "有" in info["車位"] else False,
+            "equip": info["設備"],
+            "furniture": info["家具"],
+            "floor": info["floor"],
+            "corner": True if info["邊間"] == "是" else False,
+            "center": True if info["中庭"] == "是" else False,
+            "top_add": True if info["頂樓加蓋"] == "是" else False,
+            "img_url": info["img_url"],
+            "layout": info["layout"]
         }
-
 
         collection.insert_one(transform_info_dict)
 
@@ -114,8 +118,6 @@ def insert_good_info_to_mgdb(good_info_url, info):
         print("Error:", e)
 
 
-
-
 def main():
 
     download_from_s3(aws_bucket, s3_good_info_path, local_good_info_file)
@@ -123,13 +125,14 @@ def main():
     all_h_url = [doc["h_url"] for doc in all_h_url]
 
     good_infos = load_from_json(good_json_file_path)
-    
+    print(len(all_h_url))
 
     # Log start time
     logger.info(f"Previous number : {len(all_h_url)}")
     timestamp_start = datetime.datetime.now()
     timestamp_start_stf = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    logger.info(f"---------- ---Start Crawler {timestamp_start_stf}-------------")
+    logger.info(
+        f"---------- ---Start Crawler {timestamp_start_stf}-------------")
 
     for good_info_url, content in good_infos.items():
 
@@ -139,13 +142,16 @@ def main():
 
         insert_good_info_to_mgdb(good_info_url, content)
 
+    client.close()
+
     # Log end time
     logger.info(f"Total number : {len(all_h_url)}")
     timestamp_end = datetime.datetime.now()
     timestamp_end_stf = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    logger.info(f"-------------Time consume {timestamp_end - timestamp_start}-------------")
+    logger.info(
+        f"-------------Time consume {timestamp_end - timestamp_start}-------------")
     logger.info(f"-------------End Crawler {timestamp_end_stf}-------------")
-    
-    
+
+
 if __name__ == "__main__":
     main()

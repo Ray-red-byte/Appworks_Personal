@@ -4,145 +4,99 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Basic Information</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f2f2f2;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        .container {
-            background: linear-gradient(to right, #8a2be2, #ff7f50); /* Purple to orange gradient */
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Shadow */
-            width: 400px;
-            margin: 20px;
-        }
-        .greeting {
-            color: #fff; /* White color */
-            font-size: 20px;
-            margin-bottom: 20px;
-        }
-        h1 {
-            color: #fff; /* White color */
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        form {
-            display: flex;
-            flex-direction: column;
-            align-items: stretch;
-        }
-        label {
-            color: #fff; /* White color */
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        input[type="text"],
-        textarea {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 20px;
-            border: none;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
-        textarea {
-            height: 100px;
-            resize: none;
-        }
-        input[type="submit"] {
-            background-color: #fff; /* White color */
-            color: #8a2be2; /* Purple color */
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: background-color 0.3s;
-        }
-        input[type="submit"]:hover {
-            background-color: #f0f0f0;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Basic Information</h1>
-        <div class="greeting">Hello, {{ username }}</div>
-        <form id="greetinForm" action="/submit" method="POST">
-            <label for="gender">Gender:</label>
-            <input type="text" id="gender" name="gender" placeholder="Male/Female/Non-binary">
-            <label for="identity">Identity:</label>
-            <input type="text" id="identity" name="identity" placeholder="Student/Office Worker/Teacher">
-            <label for="introduction">Short Introduction:</label>
-            <textarea id="introduction" name="introduction" placeholder="Tell us about yourself..."></textarea>
-            <label for="partner">Do you have a partner?</label>
-            <input type="text" id="partner" name="partner" placeholder="Yes/No">
-            <input type="submit" value="Submit">
-        </form>
-    </div>
-
-    <script>
-        document.getElementById('greetinForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const form = event.target;
-            const formData = new FormData(form);
-
-            // Convert form data to JSON object
-            const jsonObject = {};
-            formData.forEach((value, key) => {
-                jsonObject[key] = value;
-            });
-
-            // Perform AJAX request to submit login form data as JSON
-            fetch('{{ url_for("main_page") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(jsonObject)
-            })
-            .then(response => {
-                if (response.ok) {
-                    // Extract token from response header
-                    const token = response.headers.get('Authorization').split(' ')[1]; // Assuming token is in the format "Bearer <token>"
-                    // Store token in local storage
-                    localStorage.setItem('token', token);
-                    // Redirect to user information page
-                    window.location.href = '/main';
-
-                    // get token from localstorage and set in header
-                    const storedToken = localStorage.getItem('token');
-                    if (storedToken) {
-                        // Set token in request header
-                        fetch('/main', {
-                            method: 'GET',
-                            headers: {
-                                'Authorization': `Bearer ${storedToken}`
-                            }
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            console.log(data); // Handle the response data accordingly
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                        });
-                    }
-                } else {
-                    throw new Error('Login failed');
-                }
-            })
-            .catch(error => {
-                console.log('Error:', error);
-            });
-        });
-    </script>
-
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Basic Information</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #f2f2f2;
+                margin: 0;
+                padding: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+            }
+            .container {
+                background: linear-gradient(to right, #8a2be2, #ff7f50); /* Purple to orange gradient */
+                border-radius: 10px;
+                padding: 20px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Shadow */
+                width: 400px;
+                margin: 20px;
+            }
+            .greeting {
+                color: #fff; /* White color */
+                font-size: 20px;
+                margin-bottom: 20px;
+            }
+            h1 {
+                color: #fff; /* White color */
+                text-align: center;
+                margin-bottom: 20px;
+            }
+            form {
+                display: flex;
+                flex-direction: column;
+                align-items: stretch;
+            }
+            label {
+                color: #fff; /* White color */
+                font-weight: bold;
+                margin-bottom: 10px;
+            }
+            input[type="text"],
+            textarea,
+            select {
+                width: 100%;
+                padding: 10px;
+                margin-bottom: 20px;
+                border: none;
+                border-radius: 5px;
+                box-sizing: border-box;
+            }
+            textarea {
+                height: 100px;
+                resize: none;
+            }
+            input[type="submit"] {
+                background-color: #fff; /* White color */
+                color: #8a2be2; /* Purple color */
+                border: none;
+                padding: 10px 20px;
+                cursor: pointer;
+                border-radius: 5px;
+                transition: background-color 0.3s;
+            }
+            input[type="submit"]:hover {
+                background-color: #f0f0f0;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Basic Information</h1>
+            <div class="greeting">Hello, {{ username }}</div>
+            <form id="greetinForm" action='/user/info_insert' method="POST">
+                <label for="gender">Gender:</label>
+                <select id="gender" name="gender">
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="non-binary">Non-binary</option>
+                </select>
+                <label for="identity">Identity:</label>
+                <input type="text" id="identity" name="identity" placeholder="Student/Office Worker/Teacher">
+                <label for="partner">Do you have a partner?</label>
+                <select id="partner" name="partner">
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                </select>
+                <label for="introduction">Short Introduction:</label>
+                <textarea id="introduction" name="introduction" placeholder="Tell us about yourself..."></textarea>
+                <input type="submit" value="Submit">
+            </form>
+        </div>
 </body>
 </html>

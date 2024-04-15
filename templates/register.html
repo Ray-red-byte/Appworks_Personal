@@ -108,7 +108,7 @@
                 body: JSON.stringify(jsonObject)
             })
             .then(response => {
-                if (response.ok) {
+                if (response.status === 200) {
                     // If login is successful, redirect to the main page
                     window.location.href = '/login';
                 } else {

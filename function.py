@@ -21,6 +21,8 @@ house_collection = db["house"]
 
 
 def get_user_id(username, email):
+    db = client["personal_project"]
+    user_collection = db["user"]
     user = user_collection.find_one({"username": username, "email": email})
     try:
         if user:
@@ -32,19 +34,33 @@ def get_user_id(username, email):
 
 
 def get_user_password(user_id):
-    user = user_collection.find_one({"user_id": user_id})
-
-    if user:
-        return user["password"]
-    return None
+    db = client["personal_project"]
+    user_collection = db["user"]
+    try:
+        user = user_collection.find_one({"user_id": user_id})
+        if user:
+            return user["password"]
+        else:
+            print("User not found")
+            return None
+    except Exception as e:
+        print("Error:", e)
+        return None
 
 
 def get_user_name(user_id):
-    user = user_collection.find_one({"user_id": user_id})
-
-    if user:
-        return user["username"]
-    return None
+    db = client["personal_project"]
+    user_collection = db["user"]
+    try:
+        user = user_collection.find_one({"user_id": user_id})
+        if user:
+            return user["username"]
+        else:
+            print("User not found")
+            return None
+    except Exception as e:
+        print("Error:", e)
+        return None
 
 
 def check_exist_user(user_id):
@@ -65,8 +81,9 @@ def validate_email(email):
 
 # Custom function to create JWT toke
 def create_token(user_id, jwt_secret_key):
-    # Token expires in 1 minutes
-    expiration_time = datetime.now() + timedelta(seconds=600)
+    # Token expiresuser_id in 1 minutes
+
+    expiration_time = datetime.now() + timedelta(seconds=60)
     payload = {'user_id': user_id, 'exp': expiration_time}
     token = jwt.encode(payload, str(jwt_secret_key), algorithm='HS256')
     return token

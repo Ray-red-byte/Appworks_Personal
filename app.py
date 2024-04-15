@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, make_response
+from flask import Flask, render_template, request, jsonify, make_response, redirect, url_for
 import os
 from dotenv import load_dotenv
 import pymongo
@@ -58,8 +58,8 @@ def login_token():
         # Check if password is correct
         if not check_password_hash(user_password, user_login_password):
             response_data = {"Error": 'Invalid password'}
-            return response_data
-
+            return response_data, 400
+        print("hi")
         token = create_token(user_id, jwt_secret_key)
 
         # Create a response object
@@ -131,40 +131,128 @@ def register_validate():
 
         user_collection.insert_one(user_info)
 
-        return jsonify({'message': 'Register is valid'})
+        return jsonify({'message': 'Register is valid'}), 200
 
     else:
         response_data = {"Error": "Invalid Content-Type"}
-        return response_data
+        return response_data, 400
 
 
 # User information page
 @ app.route('/user/information', methods=["GET", "POST"])
 def user_information():
     # Retrieve the parameters from the query string
-    token = request.headers.get("Authorization")
+    token = request.cookies.get('token')
 
     # Call the authentication function to verify the token
     user_id = authentication(token, jwt_secret_key)
 
-    username = get_user_name(user_id)
+    if isinstance(user_id, int):
+        username = get_user_name(user_id)
+        return render_template('user_information.html', username=username)
 
-    # Create a response object
-    response = make_response()
+    return redirect(url_for('login'))
 
-    # Set the token in the response header
-    response.headers["Authorization"] = f"Bearer {token}"
-    return render_template('user_information.html', username=username), response
+
+@ app.route('/user/info_insert', methods=["GET", "POST"])
+def user_info_insert():
+
+    if request.method == 'POST':
+        # Retrieve the parameters from the query string
+        token = request.cookies.get('token')
+
+        # Call the authentication function to verify the token
+        user_id = authentication(token, jwt_secret_key)
+
+        # Extract form data
+        gender = request.form['gender']
+        identity = request.form['identity']
+        partner = request.form['partner']
+        introduction = request.form['introduction']
+
+        if isinstance(user_id, int):
+            username = get_user_name(user_id)
+            user_collection = client['personal_project']['user']
+
+            # Prepare basic information data
+            basic_info_data = {
+                'gender': gender,
+                'identity': identity,
+                'partner': partner,
+                'introduction': introduction
+            }
+
+            # Update user's routine information in MongoDB
+            user_collection.update_one(
+                {'user_id': user_id},
+                {'$set': {'basic_info': basic_info_data}}
+            )
+
+            return render_template('house_type.html', username=username)
+
+        return redirect(url_for('login'))
+
+
+@ app.route('/user/routine_insert', methods=["GET", "POST"])
+def user_routine_insert():
+
+    if request.method == 'POST':
+        # Retrieve the parameters from the query string
+        token = request.cookies.get('token')
+
+        # Call the authentication function to verify the token
+        user_id = authentication(token, jwt_secret_key)
+
+        # Extract form data
+        sleep_time = request.form['sleepTime']
+        wake_up_time = request.form['wakeUpTime']
+        hygiene_tolerance = int(request.form['hygieneTolerance'])
+        noise_tolerance = int(request.form['noiseTolerance'])
+        cook_options = request.form['cookOptions']
+        pet_options = request.form['petOptions']
+        smoke_options = request.form['smokeOptions']
+        additional_notes = request.form['additionalNotes']
+
+        if isinstance(user_id, int):
+            username = get_user_name(user_id)
+            user_collection = client['personal_project']['user']
+
+            # Prepare routine data
+            routine_data = {
+                'sleepTime': sleep_time,
+                'wakeUpTime': wake_up_time,
+                'hygieneTolerance': hygiene_tolerance,
+                'noiseTolerance': noise_tolerance,
+                'cookOptions': cook_options,
+                'petOptions': pet_options,
+                'smokeOptions': smoke_options,
+                'additionalNotes': additional_notes
+            }
+
+            # Update user's routine information in MongoDB
+            user_id = 2  # Assuming user_id is 2
+            user_collection.update_one(
+                {'user_id': user_id},
+                {'$push': {'routine': routine_data}}
+            )
+
+            return render_template('house.html', username=username)
+
+        return redirect(url_for('login'))
 
 
 @ app.route('/main')
 def main_page():
-    # Retrieve the parameters from the query st ring
-    token = request.headers.get("Authorization")
+    token = request.cookies.get('token')
 
     # Call the authentication function to verify the token
     user_id = authentication(token, jwt_secret_key)
-    return render_template('main.html', username=user_id)
+
+    if isinstance(user_id, int):
+        username = get_user_name(user_id)
+        return render_template('main.html', username=username)
+
+    return redirect(url_for('login'))
 
 
 @socketio.on('message')

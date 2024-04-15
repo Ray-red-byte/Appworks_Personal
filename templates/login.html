@@ -99,34 +99,18 @@
                 body: JSON.stringify(jsonObject)
             })
             .then(response => {
-                if (response.ok) {
+                if (response.status === 200) {
                     // Extract token from response header
                     const token = response.headers.get('Authorization').split(' ')[1]; // Assuming token is in the format "Bearer <token>"
-                    // Store token in local storage
-                    localStorage.setItem('token', token);
-                    // Redirect to user information page
+                    // Set cookie to expire after 10 seconds
+                    const expirationDate = new Date();
+                    expirationDate.setSeconds(expirationDate.getSeconds() + 600); // Adding 10 seconds
+                    document.cookie = `token=${token}; expires=${expirationDate.toUTCString()}; path=/`;
+
                     window.location.href = '/user/information';
 
-                    // get token from localstorage and set in header
-                    const storedToken = localStorage.getItem('token');
-                    if (storedToken) {
-                        // Set token in request header
-                        fetch('/user/information', {
-                            method: 'GET',
-                            headers: {
-                                'Authorization': `Bearer ${storedToken}`
-                            }
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            console.log(data); // Handle the response data accordingly
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                        });
-                    }
                 } else {
-                    throw new Error('Login failed');
+                    console.log(response);
                 }
             })
             .catch(error => {

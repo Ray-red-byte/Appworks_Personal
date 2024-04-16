@@ -81,7 +81,7 @@
 <body>
     <div class="container">
         <h1>Daily Routine</h1>
-        <form id="routineForm" action="/submit" method="POST">
+        <form id="routineForm" action='/user/routine_insert' method="POST">
             <div>
                 <label for="sleepTime">Sleep Time:</label>
                 <input type="time" id="sleepTime" name="sleepTime" required>
@@ -128,24 +128,5 @@
         </form>
     </div>
 
-
-    <script>
-        const form = document.getElementById('routineForm');
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(form);
-            const data = Object.fromEntries(formData);
-            console.log(data);
-            const response = await fetch('/user/information_insert', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            });
-            const result = await response.json();
-            console.log(result);
-        });
-    </script>
 </body>
 </html>

@@ -63,7 +63,7 @@ def download_from_s3(bucket_name, s3_path, local_file):
 
 
 def get_all_mgdb_info(collection):
-    data = collection.find({}, {"h_url": 1})
+    data = collection.find({}, {"url": 1})
     if data:
         return data
     return []
@@ -100,7 +100,8 @@ def insert_hap_info_to_mgdb(good_info_url, info):
             "center": info["中庭"] if info.get("中庭") and info["中庭"] == "是" else False,
             "top_add": info["頂樓加蓋"] if info.get("頂樓加蓋") and info["頂樓加蓋"] == "是" else False,
             "img_url": info["img_url"],
-            "layout": info["格局"]
+            "layout": info["格局"],
+            "'updated_at'": datetime.now()
         }
 
         collection.insert_one(transform_info_dict)
@@ -121,7 +122,7 @@ def main():
 
     # get all urls from mongoDB
     all_h_url = get_all_mgdb_info(collection)
-    all_h_url = [doc["h_url"] for doc in all_h_url]
+    all_h_url = [doc["url"] for doc in all_h_url]
     print(len(all_h_url))
 
     hap_infos = load_from_json(hap_json_file_path)

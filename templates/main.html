@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>House Search and Chat Room</title>
+    <title>Rent Right</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -17,147 +17,249 @@
             margin: 20px auto;
             padding: 20px;
             background-color: #fff;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
         }
 
         h1, h2 {
-            color: #333;
+            color: #800080;
+            text-align: center;
         }
 
-        form {
+        .filter {
             margin-bottom: 20px;
         }
 
-        input[type="text"] {
-            width: calc(100% - 80px);
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+        .filter label {
+            display: block;
+            color: #800080;
+            margin-bottom: 5px;
         }
 
-        button {
-            padding: 10px 20px;
-            background-color: #800080;
-            color: #fff;
+        .filter select, .filter input[type="range"] {
+            width: 100%;
+            padding: 10px;
             border: none;
-            border-radius: 5px;
+            border-radius: 20px;
+            background-color: #d3d3e6;
+            color: #800080;
+            font-size: 16px;
+            outline: none;
+            margin-bottom: 10px;
+        }
+
+        .filter select:hover, .filter input[type="range"]:hover {
+            background-color: #b3b3cc;
+        }
+
+        .filter select:focus, .filter input[type="range"]:focus {
+            background-color: #fff;
+        }
+
+        .filter input[type="range"] {
+            appearance: none;
+            height: 10px;
+            background-color: #d3d3e6;
+            border-radius: 10px;
+            outline: none;
+            margin-bottom: 10px;
+        }
+
+        .filter input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background-color: #800080;
+            border-radius: 50%;
             cursor: pointer;
         }
 
-        button:hover {
+        .filter input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
             background-color: #800080;
+            border-radius: 50%;
+            cursor: pointer;
         }
 
-        #searchResults, #chatMessages {
-            padding: 10px;
-            background-color: #f9f9f9;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            overflow-y: auto;
-            max-height: 200px;
-        }
-
-        #chatMessages {
-            max-height: 300px;
-        }
-
-        #chatMessages p {
-            margin: 5px 0;
-        }
-
-        #chatForm {
+        .houses {
             display: flex;
-            margin-top: 10px;
+            flex-wrap: wrap;
+            gap: 20px;
         }
 
-        #chatInput {
-            flex: 1;
-            padding: 10px;
+        .house {
+            width: calc(50% - 10px);
             border: 1px solid #ccc;
-            border-radius: 5px;
+            border-radius: 10px;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
-        #chatForm button {
-            flex: 0 0 auto;
-            margin-left: 10px;
+        .house img {
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .house h3 {
+            color: #800080;
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .house p {
+            color: #333;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .match-list {
+            position: fixed;
+            top: 200px;
+            right: 20px;
+            width: 250px;
+            background-color: #d3c7d3;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .match-list h2 {
+            color: #800080;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .match {
+            margin-bottom: 15px;
+        }
+
+        .match p {
+            color: #333;
+            font-size: 16px;
+            line-height: 1.5;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>House Search</h1>
-        <!-- House search form and results display -->
-        <form id="searchForm">
-            <input type="text" id="searchInput" placeholder="Search for houses...">
-            <button type="submit">Search</button>
-        </form>
-        <div id="searchResults">
-            <!-- Search results will be displayed here -->
+        <h1>Rent Right</h1>
+        <h2>Hello {{ username }}</h2>
+        <div class="filter">
+            <label for="size">Select Size:</label>
+            <select name="size" id="size">
+                <option value="">Any</option>
+                <option value="small">Small</option>
+                <option value="medium">Medium</option>
+                <option value="large">Large</option>
+            </select>
+            <label for="floor">Floor Range:</label>
+            <input type="range" id="floor" name="floor" min="0" max="10" value="0">
+            <label for="price">Price Range:</label>
+            <input type="range" id="price" name="price" min="0" max="10000" value="0">
         </div>
-
-        <hr>
-
-        <h2>Chat Room</h2>
-        <!-- Chat room interface -->
-        <div id="chatMessages">
-            <!-- Chat messages will be displayed here -->
+        <div class="houses">
+            <!-- House cards will be displayed here -->
         </div>
-        <form id="chatForm">
-            <input type="text" id="chatInput" placeholder="Type your message...">
-            <button type="submit">Send</button>
-        </form>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+    <div class="match-list" id="match-list">
+        <h2>Match List</h2>
+        <ul></ul>
+    </div>
+
     <script>
 
-        // WebSocket connection
-        const socket = io();
+        // Sample data for houses and matches (Replace with actual data)
+        const housesData = [
+            { id: 1, image: 'house1.jpg', title: 'House 1', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
+            { id: 2, image: 'house2.jpg', title: 'House 2', description: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.' },
+            { id: 3, image: 'house3.jpg', title: 'House 3', description: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.' },
+            { id: 4, image: 'house4.jpg', title: 'House 4', description: 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.' },
+        ];
 
-        // Handle incoming messages
-        socket.on('message', function(message) {
-            // Display the incoming message in the chat room
-            document.getElementById('chatMessages').innerHTML += '<p>' + message + '</p>';
-        });
+        
+        // Function to render match list
+        function renderMatchList(matches) {
+            const matchList = document.getElementById('match-list');
+            matchList.innerHTML = '';
+            matchList.innerHTML = '<h2>Match List</h2>';
+            matches.forEach(match => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `${match["username"]}`;
+                listItem.addEventListener('click', () => allocateChatRoom(match["user_id"]));
+                matchList.appendChild(listItem);
+            });
+        }
 
 
-        // Send message when the form is submitted
-        document.getElementById('chatForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const message = document.getElementById('chatInput').value;
-            const username = '{{ username }}'; // Replace 'username' with the actual username of the logged-in user
-            console.log(username);
-            const messageWithIdentity = username + ': ' + message; // Combine username and message
-            // Send the message with user identity over the WebSocket connection
-            socket.send(messageWithIdentity);
-            // Clear the input field
-            document.getElementById('chatInput').value = '';
-        });
+        // Function to fetch user matches from Flask API
+        function fetchUserMatches() {
+            fetch('/matches')
+            .then(response => {
+                if (response.status === 200) {
+                    return response.json();
+                }
+                throw new Error('Failed to fetch user matches');
+            })
+            .then(matches => {
+                // Update the match list with fetched matches data
+                renderMatchList(matches);
+            })
+            .catch(error => {
+                console.error(error);
+                // Handle the error, e.g., show an error message to the user
+            });
+        }
 
-
-        // Handle search form submission
-        document.getElementById('searchForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const searchTerm = document.getElementById('searchInput').value;
-            // Send the search term to the server for processing
-            // You can use fetch or AJAX to send an HTTP request to the Flask server
-            // Example using fetch:
-            fetch('/search', {
+        // Send user info to the chat room
+        function allocateChatRoom(userId) {
+            fetch('/allocate_chat_room', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ search_term: searchTerm })
+                body: JSON.stringify({ user_id: userId})
             })
-            .then(response => response.json())
-            .then(data => {
-                // Display search results on the page
-                // Modify this part according to your application's logic
-                document.getElementById('searchResults').innerHTML = JSON.stringify(data);
+            .then(response => {
+                if (response.status === 200) {
+                    return response.json();
+                }
+                throw new Error('Failed to enter chat room');
             })
-            .catch(error => console.error('Error:', error));
-        });
+            .then(user_id => {
+                
+                // Handle entering chat room with the user data
+                const chatUrl = `/chat/${user_id}`;
+                window.location.href = chatUrl;
+            })
+            .catch(error => {
+                console.error(error);
+                // Handle the error, e.g., show an error message to the user
+            });
+        }
+
+        // Function to render house cards
+        function renderHouses() {
+            const housesContainer = document.querySelector('.houses');
+            housesContainer.innerHTML = '';
+            housesData.forEach(house => {
+                const houseCard = `
+                    <div class="house">
+                        <img src="${house.image}" alt="${house.title}">
+                        <h3>${house.title}</h3>
+                        <p>${house.description}</p>
+                    </div>
+                `;
+                housesContainer.innerHTML += houseCard;
+            });
+        }
+
+        // Initial render
+        fetchUserMatches();
+        renderHouses();
     </script>
 </body>
 </html>

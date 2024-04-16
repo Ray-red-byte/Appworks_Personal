@@ -64,7 +64,7 @@ def download_from_s3(bucket_name, s3_path, local_file):
 
 
 def get_all_mgdb_good_info():
-    data = collection.find({}, {"h_url": 1})
+    data = collection.find({}, {"url": 1})
     if data:
         return data
     return []
@@ -103,7 +103,8 @@ def insert_good_info_to_mgdb(good_info_url, info):
             "center": True if info["中庭"] == "是" else False,
             "top_add": True if info["頂樓加蓋"] == "是" else False,
             "img_url": info["img_url"],
-            "layout": info["layout"]
+            "layout": info["layout"],
+            'updated_at': datetime.datetime.now()
         }
 
         collection.insert_one(transform_info_dict)
@@ -122,7 +123,7 @@ def main():
 
     download_from_s3(aws_bucket, s3_good_info_path, local_good_info_file)
     all_h_url = get_all_mgdb_good_info()
-    all_h_url = [doc["h_url"] for doc in all_h_url]
+    all_h_url = [doc["url"] for doc in all_h_url]
 
     good_infos = load_from_json(good_json_file_path)
     print(len(all_h_url))

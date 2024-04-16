@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>House Search and Chat Room</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f2f2f2;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        h2 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #chatMessages {
+            padding: 10px;
+            overflow-x: auto;
+            white-space: nowrap;
+            max-width: 100%;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+
+        .message {
+            display: inline-block;
+            padding: 10px;
+            margin: 5px;
+            border-radius: 10px;
+            background-color: #e6f2ff;
+        }
+
+        .message .sender {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        #chatForm {
+            display: flex;
+            flex-direction: column; /* Arrange elements vertically */
+            width: 300px; /* Set the width of the rectangle */
+            height: 400px; /* Set the height of the rectangle */
+            border: 2px solid #ccc; /* Add a border */
+            border-radius: 10px; /* Add rounded corners */
+            padding: 20px; /* Add padding inside the rectangle */
+            overflow-y: auto; /* Add vertical scroll if content exceeds height */
+        }
+
+        #chatInput {
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px 0 0 5px;
+            border-right: none;
+            margin-top: 350px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #a552dc;
+            color: #fff;
+            border: none;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="username">{{ cur_user }} {{ chat_user_name }}</h2>
+
+        <!-- User ID of the current user -->
+        <h2 class="uid" style="display: none;">{{ cur_user_id }}</h2>
+        <h2 class="cuid" style="display: none;">{{ chat_user_id }}</h2>
+        <h2 class="room_id" style="display: none;"></h2>
+
+
+        
+        <h2>Chat Room</h2>
+        <!-- Chat room interface -->
+        <div id="chatMessages">
+            <!-- Chat messages will be displayed here -->
+        </div>
+        <form id="chatForm">
+            <input type="text" id="chatInput" placeholder="Type your message...">
+            <button type="submit">Send</button>
+        </form>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+    <script>
+        // WebSocket connection
+        const socket = io();
+
+        // User ID of the current user
+        const userId1 = document.querySelector('.uid').innerHTML;
+        const userId2 = document.querySelector('.cuid').innerHTML;
+        const roomId = generateRoomId(userId1, userId2);
+
+        // put room id in the chat room and make its style display none
+        document.querySelector('.room_id').innerHTML = roomId;
+
+        // Handle incoming messages
+        socket.on('chat', function(data) {
+
+            const { message, senderId, room_id } = data;
+            const cur_room_id = document.querySelector('.room_id').innerHTML;
+            console.log(cur_room_id, room_id, data)
+
+            // Check if the message is intended for the current user
+            if (cur_room_id === room_id) {
+                // Display the incoming message in the chat room
+                const chatMessages = document.getElementById('chatMessages');
+                const newMessage = document.createElement('div');
+                newMessage.classList.add('message');
+                newMessage.textContent = message;
+                chatMessages.appendChild(newMessage);
+                // Automatically scroll to the right edge of the chat room
+                chatMessages.scrollTo({
+                    left: chatMessages.scrollWidth,
+                    behavior: 'smooth'
+                });
+            }
+        });
+
+        // Send message when the form is submitted
+        document.getElementById('chatForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const messageInput = document.getElementById('chatInput');
+            const message = messageInput.value.trim(); // Trim whitespace
+            const send_user_id = document.querySelector('.cuid').innerHTML;
+            const recip_user_id = document.querySelector('.uid').innerHTML;
+            if (message !== '') {
+                socket.emit('new_message', { 'message': message, senderId: send_user_id, recipientId: recip_user_id });
+                messageInput.value = '';
+            }
+        });
+
+
+        // Concatenate user IDs to create a unique room ID
+        function generateRoomId(userId1, userId2) {
+            const sortedUserIds = [userId1, userId2].sort((a, b) => a - b); // Sort the user IDs
+            return sortedUserIds.join('_');
+        }
+
+    
+        // Join a room
+        socket.emit('join_room', { user_id: userId1, room_id: roomId });
+    </script>
+</body>
+</html>

@@ -9,16 +9,16 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f2f2f2;
+            background-color: #fdfdfd;
         }
 
         .container {
             max-width: 800px;
             margin: 20px auto;
             padding: 20px;
-            background-color: #fff;
+            background-color: #fdfdfd;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 100px rgba(0, 0, 0, 0.1);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -28,15 +28,6 @@
             color: #333;
             text-align: center;
             margin-bottom: 20px;
-        }
-
-        #chatMessages {
-            padding: 10px;
-            overflow-x: auto;
-            white-space: nowrap;
-            max-width: 100%;
-            border-radius: 10px;
-            background-color: #faf7f9;
         }
 
         .message {
@@ -72,14 +63,19 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add box shadow for depth */
         }
 
+        .input-container {
+            display: flex;
+            align-items: center;
+            width: 500px; /* Adjust the width as needed */
+        }
+
         #chatInput {
             padding: 5px;
             border: 1px solid #ccc;
             border-radius: 5px 0 0 5px;
             border-right: none;
-            margin-top: 30px;
-            width: 485px;
             height: 30px;
+            flex: 1; /* Takes up remaining space */
             font-size: 16px;
         }
 
@@ -91,9 +87,9 @@
             border-radius: 0 5px 5px 0;
             cursor: pointer;
             transition: background-color 0.3s;
-            width: 500px;
             font-size: 16px;
         }
+
 
         button:hover {
             background-color: #0056b3;
@@ -102,7 +98,8 @@
 </head>
 <body>
     <div class="container">
-        <h2 class="username">{{ cur_user }} {{ chat_user_name }}</h2>
+        <h2 class="cur-username">{{ cur_user }}</h2>
+        <h2 class="chat-username">{{ chat_user_name }}</h2>
 
         <!-- User ID of the current user -->
         <h2 class="uid" style="display: none;">{{ cur_user_id }}</h2>
@@ -112,15 +109,17 @@
 
         
         <h2>Chat Room</h2>
-        
-        <form id="chatForm">
+        <button id="leave-btn" type="submit">leave</button>
+        <div id="chatForm">
             <div id="chatMessages">
                 <!-- Chat messages will be displayed here -->
             </div>
             
-        </form>
-        <input type="text" id="chatInput" placeholder="Type your message...">
-        <button type="submit">Send</button>
+        </div>
+        <div class="input-container">
+            <input type="text" id="chatInput" placeholder="Type your message...">
+            <button id="send-btn" type="submit">Send</button>
+        </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
@@ -131,6 +130,8 @@
         // User ID of the current user
         const userId1 = document.querySelector('.uid').innerHTML;
         const userId2 = document.querySelector('.cuid').innerHTML;
+        const curUserName = document.querySelector('.cur-username').innerHTML;
+        const chatUserName = document.querySelector('.chat-username').innerHTML;
         const roomId = generateRoomId(userId1, userId2);
 
         // put room id in the chat room and make its style display none
@@ -139,46 +140,60 @@
         // Join a room
         socket.emit('join_room', { user_id: userId1, room_id: roomId });
         
+
+        // Leave a room
+        function leaveRoom(roomId, userId1) {
+            socket.emit('leave', {'roomId': roomId, 'userId1': userId1});
+        }
+
+        // Create a button to let user leave room
+        const leaveRoomBtn = document.getElementById('leave-btn');
+
+        leaveRoomBtn.addEventListener('click', function() {
+            leaveRoom(roomId, userId1);
+        });
+
+
         // Handle incoming messages
-        socket.on('chat', function(data) {
+        socket.on('message', function(data) {
 
-            const { message, senderId, room_id } = data;
+            const { message, senderId, recipientId } = data;
             const cur_room_id = document.querySelector('.room_id').innerHTML;
+            
 
-            // Check if the message is intended for the current user
-            if (cur_room_id === room_id) {
-                // Display the incoming message in the chat room
-                const chatForm = document.getElementById('chatForm');
-                const newMessage = document.createElement('div');
+            // Display the incoming message in the chat room
+            const chatForm = document.getElementById('chatForm');
+            const newMessage = document.createElement('div');   
 
-                // Check if the message is sent by the current user
-                if (senderId === userId1) {
-                    newMessage.classList.add('sent'); // Add 'sent' class for messages sent by the current user
-                } else {
-                    newMessage.classList.add('received'); // Add 'received' class for messages received by the current user
-                }
-
-                //newMessage.textContent = message;  For testing
-
-                newMessage.textContent = "message";
-                chatForm.appendChild(newMessage);
-                // Automatically scroll to the right edge of the chat room
-                chatMessages.scrollTo({
-                    left: chatMessages.scrollWidth,
-                    behavior: 'smooth'
-                });
+            // Check if the message is sent by the current user
+            if (senderId === userId1) {
+                newMessage.classList.add('received'); // Add 'sent' class for messages sent by the current user
+            } else {
+                newMessage.classList.add('sent'); // Add 'received' class for messages received by the current user
             }
+
+            //newMessage.textContent = message;  For testing
+
+            newMessage.textContent = curUserName + ':' + message;
+            chatForm.appendChild(newMessage);
+            // Automatically scroll to the right edge of the chat room
+            chatMessages.scrollTo({
+                left: chatMessages.scrollWidth,
+                behavior: 'smooth'
+            });
         });
 
         // Send message when the form is submitted
-        document.getElementById('chatForm').addEventListener('submit', function(event) {
+        document.getElementById('send-btn').addEventListener('click', function(event) {
             event.preventDefault();
             const messageInput = document.getElementById('chatInput');
             const message = messageInput.value.trim(); // Trim whitespace
             const send_user_id = document.querySelector('.cuid').innerHTML;
             const recip_user_id = document.querySelector('.uid').innerHTML;
+            
             if (message !== '') {
-                socket.emit('new_message', { 'message': message, senderId: send_user_id, recipientId: recip_user_id });
+                console.log('input', message)
+                socket.emit('send_message', { 'message': message, "senderId": send_user_id, "recipientId": recip_user_id, "room": roomId });
                 messageInput.value = '';
             }
         });

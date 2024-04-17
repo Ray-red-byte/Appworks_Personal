@@ -9,6 +9,7 @@ from flask_socketio import SocketIO, emit, join_room, leave_room
 
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET')
 CORS(app)
 
 socketio = SocketIO(app)
@@ -350,6 +351,38 @@ def main_page():
     return redirect(url_for('login'))
 
 
+# ----------------------------Testing--------------------------------
+@socketio.on('join_room')
+def on_join(data):
+    user_id = data['user_id']
+    room_id = data['room_id']
+    join_room(room_id)
+    print(room_id)
+    emit('message', f'{user_id} has joined the room.', room=room_id)
+
+
+@socketio.on('leave')
+def on_leave(data):
+    username = data['userId1']
+    room = data['roomId']
+    leave_room(room)
+    print(f'{username} has left the room.')
+    emit('message', f'{username} has left the room.', room=room)
+
+
+@socketio.on('send_message')
+def handle_message(data):
+    senderId = data['senderId']
+    recipientId = data['recipientId']
+    room = data['room']
+    message = data['message']
+    print(message)
+    emit('message', {'senderId': senderId,
+         "recipientId": recipientId, 'message': message}, room=room)
+
+
+# ----------------------------Testing--------------------------------
+'''
 # Dictionary to store users in each room
 rooms = {}
 
@@ -396,6 +429,7 @@ def handle_leave_room(data):
         rooms[room_id].remove(user_id)
         if len(rooms[room_id]) == 0:
             del rooms[room_id]
+'''
 
 
 @ app.route('/search')

@@ -375,22 +375,29 @@ def handle_offline(data):
 # ----------------------------Testing--------------------------------
 
 
+room_messages = {}
+
+
 @socketio.on('join_room')
 def on_join(data):
     user_id = data['user_id']
     room_id = data['room_id']
     join_room(room_id)
+
+    previous_messages = room_messages.get(room_id, [])
     print(room_id)
-    emit('message', f'{user_id} has joined the room.', room=room_id)
+    emit('message', {"message": 'joined the room.',
+         "recipientId": None, 'senderId': None}, room=room_id)
 
 
 @socketio.on('leave')
 def on_leave(data):
     username = data['userId1']
-    room = data['roomId']
-    leave_room(room)
+    room_id = data['roomId']
+    leave_room(room_id)
     print(f'{username} has left the room.')
-    emit('message', f'{username} has left the room.', room=room)
+    emit('message', {"message": 'eft the room.',
+         "recipientId": None, 'senderId': None}, room=room_id)
 
 
 @socketio.on('send_message')
@@ -400,6 +407,7 @@ def handle_message(data):
     room = data['room']
     message = data['message']
     print(senderId, ':', message)
+    room_messages.setdefault(room, []).append(message)
     emit('message', {'senderId': senderId,
          "recipientId": recipientId, 'message': message}, room=room)
 

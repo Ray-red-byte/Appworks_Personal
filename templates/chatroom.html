@@ -45,6 +45,10 @@
             align-self: flex-start; /* Position messages received by the current user on the left side */
         }
 
+        .middle {
+            align-self: center; /* Position messages received by the current user on the left side */
+        }
+
 
         .message .sender {
             font-weight: bold;
@@ -98,8 +102,8 @@
 </head>
 <body>
     <div class="container">
-        <h2 class="cur-username">{{ cur_user }}</h2>
         <h2 class="chat-username">{{ chat_user_name }}</h2>
+        <h2 class="cur-username" style="display: none;">{{ cur_user }}</h2>
 
         <!-- User ID of the current user -->
         <h2 class="uid" style="display: none;">{{ cur_user_id }}</h2>
@@ -111,9 +115,6 @@
         <h2>Chat Room</h2>
         <button id="leave-btn" type="submit">leave</button>
         <div id="chatForm">
-            <div id="chatMessages">
-                <!-- Chat messages will be displayed here -->
-            </div>
             
         </div>
         <div class="input-container">
@@ -133,6 +134,21 @@
         const curUserName = document.querySelector('.cur-username').innerHTML;
         const chatUserName = document.querySelector('.chat-username').innerHTML;
         const roomId = generateRoomId(userId1, userId2);
+
+
+        function displayPreviousMessage(){
+            // Get all messages
+            fetch('/messages')
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+            });
+        }
+
+        function saveMessage(){
+            const messages = document.getElementById('chatForm');
+            const message = messages.innerHTML;
+        }
 
         // put room id in the chat room and make its style display none
         document.querySelector('.room_id').innerHTML = roomId;
@@ -157,7 +173,7 @@
         // Handle incoming messages
         socket.on('message', function(data) {
 
-            const { message, senderId, recipientId } = data;
+            const { message, recipientId, senderId } = data;
             const cur_room_id = document.querySelector('.room_id').innerHTML;
             
 
@@ -167,14 +183,16 @@
 
             // Check if the message is sent by the current user
             if (senderId === userId1) {
-                newMessage.classList.add('received'); // Add 'sent' class for messages sent by the current user
+                newMessage.classList.add('received'); 
+                newMessage.textContent = chatUserName + ':' + message;
+            } else if (recipientId) {
+                newMessage.classList.add('sent'); 
+                newMessage.textContent = curUserName + ':' + message;
             } else {
-                newMessage.classList.add('sent'); // Add 'received' class for messages received by the current user
+                newMessage.classList.add('middle'); 
+                newMessage.textContent = curUserName + " " + message + "!";
             }
-
-            //newMessage.textContent = message;  For testing
-
-            newMessage.textContent = curUserName + ':' + message;
+            
             chatForm.appendChild(newMessage);
             // Automatically scroll to the right edge of the chat room
             chatMessages.scrollTo({

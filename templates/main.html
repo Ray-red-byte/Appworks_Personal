@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -229,10 +230,10 @@
                 }
                 throw new Error('Failed to enter chat room');
             })
-            .then(user_id => {
+            .then(user => {
                 
                 // Handle entering chat room with the user data
-                const chatUrl = `/chat/${user_id}`;
+                const chatUrl = `/chat/${user["user_id"]}`;
                 window.location.href = chatUrl;
             })
             .catch(error => {

@@ -21,6 +21,7 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             display: flex;
             flex-direction: column;
+            align-items: center;
         }
 
         h2 {
@@ -35,16 +36,24 @@
             white-space: nowrap;
             max-width: 100%;
             border-radius: 10px;
-            background-color: #f9f9f9;
+            background-color: #faf7f9;
         }
 
         .message {
-            display: inline-block;
             padding: 10px;
             margin: 5px;
             border-radius: 10px;
             background-color: #e6f2ff;
         }
+
+        .sent {
+            align-self: flex-end; /* Position messages sent by the current user on the right side */
+        }
+
+        .received {
+            align-self: flex-start; /* Position messages received by the current user on the left side */
+        }
+
 
         .message .sender {
             font-weight: bold;
@@ -53,13 +62,14 @@
 
         #chatForm {
             display: flex;
-            flex-direction: column; /* Arrange elements vertically */
-            width: 300px; /* Set the width of the rectangle */
-            height: 400px; /* Set the height of the rectangle */
-            border: 2px solid #ccc; /* Add a border */
-            border-radius: 10px; /* Add rounded corners */
-            padding: 20px; /* Add padding inside the rectangle */
-            overflow-y: auto; /* Add vertical scroll if content exceeds height */
+            flex-direction: column;
+            width: 480px;
+            height: 600px;
+            border-radius: 10px;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #e5dada; /* Set background color */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add box shadow for depth */
         }
 
         #chatInput {
@@ -67,7 +77,10 @@
             border: 1px solid #ccc;
             border-radius: 5px 0 0 5px;
             border-right: none;
-            margin-top: 350px;
+            margin-top: 30px;
+            width: 485px;
+            height: 30px;
+            font-size: 16px;
         }
 
         button {
@@ -78,6 +91,8 @@
             border-radius: 0 5px 5px 0;
             cursor: pointer;
             transition: background-color 0.3s;
+            width: 500px;
+            font-size: 16px;
         }
 
         button:hover {
@@ -97,14 +112,15 @@
 
         
         <h2>Chat Room</h2>
-        <!-- Chat room interface -->
-        <div id="chatMessages">
-            <!-- Chat messages will be displayed here -->
-        </div>
+        
         <form id="chatForm">
-            <input type="text" id="chatInput" placeholder="Type your message...">
-            <button type="submit">Send</button>
+            <div id="chatMessages">
+                <!-- Chat messages will be displayed here -->
+            </div>
+            
         </form>
+        <input type="text" id="chatInput" placeholder="Type your message...">
+        <button type="submit">Send</button>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
@@ -120,21 +136,32 @@
         // put room id in the chat room and make its style display none
         document.querySelector('.room_id').innerHTML = roomId;
 
+        // Join a room
+        socket.emit('join_room', { user_id: userId1, room_id: roomId });
+        
         // Handle incoming messages
         socket.on('chat', function(data) {
 
             const { message, senderId, room_id } = data;
             const cur_room_id = document.querySelector('.room_id').innerHTML;
-            console.log(cur_room_id, room_id, data)
 
             // Check if the message is intended for the current user
             if (cur_room_id === room_id) {
                 // Display the incoming message in the chat room
-                const chatMessages = document.getElementById('chatMessages');
+                const chatForm = document.getElementById('chatForm');
                 const newMessage = document.createElement('div');
-                newMessage.classList.add('message');
-                newMessage.textContent = message;
-                chatMessages.appendChild(newMessage);
+
+                // Check if the message is sent by the current user
+                if (senderId === userId1) {
+                    newMessage.classList.add('sent'); // Add 'sent' class for messages sent by the current user
+                } else {
+                    newMessage.classList.add('received'); // Add 'received' class for messages received by the current user
+                }
+
+                //newMessage.textContent = message;  For testing
+
+                newMessage.textContent = "message";
+                chatForm.appendChild(newMessage);
                 // Automatically scroll to the right edge of the chat room
                 chatMessages.scrollTo({
                     left: chatMessages.scrollWidth,
@@ -164,8 +191,7 @@
         }
 
     
-        // Join a room
-        socket.emit('join_room', { user_id: userId1, room_id: roomId });
+        
     </script>
 </body>
 </html>

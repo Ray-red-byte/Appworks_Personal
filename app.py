@@ -317,14 +317,11 @@ def get_matches():
 def allocate_chat_room():
 
     chat_user_id = request.json.get('user_id')
-    room_name = f'user_{chat_user_id}'  # Generate room name based on user_id
-
-    join_room(room_name)
-
-    return {'user_id': chat_user_id, 'room_name': room_name}
+    print(chat_user_id)
+    return {'user_id': chat_user_id}
 
 
-@app.route('/chat/<int:user_id>')
+@ app.route('/chat/<int:user_id>')
 def chat(user_id):
     token = request.cookies.get('token')
 
@@ -357,7 +354,7 @@ def main_page():
 rooms = {}
 
 
-@socketio.on('join_room')
+@ socketio.on('join_room')
 def handle_join_room(data):
 
     user_id = data['user_id']
@@ -370,12 +367,14 @@ def handle_join_room(data):
         rooms[room_id].append(user_id)
 
 
-@socketio.on('new_message')
+@ socketio.on('new_message')
 def handle_message(data):
 
     sender_id = data['senderId']
     recipient_id = data['recipientId']
     message = data['message']
+
+    print(sender_id, recipient_id, message)
 
     # Check if both sender and recipient are in the same room
 
@@ -387,7 +386,7 @@ def handle_message(data):
                  'message': message, 'room_id': room_id}, broadcast=True)
 
 
-@socketio.on('leave_room')
+@ socketio.on('leave_room')
 def handle_leave_room(data):
     user_id = data['user_id']
     room_id = data['room_id']

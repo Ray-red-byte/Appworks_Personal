@@ -351,6 +351,49 @@ def main_page():
     return redirect(url_for('login'))
 
 
+@app.route('/save/messages', methods=['POST'])
+def save_messages():
+    room_collection = client['personal_project']['room']
+
+    messages = request.json.get('messages')
+    room_id = request.json.get('room_id')
+    user_id = request.json.get('user_id')
+
+    save_messages = {
+        'room_id': room_id,
+        'last_updated_by': user_id,
+        'messages': messages
+    }
+
+    # Insert messages into MongoDB
+    try:
+
+        room_collection.update_one(
+            {'room_id': room_id},
+            {'$set': {'last_updated_by': user_id, ' messages': messages}},
+            upsert=True  # Create a new document if no matching document is found
+        )
+
+        print("save messages successfully")
+        return jsonify({'success': True, 'message': 'Messages saved successfully'}), 200
+    except Exception as e:
+        print(e)
+        return jsonify({'success': False, 'message': 'Failed to save messages'}), 500
+
+
+@app.route('/get/messages')
+def get_messages():
+    room_id = request.args.get('room_id')
+    room_collection = client['personal_project']['room']
+    room = room_collection.find_one({"room_id": room_id})
+
+    if room:
+        messages = room['messages']
+        last_updated_by = room['last_updated_by']
+        return jsonify({'messages': messages, 'last_updated_by': last_updated_by}), 200
+    return "Messages will be displayed here"
+
+
 # ------------------------Show online users------------------------
 online_users = []
 
@@ -359,7 +402,7 @@ online_users = []
 def handle_online(data):
     user_id = data['user_id']
     online_users.append(user_id)
-    print("add", user_id)
+    print("online", user_id)
     emit('show', online_users, broadcast=True)
 
 
@@ -375,7 +418,7 @@ def handle_offline(data):
 # ----------------------------Testing--------------------------------
 
 
-room_messages = {}
+room_count = {}
 
 
 @socketio.on('join_room')
@@ -383,9 +426,8 @@ def on_join(data):
     user_id = data['user_id']
     room_id = data['room_id']
     join_room(room_id)
-
-    previous_messages = room_messages.get(room_id, [])
-    print(room_id)
+    room_count.setdefault(room_id, 0)
+    room_count[room_id] += 1
     emit('message', {"message": 'joined the room.',
          "recipientId": None, 'senderId': None}, room=room_id)
 
@@ -394,10 +436,22 @@ def on_join(data):
 def on_leave(data):
     username = data['userId1']
     room_id = data['roomId']
-    leave_room(room_id)
+
+    room_count[room_id] -= 1
+    user_count = room_count[room_id]
+
+    print(user_count)
+
+    # if the last one leave the room
     print(f'{username} has left the room.')
-    emit('message', {"message": 'eft the room.',
-         "recipientId": None, 'senderId': None}, room=room_id)
+    if user_count == 0:
+        print("last user left the room.")
+        emit('save_messages', {'last_user': username}, room=room_id)
+        leave_room(room_id)
+    else:
+
+        emit('message', {"message": 'left the room.',
+                         "recipientId": None, 'senderId': None}, room=room_id)
 
 
 @socketio.on('send_message')
@@ -407,7 +461,7 @@ def handle_message(data):
     room = data['room']
     message = data['message']
     print(senderId, ':', message)
-    room_messages.setdefault(room, []).append(message)
+
     emit('message', {'senderId': senderId,
          "recipientId": recipientId, 'message': message}, room=room)
 

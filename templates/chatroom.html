@@ -102,8 +102,8 @@
 </head>
 <body>
     <div class="container">
-        <h2 class="chat-username">{{ chat_user_name }}</h2>
-        <h2 class="cur-username" style="display: none;">{{ cur_user }}</h2>
+        <h2 class="chat-username" style="display: none;">{{ chat_user_name }}</h2>
+        <h2 class="cur-username" >{{ cur_user }}</h2>
 
         <!-- User ID of the current user -->
         <h2 class="uid" style="display: none;">{{ cur_user_id }}</h2>
@@ -115,7 +115,7 @@
         <h2>Chat Room</h2>
         <button id="leave-btn" type="submit">leave</button>
         <div id="chatForm">
-            
+            <!-- Messages show here -->
         </div>
         <div class="input-container">
             <input type="text" id="chatInput" placeholder="Type your message...">
@@ -136,24 +136,79 @@
         const roomId = generateRoomId(userId1, userId2);
 
 
-        function displayPreviousMessage(){
+        function displayPreviousMessage(roomId){
             // Get all messages
-            fetch('/messages')
+            fetch('/get/messages', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ "room_id": roomId})
+            })
             .then(response => response.json())
             .then(data => {
+                const chatForm = document.getElementById('chatForm');
+                if (data['last_updated_by'] === userId1) {
+                    data.forEach(message => {
+                        const newMessage = document.createElement('div');
+                        newMessage.classList.add(data['class']);
+                        newMessage.textContent = data['text'];
+                        chatForm.appendChild(newMessage);
+                    });
+                } else {
+                    data.forEach(message => {
+                        const newMessage = document.createElement('div');
+                        if (data['class'] === 'sent') {
+                            newMessage.classList.add('received');
+                        }
+                        newMessage.classList.add(data['class']);
+                        newMessage.textContent = data['text'];
+                        chatForm.appendChild(newMessage);
+                    });
+                }
+
+
                 console.log(data);
             });
         }
 
         function saveMessage(){
-            const messages = document.getElementById('chatForm');
-            const message = messages.innerHTML;
+            const chatForm = document.getElementById('chatForm');
+            const chatMessages = Array.from(chatForm.children).map(child => {
+                const messageText = child.innerText;
+                const messageClass = child.classList[0];
+                return { "text": messageText, "class": messageClass };
+            }).filter(message => message.class !== 'middle');     
+            
+            console.log('Messages to save:', chatMessages);
+
+            fetch('/save/messages', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ "messages": chatMessages , "room_id": roomId, "user_id": userId1})
+            })
+            .then(response => {
+                if (response.status !== 200) {
+                    throw new Error('Failed to save messages');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Messages saved:', data);
+            })
+            .catch(error => {
+                console.error('Error saving messages:', error);
+            });
+            
         }
 
         // put room id in the chat room and make its style display none
         document.querySelector('.room_id').innerHTML = roomId;
 
         // Join a room
+        displayPreviousMessage();
         socket.emit('join_room', { user_id: userId1, room_id: roomId });
         
 
@@ -162,11 +217,17 @@
             socket.emit('leave', {'roomId': roomId, 'userId1': userId1});
         }
 
-        // Create a button to let user leave room
+        
+
+        socket.on('save_messages', function() {
+            saveMessage();
+        });
+
         const leaveRoomBtn = document.getElementById('leave-btn');
 
         leaveRoomBtn.addEventListener('click', function() {
             leaveRoom(roomId, userId1);
+            window.location.href = '/main';
         });
 
 
@@ -181,6 +242,7 @@
             const chatForm = document.getElementById('chatForm');
             const newMessage = document.createElement('div');   
 
+
             // Check if the message is sent by the current user
             if (senderId === userId1) {
                 newMessage.classList.add('received'); 
@@ -194,11 +256,7 @@
             }
             
             chatForm.appendChild(newMessage);
-            // Automatically scroll to the right edge of the chat room
-            chatMessages.scrollTo({
-                left: chatMessages.scrollWidth,
-                behavior: 'smooth'
-            });
+            chatForm.scrollTop = chatForm.scrollHeight; // Scroll to the bottom
         });
 
         // Send message when the form is submitted
@@ -210,7 +268,6 @@
             const recip_user_id = document.querySelector('.uid').innerHTML;
             
             if (message !== '') {
-                console.log('input', message)
                 socket.emit('send_message', { 'message': message, "senderId": send_user_id, "recipientId": recip_user_id, "room": roomId });
                 messageInput.value = '';
             }

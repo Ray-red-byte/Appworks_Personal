@@ -203,7 +203,7 @@
         
         
         // Function to render match list
-        function renderMatchList(matches, online_users) {
+        function renderMatchList(matches) {
             const matchList = document.getElementById('match-list');
             matchList.innerHTML = '';
             matchList.innerHTML = '<h2>Match List</h2>';
@@ -275,7 +275,7 @@
             })
             .then(matches => {
                 // Update the match list with fetched matches data
-                renderMatchList(matches, );
+                renderMatchList(matches);
             })
             .catch(error => {
                 console.error(error);

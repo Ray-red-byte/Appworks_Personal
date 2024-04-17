@@ -100,6 +100,7 @@
             })
             .then(response => {
                 if (response.status === 200) {
+                    alert('Login successful!');
                     // Extract token from response header
                     const token = response.headers.get('Authorization').split(' ')[1]; // Assuming token is in the format "Bearer <token>"
                     // Set cookie to expire after 10 seconds
@@ -110,7 +111,7 @@
                     window.location.href = '/user/information';
 
                 } else {
-                    console.log(response);
+                    alert('Login failed!');
                 }
             })
             .catch(error => {

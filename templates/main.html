@@ -142,10 +142,22 @@
             font-size: 16px;
             line-height: 1.5;
         }
+
+        /* Online icon style */
+        .fa-circle.text-success {
+            color: green; /* Change the color as needed */
+        }
+
+        /* Offline icon style */
+        .fa-circle.text-danger {
+            color: red; /* Change the color as needed */
+        }
+
     </style>
 </head>
 <body>
     <div class="container">
+        <h1 class="cur-userId" style="display: none;">{{ user_id }}</h1>
         <h1>Rent Right</h1>
         <h2>Hello {{ username }}</h2>
         <div class="filter">
@@ -171,7 +183,10 @@
         <ul></ul>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
     <script>
+
+        const socket = io();
 
         // Sample data for houses and matches (Replace with actual data)
         const housesData = [
@@ -181,19 +196,72 @@
             { id: 4, image: 'house4.jpg', title: 'House 4', description: 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.' },
         ];
 
+
+        // use socketIO Show I am online
+        const userId = document.querySelector('.cur-userId').innerHTML;
+        socket.emit('online', { user_id: userId });
+        
         
         // Function to render match list
-        function renderMatchList(matches) {
+        function renderMatchList(matches, online_users) {
             const matchList = document.getElementById('match-list');
             matchList.innerHTML = '';
             matchList.innerHTML = '<h2>Match List</h2>';
             matches.forEach(match => {
-                const listItem = document.createElement('li');
-                listItem.textContent = `${match["username"]}`;
-                listItem.addEventListener('click', () => allocateChatRoom(match["user_id"]));
-                matchList.appendChild(listItem);
+
+                if (match["user_id"] !== userId) {
+                    const listItem = document.createElement('li');
+
+                    // Creating an icon element
+                    const icon = document.createElement('i');
+                    
+                    // Initially, assuming user is offline
+                    icon.className = `fas fa-circle text-danger`;
+                    icon.id = `${match["user_id"]}`;
+                    icon.textContent = 'offline';
+
+                    const usernameSpan = document.createElement('span');
+
+                    usernameSpan.textContent = match["username"];
+
+                    listItem.appendChild(icon);
+                    listItem.appendChild(usernameSpan);
+
+                    listItem.addEventListener('click', () => allocateChatRoom(match["user_id"]));
+
+                    matchList.appendChild(listItem);
+                }
             });
         }
+
+
+        
+
+
+        // Socket.io event listener to handle online status updates
+        socket.on('show', function(online_users) {
+            // Find the corresponding list item and update its online status
+            online_users.forEach(user_id => {
+                const icon = document.getElementById(user_id);            
+                if (icon) {
+                    icon.textContent = 'online';
+                    icon.className = `fas fa-circle text-success`;
+                }
+            });
+        });
+
+        // Socket.io event listener to handle offline status updates
+        socket.on('hide', function(offline_users) {
+            // Find the corresponding list item and update its online status
+            offline_users.forEach(user_id => {
+                const icon = document.getElementById(user_id);            
+                if (icon) {
+                    icon.textContent = 'offline';
+                    icon.className = `fas fa-circle text-danger`;
+                }
+            });
+        });
+
 
 
         // Function to fetch user matches from Flask API
@@ -207,7 +275,7 @@
             })
             .then(matches => {
                 // Update the match list with fetched matches data
-                renderMatchList(matches);
+                renderMatchList(matches, );
             })
             .catch(error => {
                 console.error(error);
@@ -257,6 +325,9 @@
                 housesContainer.innerHTML += houseCard;
             });
         }
+
+
+        
 
         // Initial render
         fetchUserMatches();

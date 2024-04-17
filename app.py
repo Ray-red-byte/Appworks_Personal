@@ -346,12 +346,35 @@ def main_page():
 
     if isinstance(user_id, int):
         username = get_user_name(user_id)
-        return render_template('main.html', username=username)
+        return render_template('main.html', username=username, user_id=user_id)
 
     return redirect(url_for('login'))
 
 
+# ------------------------Show online users------------------------
+online_users = []
+
+
+@socketio.on('online')
+def handle_online(data):
+    user_id = data['user_id']
+    online_users.append(user_id)
+    print("add", user_id)
+    emit('show', online_users, broadcast=True)
+
+
+@socketio.on('offline')
+def handle_offline(data):
+    user_id = data['user_id']
+    online_users.remove(user_id)
+    print("remove", user_id)
+    emit('hide', user_id, broadcast=True)
+
+# ------------------------Show online users------------------------
+
 # ----------------------------Testing--------------------------------
+
+
 @socketio.on('join_room')
 def on_join(data):
     user_id = data['user_id']
@@ -376,7 +399,7 @@ def handle_message(data):
     recipientId = data['recipientId']
     room = data['room']
     message = data['message']
-    print(message)
+    print(senderId, ':', message)
     emit('message', {'senderId': senderId,
          "recipientId": recipientId, 'message': message}, room=room)
 

@@ -156,6 +156,10 @@
     </style>
 </head>
 <body>
+    <div class="header">
+        <h1 class="greeting">Hello, {{ username }}</h1>
+        <a href="/logout" class="logout-icon"><img src="/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/icons/7124045_logout_icon.png" /></a>
+    </div>
     <div class="container">
         <h1 class="cur-userId" style="display: none;">{{ user_id }}</h1>
         <h1>Rent Right</h1>
@@ -234,10 +238,6 @@
             });
         }
 
-
-        
-
-
         // Socket.io event listener to handle online status updates
         socket.on('show', function(online_users) {
             // Find the corresponding list item and update its online status
@@ -261,7 +261,6 @@
                 }
             });
         });
-
 
 
         // Function to fetch user matches from Flask API

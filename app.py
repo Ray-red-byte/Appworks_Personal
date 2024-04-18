@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify, make_response, redirect, url_for
 import os
 from dotenv import load_dotenv
+from datetime import datetime
 import pymongo
 from werkzeug.security import generate_password_hash, check_password_hash
 from function import get_user_id, check_exist_user, validate_email, create_token, authentication, get_user_password, get_user_name
@@ -318,7 +319,6 @@ def get_matches():
 def allocate_chat_room():
 
     chat_user_id = request.json.get('user_id')
-    print(chat_user_id)
     return {'user_id': chat_user_id}
 
 
@@ -365,12 +365,15 @@ def save_messages():
         'messages': messages
     }
 
+    print("only one user save messages", messages)
+
     # Insert messages into MongoDB
     try:
-
+        timestamp = datetime.now()
         room_collection.update_one(
             {'room_id': room_id},
-            {'$set': {'last_updated_by': user_id, ' messages': messages}},
+            {'$set': {'last_updated_by': user_id,
+                      'messages': messages, 'timestamp': timestamp}},
             upsert=True  # Create a new document if no matching document is found
         )
 
@@ -381,17 +384,20 @@ def save_messages():
         return jsonify({'success': False, 'message': 'Failed to save messages'}), 500
 
 
-@app.route('/get/messages')
+@app.route('/get/messages', methods=['POST'])
 def get_messages():
-    room_id = request.args.get('room_id')
+    room_id = request.json.get('room_id')
     room_collection = client['personal_project']['room']
     room = room_collection.find_one({"room_id": room_id})
-
+    print("room", room)
+    print("room_id", room_id)
     if room:
         messages = room['messages']
-        last_updated_by = room['last_updated_by']
-        return jsonify({'messages': messages, 'last_updated_by': last_updated_by}), 200
-    return "Messages will be displayed here"
+        last_updated_user_id = room['last_updated_by']
+        print(messages, last_updated_user_id)
+        return jsonify({'messages': messages, 'last_updated_by': last_updated_user_id}), 200
+
+    return jsonify({'error': 'Room not found'}), 404
 
 
 # ------------------------Show online users------------------------
@@ -424,17 +430,23 @@ room_count = {}
 @socketio.on('join_room')
 def on_join(data):
     user_id = data['user_id']
+    username = get_user_name(int(user_id))
+    print("new user", username)
     room_id = data['room_id']
     join_room(room_id)
     room_count.setdefault(room_id, 0)
     room_count[room_id] += 1
+
+    print(f'{username} {user_id} has join the room.')
+
     emit('message', {"message": 'joined the room.',
-         "recipientId": None, 'senderId': None}, room=room_id)
+                     "recipientId": None, 'senderId': None, 'room_status': username}, room=room_id)
 
 
 @socketio.on('leave')
 def on_leave(data):
-    username = data['userId1']
+    user_id = data['userId1']
+    username = get_user_name(int(user_id))
     room_id = data['roomId']
 
     room_count[room_id] -= 1
@@ -443,27 +455,39 @@ def on_leave(data):
     print(user_count)
 
     # if the last one leave the room
-    print(f'{username} has left the room.')
+
+    print(f'{username} {user_id}has left the room.')
     if user_count == 0:
         print("last user left the room.")
-        emit('save_messages', {'last_user': username}, room=room_id)
+        emit('save_messages', {'last_user': user_id}, room=room_id)
         leave_room(room_id)
     else:
 
         emit('message', {"message": 'left the room.',
-                         "recipientId": None, 'senderId': None}, room=room_id)
+                         "recipientId": None, 'senderId': None, 'room_status': username}, room=room_id)
+        leave_room(room_id)
 
 
 @socketio.on('send_message')
 def handle_message(data):
     senderId = data['senderId']
     recipientId = data['recipientId']
-    room = data['room']
+    room_id = data['room']
     message = data['message']
     print(senderId, ':', message)
 
-    emit('message', {'senderId': senderId,
-         "recipientId": recipientId, 'message': message}, room=room)
+    # Get all users from the room_id
+    total_user = len(room_id.split("_"))
+    user_count = room_count[room_id]
+
+    print("total_user", total_user, "user_count", user_count)
+
+    if user_count < total_user:
+        emit('message', {'senderId': senderId,
+                         "recipientId": recipientId, 'message': message, 'room_status': "save_messages"}, room=room_id)
+    else:
+        emit('message', {'senderId': senderId,
+                         "recipientId": recipientId, 'message': message, 'room_status': "user_join"}, room=room_id)
 
 
 # ----------------------------Testing--------------------------------

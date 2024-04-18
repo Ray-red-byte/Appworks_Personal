@@ -45,7 +45,6 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(filename=log_file_path, level=logging.INFO)
 
 
-
 options = Options()
 options.add_argument('--headless')  # run in headless mode.
 options.add_argument('--disable-gpu')
@@ -66,6 +65,7 @@ def simulate_human_interaction(driver):
     # Introduce another random delay
     time.sleep(random.uniform(1, 5))
 
+
 def upload_to_s3(local_file, bucket_name, s3_path):
     s3 = boto3.client('s3', aws_access_key_id=aws_access_key_id,
                       aws_secret_access_key=aws_secret_access_key)
@@ -82,6 +82,7 @@ def upload_to_s3(local_file, bucket_name, s3_path):
         print("Credentials not available")
         return False
 
+
 def download_from_s3(bucket_name, s3_path, local_file):
     s3 = boto3.client('s3', aws_access_key_id=aws_access_key_id,
                       aws_secret_access_key=aws_secret_access_key)
@@ -93,10 +94,10 @@ def download_from_s3(bucket_name, s3_path, local_file):
 
     return True
 
+
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
 
 
 def load_from_json(json_file):
@@ -115,10 +116,7 @@ def store_url(urls, json_file):
     print(f"URL stored successfully.")
 
 
-
 def crawl_each_url(website_url, driver, rent_info):
-
-    
 
     try:
 
@@ -128,7 +126,6 @@ def crawl_each_url(website_url, driver, rent_info):
 
         simulate_human_interaction(driver)
 
-        
         info_dict = {}
         xpaths = {
             "house_code": "/html/body/form/div[2]/div[2]/section/div[1]/div[2]/h2",
@@ -143,14 +140,12 @@ def crawl_each_url(website_url, driver, rent_info):
             "min_stay": "/html/body/form/div[2]/div[2]/section/div[6]/div[2]/table/tbody/tr[1]/td[4]"
         }
 
-        
         for key, xpath in xpaths.items():
             try:
                 element = driver.find_element(
-                        By.XPATH, xpath)
+                    By.XPATH, xpath)
                 text = element.text
 
-                
                 info_dict.update({key: text})
 
             except Exception as e:
@@ -158,17 +153,17 @@ def crawl_each_url(website_url, driver, rent_info):
                 continue
 
         # img url
-        img_url = driver.find_element(By.XPATH, "/html/body/form/div[2]/div[2]/section/div[2]/div[3]/ul/li[1]/figure/img").get_attribute("src")
+        img_url = driver.find_element(
+            By.XPATH, "/html/body/form/div[2]/div[2]/section/div[2]/div[3]/ul/li[1]/figure/img").get_attribute("src")
         info_dict.update({"img_url": img_url})
 
-        
         # Check if info have been extracted
         if website_url in rent_info:
             print("Already exists", website_url)
             return True, rent_info, "already exists"
 
-        
-        tbody_element = driver.find_element(By.XPATH, "/html/body/form/div[2]/div[2]/section/div[6]/div[2]/table/tbody")
+        tbody_element = driver.find_element(
+            By.XPATH, "/html/body/form/div[2]/div[2]/section/div[6]/div[2]/table/tbody")
         rows = tbody_element.find_elements(By.TAG_NAME, "tr")
         for id, row in enumerate(rows):
 
@@ -180,7 +175,8 @@ def crawl_each_url(website_url, driver, rent_info):
                 value_cells = row.find_elements(By.CLASS_NAME, "values")
 
                 for title_cell, value_cell in zip(title_cells, value_cells):
-                    title = unicodedata.normalize("NFKC", title_cell.text.strip()).replace(' ', '')
+                    title = unicodedata.normalize(
+                        "NFKC", title_cell.text.strip()).replace(' ', '')
                     span_value = value_cell.find_elements(By.TAG_NAME, "span")
                     value_list = []
                     for i in span_value:
@@ -192,37 +188,37 @@ def crawl_each_url(website_url, driver, rent_info):
 
             # Extract and store each key-value pair from the row
             for title_cell, value_cell in zip(title_cells, value_cells):
-                title = unicodedata.normalize("NFKC", title_cell.text.strip()).replace(' ', '')
+                title = unicodedata.normalize(
+                    "NFKC", title_cell.text.strip()).replace(' ', '')
                 value = unicodedata.normalize("NFKC", value_cell.text.strip())
 
                 if title == "最短租期":
                     values_cells = row.find_elements(By.CLASS_NAME, "values")
 
                     for value_cell in values_cells:
-                        value = unicodedata.normalize("NFKC", value_cell.text.strip())
+                        value = unicodedata.normalize(
+                            "NFKC", value_cell.text.strip())
                         break
 
                 info_dict[title] = value
-        
 
         # Update rent_info
         new_rent_info = {website_url: info_dict}
         new_rent_info.update(rent_info)
         rent_info = new_rent_info
 
-        # Success ! 
+        # Success !
         print("Success", website_url)
         print("--------------------------------------------------------------------------")
         return False, rent_info, "success"
-    
+
     except Exception as e:
-        print(e)
         print("Cannot crawl the website", website_url)
         return False, rent_info, "cannot crawl"
 
 
 def main():
-    
+
     # download good_url from S3
     try:
         download_from_s3(aws_bucket, s3_good_url_path, local_good_url_file)
@@ -236,7 +232,6 @@ def main():
     except Exception as e:
         print("No info file on S3")
 
-
     # Download the url and info file
     rent_good_urls = load_from_json(local_good_url_file)
     rent_good_info = load_from_json(local_good_info_file)
@@ -244,20 +239,21 @@ def main():
     logger.info(f"Previous number : {len(rent_good_info)}")
     timestamp_start = datetime.datetime.now()
     timestamp_start_stf = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    logger.info(f"-------------Start Crawler {timestamp_start_stf}-------------")
-
+    logger.info(
+        f"-------------Start Crawler {timestamp_start_stf}-------------")
 
     # Create and start threads
     count = 1
     server_error = 0
     for rent_good_url, title in rent_good_urls.items():
-        
+
         if server_error > 5:
             print("Server error more than 5 times, stop crawling. Sorry")
             break
 
         driver = webdriver.Chrome(options=options)
-        stop, rent_info, response = crawl_each_url(rent_good_url, driver, rent_good_info)
+        stop, rent_info, response = crawl_each_url(
+            rent_good_url, driver, rent_good_info)
         driver.quit()
 
         if response == "cannot crawl":
@@ -270,14 +266,13 @@ def main():
 
         server_error = 0
         store_url(rent_info, local_good_info_file)
-    
-    
+
     logger.info(f"Total number : {len(rent_good_info)}")
     timestamp_end = datetime.datetime.now()
     timestamp_end_stf = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    logger.info(f"-------------Time consume {timestamp_end - timestamp_start}-------------")
+    logger.info(
+        f"-------------Time consume {timestamp_end - timestamp_start}-------------")
     logger.info(f"-------------End Crawler {timestamp_end_stf}-------------")
-    
 
     # Upload the updated file to S3
     upload_to_s3(local_good_info_file, aws_bucket, s3_good_info_path)

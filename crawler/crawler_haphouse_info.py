@@ -77,8 +77,8 @@ def upload_to_s3(local_file, bucket_name, s3_path):
     except NoCredentialsError:
         print("Credentials not available")
         return False
-    
-    
+
+
 def download_from_s3(bucket_name, s3_path, local_file):
     s3 = boto3.client('s3', aws_access_key_id=aws_access_key_id,
                       aws_secret_access_key=aws_secret_access_key)
@@ -99,7 +99,6 @@ def download_from_s3(bucket_name, s3_path, local_file):
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
 
 
 def load_from_json(json_file):
@@ -124,10 +123,10 @@ def crawl_each_url(website_url, rent_info, driver):
 
         time.sleep(random.uniform(1, 5))
         driver.get(website_url)
-        time.sleep(random.uniform(1, 5))  # Adjust sleep time as needed for the page to load
+        # Adjust sleep time as needed for the page to load
+        time.sleep(random.uniform(1, 5))
 
         simulate_human_interaction(driver)
-
 
         # Define XPath expressions
         xpaths = {
@@ -141,7 +140,7 @@ def crawl_each_url(website_url, rent_info, driver):
         for key, xpath in xpaths.items():
             try:
                 element = driver.find_element(
-                        By.XPATH, xpath)
+                    By.XPATH, xpath)
                 text = element.text
                 info_dict.update({key: text})
 
@@ -150,7 +149,8 @@ def crawl_each_url(website_url, rent_info, driver):
                 continue
 
         # img url
-        img_url = driver.find_element(By.XPATH, "/html/body/div[8]/div[2]/div[1]/div[1]/div/div[1]/div/div/div[1]/img").get_attribute("src")
+        img_url = driver.find_element(
+            By.XPATH, "/html/body/div[8]/div[2]/div[1]/div[1]/div/div[1]/div/div/div[1]/img").get_attribute("src")
         info_dict.update({"img_url": img_url})
 
         # Check if info have been extracted
@@ -159,49 +159,51 @@ def crawl_each_url(website_url, rent_info, driver):
             return True, rent_info, "success"
 
         parent_element = driver.find_element(By.CLASS_NAME, "block__info-sub")
-        
 
         # Iterate through each section (div) containing sub-information
-        sub_info_divs = parent_element.find_elements(By.CLASS_NAME, "list__info-sub")
+        sub_info_divs = parent_element.find_elements(
+            By.CLASS_NAME, "list__info-sub")
         for sub_info_div in sub_info_divs:
-            
+
             # Extract the list items (li) within the section
             list_items = sub_info_div.find_elements(By.TAG_NAME, "li")
-            
+
             # Extract and store each key-value pair within the section
             for list_item in list_items:
-                label_element = list_item.find_element(By.CLASS_NAME, "list__label")
+                label_element = list_item.find_element(
+                    By.CLASS_NAME, "list__label")
                 label_text = label_element.text.strip()
-                
-                content_element = list_item.find_element(By.CLASS_NAME, "list__content")
+
+                content_element = list_item.find_element(
+                    By.CLASS_NAME, "list__content")
                 content_text = content_element.text.strip()
-                
+
                 # Handle cases where the content contains multiple items (e.g., equipment)
                 if content_element.find_elements(By.TAG_NAME, "b"):
-                    content_items = [b.text.strip() for b in content_element.find_elements(By.TAG_NAME, "b")]
+                    content_items = [
+                        b.text.strip() for b in content_element.find_elements(By.TAG_NAME, "b")]
                     info_dict[label_text] = content_items
                 else:
                     if label_text:
                         info_dict[label_text] = content_text
                     else:
                         info_dict["坪數"] = content_text
-            
+
         # Update rent_info
         new_rent_info = {website_url: info_dict}
         new_rent_info.update(rent_info)
         rent_info = new_rent_info
-        
+
         print("--------------------------------------------------------------------------")
         return False, rent_info, "success"
 
     except Exception as e:
-        print(e)
         print("Cannot crawl the website", website_url)
         return False, rent_info, "cannot crawl"
 
 
 def main():
-    
+
     # ----------------------------------------------------------------樂屋網----------------------------------------------------------------
     # download hap_url from S3
     try:
@@ -211,7 +213,6 @@ def main():
         print("No url file on S3")
         exit()
 
-
     # download hap_info from S3
     try:
         download_from_s3(aws_bucket, s3_hap_info_path, local_hap_info_file)
@@ -219,18 +220,16 @@ def main():
         print(e)
         print("No info file on S3")
 
-
     # Download the url and info file
     rent_hap_urls = load_from_json(local_hap_url_file)
     rent_hap_info = load_from_json(local_hap_info_file)
-
 
     # Log start time
     logger.info(f"Previous number : {len(rent_hap_info)}")
     timestamp_start = datetime.datetime.now()
     timestamp_start_stf = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    logger.info(f"---------- ---Start Crawler {timestamp_start_stf}-------------")
-
+    logger.info(
+        f"---------- ---Start Crawler {timestamp_start_stf}-------------")
 
     # Create and start threads
     server_error = 0
@@ -241,7 +240,8 @@ def main():
             break
 
         driver = webdriver.Chrome(options=options)
-        stop, rent_info, response = crawl_each_url(rent_hap_url, rent_hap_info, driver)
+        stop, rent_info, response = crawl_each_url(
+            rent_hap_url, rent_hap_info, driver)
         driver.quit()
 
         if stop:
@@ -254,19 +254,18 @@ def main():
 
         store_url(rent_info, local_hap_info_file)
 
-
     # Log end time
     logger.info(f"Total number : {len(rent_hap_info)}")
     timestamp_end = datetime.datetime.now()
     timestamp_end_stf = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    logger.info(f"-------------Time consume {timestamp_end - timestamp_start}-------------")
+    logger.info(
+        f"-------------Time consume {timestamp_end - timestamp_start}-------------")
     logger.info(f"-------------End Crawler {timestamp_end_stf}-------------")
-    
 
     # Upload the updated file to S3
     upload_to_s3(local_hap_info_file, aws_bucket, s3_hap_info_path)
     upload_to_s3(local_hap_url_file, aws_bucket, s3_hap_url_path)
-        
+
 
 if __name__ == "__main__":
     main()

@@ -9,7 +9,7 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #fdfdfd;
+            background-color: #c2c1c1;
         }
 
         .container {
@@ -108,7 +108,7 @@
         <!-- User ID of the current user -->
         <h2 class="uid" style="display: none;">{{ cur_user_id }}</h2>
         <h2 class="cuid" style="display: none;">{{ chat_user_id }}</h2>
-        <h2 class="room_id" style="display: none;"></h2>
+        <h2 class="room_id" ></h2>
 
 
         
@@ -134,8 +134,8 @@
         const curUserName = document.querySelector('.cur-username').innerHTML;
         const chatUserName = document.querySelector('.chat-username').innerHTML;
         const roomId = generateRoomId(userId1, userId2);
-
-
+        document.querySelector('.room_id').innerHTML = roomId;
+        
         function displayPreviousMessage(roomId){
             // Get all messages
             fetch('/get/messages', {
@@ -143,35 +143,41 @@
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ "room_id": roomId})
+                body: JSON.stringify({ "room_id": roomId })
             })
             .then(response => response.json())
             .then(data => {
+                console.log(data);
                 const chatForm = document.getElementById('chatForm');
                 if (data['last_updated_by'] === userId1) {
-                    data.forEach(message => {
+                    console.log("data['last_updated_by'] === userId1");
+                    data['messages'].forEach(message => {
                         const newMessage = document.createElement('div');
-                        newMessage.classList.add(data['class']);
-                        newMessage.textContent = data['text'];
+                        newMessage.classList.add(message['class']);
+                        newMessage.textContent = message['text'];
                         chatForm.appendChild(newMessage);
                     });
                 } else {
-                    data.forEach(message => {
+                    console.log("data['last_updated_by'] !== userId1");
+                    data['messages'].forEach(message => {
                         const newMessage = document.createElement('div');
-                        if (data['class'] === 'sent') {
+
+                        if (message['class'] === 'sent') {
                             newMessage.classList.add('received');
                         }
-                        newMessage.classList.add(data['class']);
-                        newMessage.textContent = data['text'];
+                        if (message['class'] === 'received') {
+                            newMessage.classList.add('sent');
+                        }
+
+                        newMessage.textContent = message['text'];
                         chatForm.appendChild(newMessage);
                     });
-                }
-
-
-                console.log(data);
+                }    
             });
         }
 
+
+        // Save messages when the user leaves the room
         function saveMessage(){
             const chatForm = document.getElementById('chatForm');
             const chatMessages = Array.from(chatForm.children).map(child => {
@@ -190,6 +196,7 @@
                 body: JSON.stringify({ "messages": chatMessages , "room_id": roomId, "user_id": userId1})
             })
             .then(response => {
+                console.log(response);
                 if (response.status !== 200) {
                     throw new Error('Failed to save messages');
                 }
@@ -204,24 +211,22 @@
             
         }
 
-        // put room id in the chat room and make its style display none
-        document.querySelector('.room_id').innerHTML = roomId;
+        socket.on('save_messages', function(data) {
+            saveMessage();
+        });
+
 
         // Join a room
-        displayPreviousMessage();
-        socket.emit('join_room', { user_id: userId1, room_id: roomId });
+        socket.emit('join_room', { user_id: userId1, room_id: roomId }, function() {
+            // This function will be called once join_room is completed
+            displayPreviousMessage(roomId);
+        });
         
 
-        // Leave a room
+        // ---------------------------------------- Leave a room -----------------------------------------------------
         function leaveRoom(roomId, userId1) {
             socket.emit('leave', {'roomId': roomId, 'userId1': userId1});
         }
-
-        
-
-        socket.on('save_messages', function() {
-            saveMessage();
-        });
 
         const leaveRoomBtn = document.getElementById('leave-btn');
 
@@ -230,11 +235,13 @@
             window.location.href = '/main';
         });
 
+        
+
 
         // Handle incoming messages
         socket.on('message', function(data) {
 
-            const { message, recipientId, senderId } = data;
+            const { message, recipientId, senderId , room_status } = data;
             const cur_room_id = document.querySelector('.room_id').innerHTML;
             
 
@@ -250,13 +257,21 @@
             } else if (recipientId) {
                 newMessage.classList.add('sent'); 
                 newMessage.textContent = curUserName + ':' + message;
-            } else {
+            } else if (room_status !== curUserName){
                 newMessage.classList.add('middle'); 
-                newMessage.textContent = curUserName + " " + message + "!";
+                // If join new user room_status will become username
+                newMessage.textContent = room_status + " " + message + "!";
             }
             
             chatForm.appendChild(newMessage);
             chatForm.scrollTop = chatForm.scrollHeight; // Scroll to the bottom
+
+
+            // Save messages after message show on the form
+            if (room_status === "save_messages"){
+                console.log("User below room total users save messages");
+                saveMessage();
+            }
         });
 
         // Send message when the form is submitted

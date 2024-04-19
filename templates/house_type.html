@@ -5,6 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>House Preference</title>
     <style>
+        .header {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .header h1 {
+            font-size: 60px; /* Adjust font size */
+            color: #800080; /* Set text color */
+        }
+
+        .logout-icon {
+            width: 50px; /* Adjust icon size */
+            height: 50px; /* Adjust icon size */
+        }
+        
+        .logout-icon img {
+            width: 50px; /* Adjust size as needed */
+            height: 50px; /* Adjust size as needed */
+        }
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -13,15 +32,17 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color:#f9f4f4;
+            background-color: #c2c1c1;
+            zoom: 67%; 
         }
         .container {
-            background: linear-gradient(to right, #8a2be2, #ff7f50); /* Purple to orange gradient */
+            background-color: #eae6e6; /* Purple to orange gradient */
             border-radius: 10px;
             padding: 20px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            width: 1000px; /* Increased width */
-            margin: 20px;
+            width: 1300px; 
+            height: 1600px;
+            margin: 15px;
             display: flex;
             flex-direction: column; /* Arrange children vertically */
             align-items: stretch;
@@ -30,7 +51,7 @@
             display: flex;
             justify-content: space-between;
             flex-wrap: wrap; /* Allow items to wrap */
-            border: 1px solid #fffefe; /* Add border */
+            border: 1px solid #111010; /* Add border */
             border-radius: 5px; /* Add border radius */
             padding: 10px; /* Add padding */
             margin-bottom: 10px; /* Add bottom margin */
@@ -38,23 +59,41 @@
         .section > div {
             width: 48%; /* Adjust width as needed */
         }
-        h1 {
+
+        .right-section {
+            font-size: 25px; /* Set the desired font size */
+        }
+
+        .right-section label {
+            font-size: inherit; /* Inherit font size from parent */
+        }
+
+
+        h1{
             text-align: center;
             margin-bottom: 20px;
-            color: #fffefe; /* White color */
+            color: #800080; 
         }
+
+        h3 {
+            color: #800080; 
+            margin-left: 10px;
+            margin-top: 90px;
+        }
+
         label {
-            display: block;
+            display: flex;
             margin-bottom: 5px;
-            color: #fffefe; /* White color */
+            color: #555; /* White color */
         }
         input[type="range"],
         select,
         input[type="checkbox"] {
-            width: calc(100% - 22px); /* Adjust width */
+            width: 25px; /* Adjust width */
+            height: 25px;
             margin-bottom: 10px;
             border: none;
-            border-radius: 5px;
+            border-radius: 10px;
             padding: 10px;
             box-sizing: border-box;
             background-color: #fffefe;
@@ -65,156 +104,142 @@
             margin-right: 10px;
         }
         input[type="checkbox"] + label {
-            display: inline-block;
+
             vertical-align: middle; /* Align labels vertically */
         }
+
+        .checkbox-container{
+            display: flex;
+            align-items: center;
+        }
+
         input[type="submit"] {
             background-color: #8a2be2; /* Purple color */
             color: white;
             border: none;
+            font-size: 35px;
             padding: 10px 20px;
+            margin-top: 10px;
             border-radius: 5px;
             cursor: pointer;
             width: 100%;
+            height: 60px;
             transition: background-color 0.3s;
         }
         input[type="submit"]:hover {
             background-color: #a971ce;
         }
+
     </style>
 </head>
 <body>
+    <div class="header">
+        <h1 style="font-size: 100px;">Rent Right</h1>
+        <a href="/logout" class="logout-icon"><img src="Appworks_Personal/icons/7124045_logout_icon.png"/></a>
+    </div>
     <div class="container">
-        <h1>House Preference</h1>
-        <form id="housePreferenceForm" action='/user/house_type_insert' method="POST">
-            <label for="price">Price:</label>
-            <input type="range" id="price" name="price" min="0" max="100" step="1" value="50">
+        <h1 style="font-size: 60px;">House Item Preference</h1>
+        <form id="housePreferenceForm" action='/user/furniture_insert' method="POST">
+            <div class="right-section">
+                <h3>Equipment:</h3>
+                <div class="section">
+                    <div>
+                        <div class="checkbox-container">
+                            <label for="internet">Internet</label>
+                            <input type="checkbox" id="internet" name="equip" value="internet">
+                        </div>
+                        <br>
+                        <div class="checkbox-container">
+                            <label for="cableTV">TV</label>
+                            <input type="checkbox" id="cableTV" name="equip" value="cableTV">
+                        </div>
+                        <br>
+                        <div class="checkbox-container">
+                            <label for="washingMachine">Washing Machine</label>
+                            <input type="checkbox" id="washingMachine" name="equip" value="washingMachine">
+                        </div>
+                        <br>
+                        <div>
+                            <label for="dryer">Dryer</label>
+                            <input type="checkbox" id="dryer" name="equip" value="dryer">
+                        </div>
+                        <br>
+                        <input type="checkbox" id="dryingMachine" name="equip" value="dryingMachine">
+                        <label for="dryingMachine">Drying Machine</label>
+                    </div>
+                    <div>   
+                        <input type="checkbox" id="waterDispenser" name="equip" value="waterDispenser">
+                        <label for="waterDispenser">Water Dispenser</label>
+                        <br>
+                        <input type="checkbox" id="waterFilter" name="equip" value="waterFilter">
+                        <label for="waterFilter">Water Filter</label>
+                        <br>
+                        <input type="checkbox" id="lcdTV" name="equip" value="lcdTV">
+                        <label for="lcdTV">LCD TV</label>
+                        <br>
+                        <input type="checkbox" id="refrigerator" name="equip" value="refrigerator">
+                        <label for="refrigerator">Refrigerator</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="microwave" name="equip" value="microwave">
+                        <label for="microwave">Microwave</label>
+                        <br>
+                        <input type="checkbox" id="gasStove" name="equip" value="gasStove">
+                        <label for="gasStove">Gas Stove</label>
+                        <br>
+                        <input type="checkbox" id="naturalGas" name="equip" value="naturalGas">
+                        <label for="naturalGas">Natural Gas</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="inductionCooker" name="equip" value="inductionCooker">
+                        <label for="inductionCooker">Induction Cooker</label>
+                        <br>
+                        <input type="checkbox" id="electricFan" name="equip" value="electricFan">
+                        <label for="electricFan">Electric Fan</label>
+                        <br>
+                        <input type="checkbox" id="oven" name="equip" value="oven">
+                        <label for="oven">Oven</label>
+                    </div>
+                </div>
 
-            <label for="houseAge">House Age:</label>
-            <input type="range" id="houseAge" name="houseAge" min="0" max="50" step="1" value="25">
-            
-            
-            <label for="zone">Zone:</label>
-            <select id="zone" name="zone">
-                <option value="">Select a district</option>
-                <optgroup label="Taipei City">
-                    <option value="Zhongzheng">Zhongzheng District (中正區)</option>
-                    <option value="Datong">Datong District (大同區)</option>
-                    <option value="Zhongshan">Zhongshan District (中山區)</option>
-                    <option value="Songshan">Songshan District (松山區)</option>
-                    <option value="Daan">Da'an District (大安區)</option>
-                    <option value="Wanhua">Wanhua District (萬華區)</option>
-                    <option value="Xinyi">Xinyi District (信義區)</option>
-                    <option value="Shilin">Shilin District (士林區)</option>
-                    <option value="Beitou">Beitou District (北投區)</option>
-                    <option value="Neihu">Neihu District (內湖區)</option>
-                    <option value="Nangang">Nangang District (南港區)</option>
-                    <option value="Wenshan">Wenshan District (文山區)</option>
-                </optgroup>
-            </select>
-
-            <label for="stayWithLandlord">Stay with Landlord:</label>
-            <select id="stayWithLandlord" name="stayWithLandlord">
-                <option value="yes">Yes</option>
-                <option value="no">No</option>
-            </select>
-            
-            <label for="park">Park Nearby:</label>
-            <select id="park" name="park">
-                <option value="yes">Yes</option>
-                <option value="no">No</option>
-            </select>
-            
-            <label for="equip">Equipment:</label>
-            <div class="section">
-                <div>
-                    <input type="checkbox" id="internet" name="equip" value="internet">
-                    <label for="internet">Internet</label>
-                    <br>
-                    <input type="checkbox" id="cableTV" name="equip" value="cableTV">
-                    <label for="cableTV">Cable TV</label>
-                    <br>
-                    <input type="checkbox" id="washingMachine" name="equip" value="washingMachine">
-                    <label for="washingMachine">Washing Machine</label>
-                    <br>
-                    <input type="checkbox" id="dryer" name="equip" value="dryer">
-                    <label for="dryer">Dryer</label>
-                    <br>
-                    <input type="checkbox" id="dryingMachine" name="equip" value="dryingMachine">
-                    <label for="dryingMachine">Drying Machine</label>
-                </div>
-                <div>   
-                    <input type="checkbox" id="waterDispenser" name="equip" value="waterDispenser">
-                    <label for="waterDispenser">Water Dispenser</label>
-                    <br>
-                    <input type="checkbox" id="waterFilter" name="equip" value="waterFilter">
-                    <label for="waterFilter">Water Filter</label>
-                    <br>
-                    <input type="checkbox" id="lcdTV" name="equip" value="lcdTV">
-                    <label for="lcdTV">LCD TV</label>
-                    <br>
-                    <input type="checkbox" id="refrigerator" name="equip" value="refrigerator">
-                    <label for="refrigerator">Refrigerator</label>
-                </div>
-                <div>
-                    <input type="checkbox" id="microwave" name="equip" value="microwave">
-                    <label for="microwave">Microwave</label>
-                    <br>
-                    <input type="checkbox" id="gasStove" name="equip" value="gasStove">
-                    <label for="gasStove">Gas Stove</label>
-                    <br>
-                    <input type="checkbox" id="naturalGas" name="equip" value="naturalGas">
-                    <label for="naturalGas">Natural Gas</label>
-                </div>
-                <div>
-                    <input type="checkbox" id="inductionCooker" name="equip" value="inductionCooker">
-                    <label for="inductionCooker">Induction Cooker</label>
-                    <br>
-                    <input type="checkbox" id="electricFan" name="equip" value="electricFan">
-                    <label for="electricFan">Electric Fan</label>
-                    <br>
-                    <input type="checkbox" id="oven" name="equip" value="oven">
-                    <label for="oven">Oven</label>
+                
+                <h3>Furniture:</h3>
+                <div class="section">
+                    <div>
+                        <input type="checkbox" id="wardrobe" name="furniture" value="wardrobe">
+                        <label for="wardrobe">Wardrobe</label>
+                        <br>
+                        <input type="checkbox" id="diningTable" name="furniture" value="diningTable">
+                        <label for="diningTable">Dining Table</label>
+                        <br>
+                        <input type="checkbox" id="diningChair" name="furniture" value="diningChair">
+                        <label for="diningChair">Dining Chair</label>
+                        <br>
+                        <input type="checkbox" id="cabinet" name="furniture" value="cabinet">
+                        <label for="cabinet">Cabinet</label>
+                        <br>
+                        <input type="checkbox" id="singleBed" name="furniture" value="singleBed">
+                        <label for="singleBed">Single Bed</label>
+                    </div>    
+                    <div>
+                        <input type="checkbox" id="doubleBed" name="furniture" value="doubleBed">
+                        <label for="doubleBed">Double Bed</label>
+                        <br>
+                        <input type="checkbox" id="desk" name="furniture" value="desk">
+                        <label for="desk">Desk</label>
+                        <br>
+                        <input type="checkbox" id="chair" name="furniture" value="chair">
+                        <label for="chair">Chair</label>
+                        <br>
+                        <input type="checkbox" id="sofa" name="furniture" value="sofa">
+                        <label for="sofa">Sofa</label>
+                        <!-- Add more furniture options here -->
+                    </div>
                 </div>
             </div>
-
-            
-            <label for="furniture">Furniture:</label>
-            <div class="section">
-                <div>
-                    <input type="checkbox" id="wardrobe" name="furniture" value="wardrobe">
-                    <label for="wardrobe">Wardrobe (衣櫥)</label>
-                    <br>
-                    <input type="checkbox" id="diningTable" name="furniture" value="diningTable">
-                    <label for="diningTable">Dining Table (餐桌)</label>
-                    <br>
-                    <input type="checkbox" id="diningChair" name="furniture" value="diningChair">
-                    <label for="diningChair">Dining Chair (餐椅)</label>
-                    <br>
-                    <input type="checkbox" id="cabinet" name="furniture" value="cabinet">
-                    <label for="cabinet">Cabinet (置物櫃)</label>
-                    <br>
-                    <input type="checkbox" id="singleBed" name="furniture" value="singleBed">
-                    <label for="singleBed">Single Bed (單人床)</label>
-                </div>    
-                <div>
-                    <input type="checkbox" id="doubleBed" name="furniture" value="doubleBed">
-                    <label for="doubleBed">Double Bed (雙人床)</label>
-                    <br>
-                    <input type="checkbox" id="desk" name="furniture" value="desk">
-                    <label for="desk">Desk (書桌)</label>
-                    <br>
-                    <input type="checkbox" id="chair" name="furniture" value="chair">
-                    <label for="chair">Chair (椅子)</label>
-                    <br>
-                    <input type="checkbox" id="sofa" name="furniture" value="sofa">
-                    <label for="sofa">Sofa (沙發)</label>
-                    <!-- Add more furniture options here -->
-                </div>
-            </div>
-            
-            <input type="submit" value="Submit">
+            <input type="submit" value="Check !">
         </form>
     </div>
+
 </body>
 </html>

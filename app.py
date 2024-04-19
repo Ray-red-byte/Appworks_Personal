@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify, make_response, redirect, url_for
 import os
+import re
 from dotenv import load_dotenv
 from datetime import datetime
 import pymongo
@@ -32,7 +33,7 @@ def login():
     return render_template('login.html')
 
 
-@app.route('/logout')
+@app.route('/logout', methods=['GET'])
 def logout():
     response = make_response(redirect(url_for('login')))
     response.set_cookie('token', '', expires=0)
@@ -147,7 +148,7 @@ def register_validate():
         return response_data, 400
 
 
-# User information page
+# -------------------------------------------------------User information page-------------------------------------------------------
 @ app.route('/user/information', methods=["GET", "POST"])
 def user_information():
     # Retrieve the parameters from the query string
@@ -197,11 +198,13 @@ def user_info_insert():
                 {'$set': {'basic_info': basic_info_data}}
             )
 
-            return render_template('house_type.html', username=username)
+            return redirect(url_for('routine_page'))
 
         return redirect(url_for('login'))
+# -------------------------------------------------------User information page-------------------------------------------------------
 
 
+# -------------------------------------------------------User routine page-------------------------------------------------------
 @ app.route('/user/routine_insert', methods=["GET", "POST"])
 def user_routine_insert():
 
@@ -244,14 +247,48 @@ def user_routine_insert():
                 {'$set': {'routine': routine_data}}
             )
 
-            return render_template('house_type.html', username=username)
+            return redirect(url_for('house_type_page'))
 
         return redirect(url_for('login'))
 
+# -------------------------------------------------------User routine page-------------------------------------------------------
 
-@ app.route('/user/house_type_insert', methods=["GET", "POST"])
-def user_house_type_insert():
+
+# -------------------------------------------------------User house type page-------------------------------------------------------
+@app.route('/user/furniture_insert', methods=["GET", "POST"])
+def furniture_insert():
+    # Retrieve the parameters from the query string
+    token = request.cookies.get('token')
+
+    # Call the authentication function to verify the token
+    user_id = authentication(token, jwt_secret_key)
+
+    if isinstance(user_id, int):
+        username = get_user_name(user_id)
+        equipment = request.form.getlist('equip')
+        furniture = request.form.getlist('furniture')
+
+        user_collection = client['personal_project']['user']
+
+        furniture_preference = {
+            'equipment': equipment,
+            'furniture': furniture
+        }
+
+        user_collection.update_one(
+            {'user_id': user_id},
+            {'$set': {'furniture_preference': furniture_preference}}
+        )
+        print("house type saved successfully")
+        return redirect(url_for('main_page'))
+
+    return redirect(url_for('login'))
+
+
+@ app.route('/user/filter', methods=["GET", "POST"])
+def user_filter_insert():
     if request.method == 'POST':
+
         # Retrieve the parameters from the query string
         token = request.cookies.get('token')
 
@@ -263,11 +300,9 @@ def user_house_type_insert():
             # Retrieve form data
             price = request.form.get('price')
             house_age = request.form.get('houseAge')
-            zone = request.form.get('zone')
+            zone = request.form.getlist('zone')
             stay_with_landlord = request.form.get('stayWithLandlord')
             park_nearby = request.form.get('park')
-            equipment = request.form.getlist('equip')
-            furniture = request.form.getlist('furniture')
 
             username = get_user_name(user_id)
             user_collection = client['personal_project']['user']
@@ -278,9 +313,7 @@ def user_house_type_insert():
                 'house_age': house_age,
                 'zone': zone,
                 'stay_with_landlord': stay_with_landlord,
-                'park_nearby': park_nearby,
-                'equipment': equipment,
-                'furniture': furniture
+                'park_nearby': park_nearby
             }
 
             user_collection.update_one(
@@ -288,12 +321,149 @@ def user_house_type_insert():
                 {'$set': {'house_preference': house_preference}}
             )
 
-            return redirect(url_for('main_page'))
+            return "House preference saved successfully", 200
 
         return redirect(url_for('login'))
 
 
-@app.route('/matches', methods=['GET'])
+translations = {
+    "basic_info": "基本資訊",
+    "house_preference": "房屋偏好",
+    "price": "價格",
+    "house_age": "房屋年齡",
+    "zone": "區域",
+    "stay_with_landlord": "與房東同住",
+    "park_nearby": "附近有公園",
+    "equipment": "設備",
+    "Internet": "網路",
+    "cableTV": "有線電視",
+    "washingMachine": "洗衣機",
+    "dryer": "烘乾機",
+    "dryingMachine": "乾衣機",
+    "waterDispenser": "飲水機",
+    "waterFilter": "淨水器",
+    "lcdTV": "電視",
+    "refrigerator": "冰箱",
+    "microwave": "微波爐",
+    "gasStove": "瓦斯爐",
+    "naturalGas": "天然瓦斯",
+    "inductionCooker": "電磁爐",
+    "electricFan": "電風扇",
+    "oven": "烤箱",
+    "furniture": "家具",
+    "wardrobe": "衣櫃",
+    "diningTable": "餐桌",
+    "diningChair": "餐椅",
+    "singleBed": "單人床",
+    "doubleBed": "雙人床",
+    "desk": "桌子",
+    "chair": "椅子",
+    "sofa": "沙發",
+    "routine": "例行公事",
+    "petOptions": "寵物選項"
+}
+
+
+@app.route('/search/hot', methods=['GET'])
+def search_hot():
+
+    # First get user's house preference
+    token = request.cookies.get('token')
+    user_id = authentication(token, jwt_secret_key)
+
+    if not user_id:
+        return redirect(url_for('login'))
+
+    house_collection = client['personal_project']['house']
+    top_houses = list(house_collection.find().sort([('click', -1)]).limit(10))
+    top_houses_json = [
+        {**house, '_id': str(house['_id'])}  # Convert ObjectId to string
+        for house in top_houses
+    ]
+
+    if top_houses_json:
+        return jsonify(top_houses_json), 200
+    else:
+        # If no clicks, return random houses
+        random_houses = list(client['personal_project']['house'].aggregate(
+            [{'$sample': {'size': 10}}]))
+        random_houses_json = [
+            {**house, '_id': str(house['_id'])}  # Convert ObjectId to string
+            for house in random_houses
+        ]
+        return jsonify(random_houses_json), 200
+
+
+# Change method to POST since you're sending data
+@app.route('/search', methods=['GET'])
+def search():
+    # Retrieve the parameters from the query string
+    token = request.cookies.get('token')
+
+    # Call the authentication function to verify the token
+    user_id = authentication(token, jwt_secret_key)
+
+    if isinstance(user_id, int):
+        print("user", user_id)
+        user_collection = client['personal_project']['user']
+        house_collection = client['personal_project']['house']
+        user = user_collection.find_one({"user_id": user_id})
+        user_house_preference = user['house_preference']
+
+        '''
+            Wrong area
+        '''
+        # Base on this preference to search for house
+        zones = user_house_preference['zone']
+        print(zones)
+        zone_pattern = '|'.join(zones)
+        regex_pattern = re.compile(f'({zone_pattern})', re.IGNORECASE)
+
+        # Query MongoDB to find matching houses
+        matching_houses = house_collection.find({
+            # Price less than user's input price
+            'price': {'$lte': float(user_house_preference['price'])},
+            'age': {'$lte': int(user_house_preference['house_age'])},
+            "address": {"$regex": regex_pattern},
+            'stay_landlord': True if user_house_preference['stay_with_landlord'] == "yes" else False,
+            'park': True if user_house_preference['park_nearby'] == "yes" else False,
+        })
+
+        # Convert matching houses to a list before returning
+        search_houses_json = [
+            {**house, '_id': str(house['_id'])}  # Convert ObjectId to string
+            for house in matching_houses
+        ]
+        print(search_houses_json)
+
+        # You may want to process the matching houses list further or send it directly to the frontend
+
+        return jsonify(search_houses_json), 200
+
+# -------------------------------------------------------User house type page-------------------------------------------------------
+
+# ------------------------------------------------------Track user click house------------------------------------------------------
+
+
+@ app.route('/track/click', methods=['POST'])
+def track_click():
+    house_id = request.json.get('house_id')
+
+    token = request.cookies.get('token')
+    user_id = authentication(token, jwt_secret_key)
+    print("click", house_id)
+    # Insert into MongoDB
+    house_collection = client['personal_project']['house']
+    house_collection.update_one(
+        {'url': house_id},
+        {'$inc': {'click': 1}}
+    )
+
+    return "Click tracked", 200
+# ------------------------------------------------------Track user click house------------------------------------------------------
+
+
+@ app.route('/matches', methods=['GET'])
 def get_matches():
     # Get all users from mongodb
     db = client["personal_project"]
@@ -315,7 +485,7 @@ def get_matches():
 # Route to enter chat room with a specific user
 
 
-@app.route('/allocate_chat_room', methods=['POST'])
+@ app.route('/allocate_chat_room', methods=['POST'])
 def allocate_chat_room():
 
     chat_user_id = request.json.get('user_id')
@@ -336,6 +506,8 @@ def chat(user_id):
 
     return redirect(url_for('login'))
 
+# ------------------------------------- Render template-------------------------------------
+
 
 @ app.route('/main')
 def main_page():
@@ -351,7 +523,37 @@ def main_page():
     return redirect(url_for('login'))
 
 
-@app.route('/save/messages', methods=['POST'])
+@ app.route('/routine')
+def routine_page():
+    token = request.cookies.get('token')
+
+    # Call the authentication function to verify the token
+    user_id = authentication(token, jwt_secret_key)
+
+    if isinstance(user_id, int):
+        username = get_user_name(user_id)
+        return render_template('routine.html', username=username)
+
+    return redirect(url_for('login'))
+
+
+@ app.route('/house_type')
+def house_type_page():
+    token = request.cookies.get('token')
+
+    # Call the authentication function to verify the token
+    user_id = authentication(token, jwt_secret_key)
+
+    if isinstance(user_id, int):
+        username = get_user_name(user_id)
+        return render_template('house_type.html', username=username)
+
+    return redirect(url_for('login'))
+
+# ------------------------------------- Render template-------------------------------------
+
+
+@ app.route('/save/messages', methods=['POST'])
 def save_messages():
     room_collection = client['personal_project']['room']
 
@@ -389,12 +591,10 @@ def get_messages():
     room_id = request.json.get('room_id')
     room_collection = client['personal_project']['room']
     room = room_collection.find_one({"room_id": room_id})
-    print("room", room)
-    print("room_id", room_id)
+
     if room:
         messages = room['messages']
         last_updated_user_id = room['last_updated_by']
-        print(messages, last_updated_user_id)
         return jsonify({'messages': messages, 'last_updated_by': last_updated_user_id}), 200
 
     return jsonify({'error': 'Room not found'}), 404
@@ -421,8 +621,6 @@ def handle_offline(data):
 
 # ------------------------Show online users------------------------
 
-# ----------------------------Testing--------------------------------
-
 
 room_count = {}
 
@@ -437,7 +635,7 @@ def on_join(data):
     room_count.setdefault(room_id, 0)
     room_count[room_id] += 1
 
-    print(f'{username} {user_id} has join the room.')
+    print(f'{username} has join the room.')
 
     emit('message', {"message": 'joined the room.',
                      "recipientId": None, 'senderId': None, 'room_status': username}, room=room_id)
@@ -456,7 +654,7 @@ def on_leave(data):
 
     # if the last one leave the room
 
-    print(f'{username} {user_id}has left the room.')
+    print(f'{username} has left the room.')
     if user_count == 0:
         print("last user left the room.")
         emit('save_messages', {'last_user': user_id}, room=room_id)
@@ -488,63 +686,6 @@ def handle_message(data):
     else:
         emit('message', {'senderId': senderId,
                          "recipientId": recipientId, 'message': message, 'room_status': "user_join"}, room=room_id)
-
-
-# ----------------------------Testing--------------------------------
-'''
-# Dictionary to store users in each room
-rooms = {}
-
-
-@ socketio.on('join_room')
-def handle_join_room(data):
-
-    user_id = data['user_id']
-    room_id = data['room_id']
-
-    # Add user to the room
-    if room_id not in rooms:
-        rooms[room_id] = [user_id]
-    else:
-        rooms[room_id].append(user_id)
-
-
-@ socketio.on('new_message')
-def handle_message(data):
-
-    sender_id = data['senderId']
-    recipient_id = data['recipientId']
-    message = data['message']
-
-    print(sender_id, recipient_id, message)
-
-    # Check if both sender and recipient are in the same room
-
-    for room_id, users in rooms.items():
-        # if both user in the same room
-        if sender_id in users and recipient_id in users:
-            # Broadcast the message only to users in the same room
-            emit('chat', {'senderId': sender_id,
-                 'message': message, 'room_id': room_id}, broadcast=True)
-
-
-@ socketio.on('leave_room')
-def handle_leave_room(data):
-    user_id = data['user_id']
-    room_id = data['room_id']
-
-    # Remove user from the room
-    if room_id in rooms:
-        rooms[room_id].remove(user_id)
-        if len(rooms[room_id]) == 0:
-            del rooms[room_id]
-'''
-
-
-@ app.route('/search')
-def search():
-    # Implement your house search functionality here
-    return "Search results will be displayed here"
 
 
 if __name__ == '__main__':

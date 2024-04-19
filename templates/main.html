@@ -6,20 +6,84 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rent Right</title>
     <style>
+      
+        
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f2f2f2;
+            background-color: #dbdada;
+            zoom: 67%; 
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            margin-left: 1200px; /* Remove default margin */
+        }
+
+        .logout-icon {
+            margin-top: 60px;
+            margin-right: 100px; /* Push logout icon to the right */
+        }
+        /* Optional: Adjust styles for the logout icon */
+        .logout-icon img {
+            width: 50px; /* Adjust size as needed */
+            height: 50px; /* Adjust size as needed */
         }
 
         .container {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: #fff;
+            background-color: #dbdada; /* Purple to orange gradient */
             border-radius: 10px;
+            padding: 20px;
+            width: 1000px; /* Increased width */
+            height: 100%;
+            margin: 20px;
+            display: flex;
+            flex-direction: column; /* Arrange children vertically */
+            align-items: stretch;
+        }
+
+        .left-main-section {
+            position: sticky;
+            flex-direction: column;
+            font-size: large;
+            width: 35%;
+            height: 1560px;
+            padding: 20px;
+            margin-top: -50px;
+            margin-left: 60px;
+            background-color: #eae6e6;
+            border-radius: 10px;
+            border: 2px solid #7d7777;
+            z-index: 9999;
+            overflow-y: auto;
+        }
+
+        .right-main-section {
+            display: flex;
+            flex-direction: column;
+            margin-left: 300px;
+            width: 80%;
+            padding: 10px;
+            margin-top: -1700px;
+            background-attachment: fixed;
+        }
+
+        .inside-container {
+            max-width: 1500px;
+            margin: 50px auto;
+            padding: 20px;
+            width: 2500px;
+            background-color: #eae6e6;
+            border-radius: 10px;
+            border: 2px solid #7d7777;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            align-items: center;
         }
 
         h1, h2 {
@@ -120,16 +184,20 @@
             position: fixed;
             top: 200px;
             right: 20px;
-            width: 250px;
+            width: 500px;
+            font-size: 30px;
             background-color: #d3c7d3;
+            border: 2px solid #7d7777;
             border-radius: 10px;
             padding: 20px;
+            margin-top: 200px;
+
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .match-list h2 {
             color: #800080;
-            font-size: 18px;
+            font-size: 30px;
             margin-bottom: 15px;
         }
 
@@ -139,7 +207,7 @@
 
         .match p {
             color: #333;
-            font-size: 16px;
+            font-size: 25px;
             line-height: 1.5;
         }
 
@@ -153,37 +221,187 @@
             color: red; /* Change the color as needed */
         }
 
+        .section {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap; /* Allow items to wrap */
+            border: 1px solid #111010; /* Add border */
+            border-radius: 5px; /* Add border radius */
+            padding: 10px; /* Add padding */
+            margin-bottom: 10px; /* Add bottom margin */
+        }
+        .section > div {
+            width: 48%; /* Adjust width as needed */
+        }
+
+
+        label {
+            display: flex;
+            margin-bottom: 5px;
+            color: #555; /* White color */
+        }
+        input[type="range"],
+        select,
+        input[type="checkbox"] {
+            width: calc(100% - 22px); /* Adjust width */
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+            box-sizing: border-box;
+            background-color: #fffefe;
+        }
+        input[type="checkbox"] {
+            display: inline-block;
+            vertical-align: middle; /* Align checkboxes vertically */
+            margin-right: 10px;
+        }
+        input[type="checkbox"] + label {
+            display: inline-block;
+            vertical-align: middle; /* Align labels vertically */
+        }
+
+        input[type="submit"] {
+            background-color: #8a2be2; /* Purple color */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        input[type="submit"]:hover {
+            background-color: #a971ce;
+        }
+
+        .price, .houseAge{
+            -webkit-appearance: none;
+            appearance: none;
+            width: 130px;
+            height: 5px;
+            background: rgb(28, 2, 2);
+            outline: none;
+            opacity: 0.7;
+            -webkit-transition: .2s;
+            transition: opacity .2s;
+            margin-top: -27px;
+        }
+
+        .price::-webkit-slider-thumb, .houseAge::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #a971ce;
+            cursor: pointer; 
+        }
+
+
     </style>
 </head>
 <body>
     <div class="header">
-        <h1 class="greeting">Hello, {{ username }}</h1>
-        <a href="/logout" class="logout-icon"><img src="/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/icons/7124045_logout_icon.png" /></a>
+        <h1 style="font-size: 100px;">Rent Right</h1>
+        <a href="/logout" class="logout-icon"><img src="Appworks_Personal/icons/7124045_logout_icon.png"/></a>
     </div>
+
     <div class="container">
-        <h1 class="cur-userId" style="display: none;">{{ user_id }}</h1>
-        <h1>Rent Right</h1>
-        <h2>Hello {{ username }}</h2>
-        <div class="filter">
-            <label for="size">Select Size:</label>
-            <select name="size" id="size">
-                <option value="">Any</option>
-                <option value="small">Small</option>
-                <option value="medium">Medium</option>
-                <option value="large">Large</option>
-            </select>
-            <label for="floor">Floor Range:</label>
-            <input type="range" id="floor" name="floor" min="0" max="10" value="0">
-            <label for="price">Price Range:</label>
-            <input type="range" id="price" name="price" min="0" max="10000" value="0">
+        <div class="left-main-section">
+            <h1 style="font-size: 25px;">House Preference</h1>
+            <form id="housePreferenceForm" method="POST">
+                <div class="left-section">
+                    <div style="margin-bottom: 50px;">
+                        <h3>Price:</h3>
+                        <input type="range" id="price" class="price" name="price" min="0" max="200000" step="1" value="50">
+                        <span id="priceValue">50</span>
+                    </div>
+
+                    <div style="margin-bottom: 80px;">
+                        <h3>House Age:</h3>
+                        <input type="range" id="houseAge" class="houseAge" name="houseAge" min="0" max="100" step="1" value="25">
+                        <span id="houseAgeValue">25</span>
+                    </div>
+                    
+                    <div style="margin-bottom: 80px;">
+                        <h3>Zone:</h3>
+                        <div>
+                            <input type="checkbox" id="Zhongzheng" name="zone" value="中正區">
+                            <label for="Zhongzheng">中正區</label>
+     
+                            <input type="checkbox" id="Datong" name="zone" value="大同區">
+                            <label for="Datong">大同區</label>
+                            <br>
+                            <input type="checkbox" id="Zhongshan" name="zone" value="中山區">
+                            <label for="Zhongshan">中山區</label>
+
+                            <input type="checkbox" id="Songshan" name="zone" value="松山區">
+                            <label for="Songshan">松山區</label>
+                            <br>
+                            <input type="checkbox" id="Daan" name="zone" value="大安區">
+                            <label for="Daan">大安區</label>
+
+                            <input type="checkbox" id="Wanhua" name="zone" value="萬華區">
+                            <label for="Wanhua">萬華區</label>
+                            <br>
+                            <input type="checkbox" id="Xinyi" name="zone" value="信義區">
+                            <label for="Xinyi">信義區</label>
+
+                            <input type="checkbox" id="Shilin" name="zone" value="士林區">
+                            <label for="Shilin">士林區</label>
+                            <br>
+                            <input type="checkbox" id="Beitou" name="zone" value="北投區">
+                            <label for="Beitou">北投區</label>
+   
+                            <input type="checkbox" id="Neihu" name="zone" value="內湖區">
+                            <label for="Neihu">內湖區</label>
+                            <br>
+                            <input type="checkbox" id="Nangang" name="zone" value="南港區">
+                            <label for="Nangang">南港區</label>
+ 
+                            <input type="checkbox" id="Wenshan" name="zone" value="文山區">
+                            <label for="Wenshan">文山區</label>
+                            <br>
+                        </div>
+                    </div>
+                    
+
+                    <div style="margin-bottom: 80px;">
+                        <h3>Stay with Landlord:</h3>
+                        <select id="stayWithLandlord" name="stayWithLandlord">
+                            <option value="yes">Yes</option>
+                            <option value="no">No</option>
+                        </select>
+                    </div>
+                    
+                    <div style="margin-bottom: 80px;">
+                        <h3>Park Nearby:</h3>
+                        <select id="park" name="park">
+                            <option value="yes">Yes</option>
+                            <option value="no">No</option>
+                        </select>
+                    </div>
+                </div>
+
+                
+                <input id="search-input" type="submit" value="search">
+            </form>
         </div>
-        <div class="houses">
-            <!-- House cards will be displayed here -->
+    </div>
+
+    <div class="right-main-section">
+        <div class="inside-container">
+            <h1 class="cur-userId" style="display: none;">{{ user_id }}</h1>
+            <h2 style="font-size: 40px;">Hello {{ username }} , Find your future</h2>
+
+            <div class="houses">
+                <!-- House cards will be displayed here -->
+            </div>
         </div>
     </div>
 
     <div class="match-list" id="match-list">
-        <h2>Match List</h2>
+        <h2 style="font-size: 30px;">Match List</h2>
         <ul></ul>
     </div>
 
@@ -192,19 +410,11 @@
 
         const socket = io();
 
-        // Sample data for houses and matches (Replace with actual data)
-        const housesData = [
-            { id: 1, image: 'house1.jpg', title: 'House 1', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
-            { id: 2, image: 'house2.jpg', title: 'House 2', description: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.' },
-            { id: 3, image: 'house3.jpg', title: 'House 3', description: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.' },
-            { id: 4, image: 'house4.jpg', title: 'House 4', description: 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.' },
-        ];
 
 
         // use socketIO Show I am online
         const userId = document.querySelector('.cur-userId').innerHTML;
         socket.emit('online', { user_id: userId });
-        
         
         // Function to render match list
         function renderMatchList(matches) {
@@ -244,7 +454,7 @@
             online_users.forEach(user_id => {
                 const icon = document.getElementById(user_id);            
                 if (icon) {
-                    icon.textContent = 'online';
+                    icon.textContent = 'online  ';
                     icon.className = `fas fa-circle text-success`;
                 }
             });
@@ -256,12 +466,11 @@
             offline_users.forEach(user_id => {
                 const icon = document.getElementById(user_id);            
                 if (icon) {
-                    icon.textContent = 'offline';
+                    icon.textContent = 'offline  ';
                     icon.className = `fas fa-circle text-danger`;
                 }
             });
         });
-
 
         // Function to fetch user matches from Flask API
         function fetchUserMatches() {
@@ -310,27 +519,115 @@
         }
 
         // Function to render house cards
-        function renderHouses() {
-            const housesContainer = document.querySelector('.houses');
-            housesContainer.innerHTML = '';
-            housesData.forEach(house => {
-                const houseCard = `
-                    <div class="house">
-                        <img src="${house.image}" alt="${house.title}">
-                        <h3>${house.title}</h3>
-                        <p>${house.description}</p>
-                    </div>
-                `;
-                housesContainer.innerHTML += houseCard;
+        function renderHouses(api) {
+            // fetch houses from the Flask API
+            fetch(api)
+            .then(response => {
+                console.log("search", response)
+                if (response.status === 200) {
+                    return response.json();
+                }
+                throw new Error('Failed to fetch houses');
+            })
+            .then(housesData => {
+                const housesContainer = document.querySelector('.houses');
+                housesContainer.innerHTML = '';
+                housesData.forEach(house => {
+                    const houseCard = `
+                        <div class="house">
+                            <img src="${house["img_url"]}" alt="${house["title"]}" >
+                            <h3 class="${house["url"]}">${house["title"]}</h3>
+                            <p>${house["price"]}</p>
+                            <p>${house["age"]}</p>
+                            <p>${house["address"]}</p>
+                        </div>
+                    `;
+                    housesContainer.innerHTML += houseCard;
+                });
+            })
+            .catch(error => {
+                console.error(error);
+                // Handle the error, e.g., show an error message to the user
             });
         }
 
+        // Event listener to handle house card click
+        document.querySelector('.houses').addEventListener('click', function(event) {
+            const houseElement = event.target.closest('.house h3');
+            if (houseElement) {
+                const houseId = houseElement.classList[0];
+                // Make an AJAX request to track click
+                fetch('/track/click', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        house_id: houseId,
+                    })
+                })
+                .then(response => {
+                    if (response.status !== 200) {
+                        throw new Error('Failed to track click');
+                    }
+                    // Optionally handle successful response here
+                    console.log('Click tracked successfully');
+                })
+                .catch(error => {
+                    console.error('Error tracking click:', error);
+                });
+                // Navigate to the house details page
+                window.location.href = houseId;
+            }
+        });
 
-        
+
+        // Price range input
+        const priceInput = document.getElementById('price');
+        const priceValue = document.getElementById('priceValue');
+
+        priceInput.addEventListener('input', function() {
+            priceValue.textContent = this.value;
+        });
+
+        // House Age range input
+        const houseAgeInput = document.getElementById('houseAge');
+        const houseAgeValue = document.getElementById('houseAgeValue');
+
+        houseAgeInput.addEventListener('input', function() {
+            houseAgeValue.textContent = this.value;
+        });
+
+
+        // Form submission event listener
+        const housePreferenceForm = document.getElementById('housePreferenceForm');
+
+        housePreferenceForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            fetch('/user/filter', {
+                method: 'POST',
+                body: new FormData(housePreferenceForm)
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    // If the form submission was successful, render houses
+                    renderHouses('/search');
+                } else {
+                    // Handle errors if the form submission failed
+                    console.error('Form submission failed');
+                }
+            })
+            .catch(error => {
+                // Handle network errors or other exceptions
+                console.error('Error:', error);
+            });
+        });
+
 
         // Initial render
+        // with DOM load 
+        renderHouses('/search/hot');
         fetchUserMatches();
-        renderHouses();
     </script>
 </body>
 </html>

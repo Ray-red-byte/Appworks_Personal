@@ -17,6 +17,7 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
+            zoom: 67%; 
         }
         .container {
             background: linear-gradient(to right, #8a2be2, #ff7f50); /* Purple to orange gradient */
@@ -79,6 +80,11 @@
     </style>
 </head>
 <body>
+    <div class="header">
+        <h1 class="greeting">Hello, {{ username }}</h1>
+        <a href="/logout" class="logout-icon"><img src="/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/icons/7124045_logout_icon.png" /></a>
+        <a href="/house_type" class="change-routine">next page</a>
+    </div>
     <div class="container">
         <h1>Daily Routine</h1>
         <form id="routineForm" action='/user/routine_insert' method="POST">

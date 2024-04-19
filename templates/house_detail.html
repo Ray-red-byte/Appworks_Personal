@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>House Details</title>
+    <style>
+        .house-details {
+            margin: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+        }
+        .house-details img {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            border-radius: 10px;
+        }
+        .house-info {
+            margin-top: 20px;
+        }
+        .house-info p {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h2 class="houseId" style="display: none;">{{ houseId }}</h2>
+    <div class="house-details">
+        <h2>House Details</h2>
+        <div class="house-info"></div>
+    </div>
+
+    <script>
+
+        function getHouseData() {
+            const houseId = document.querySelector('.houseId').textContent
+            fetch(`/user/house/${houseId}`)
+                .then(response => response.json())
+                .then(houseData => renderHouseData(houseData))
+                .catch(error => console.error('Error fetching house data:', error));
+        }
+
+        // Function to render house data
+        function renderHouseData(houseData) {
+            const houseInfoContainer = document.querySelector('.house-info');
+            houseInfoContainer.innerHTML = `
+                <h3><a href="${houseData['id']}" target="_blank">${houseData['title']}</a></h3>
+                <img src="${houseData['img_url']}" alt="${houseData['title']}">
+                <p>Price: ${houseData['price']}</p>
+                <p>Address: ${houseData['address']}</p>
+                <p>Type: ${houseData['type']}</p>
+                <p>Age: ${houseData['age']} years</p>
+                <p>Size: ${houseData['size']} sq.m</p>
+                <p>Move-in Date: ${houseData['move_date']}</p>
+                <p>Layout: ${houseData['layout']}</p>
+                <p>Floor: ${houseData['floor']}</p>
+                <p>Clicks: ${houseData['click']}</p>
+            `;
+        }
+
+        // Fetch house data and render it
+        getHouseData()
+            
+    </script>
+
+</body>
+</html>

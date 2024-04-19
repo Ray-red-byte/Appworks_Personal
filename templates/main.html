@@ -72,6 +72,7 @@
             padding: 10px;
             margin-top: -1700px;
             background-attachment: fixed;
+            align-items: center;
         }
 
         .inside-container {
@@ -172,6 +173,10 @@
             color: #800080;
             font-size: 20px;
             margin-bottom: 10px;
+        }
+
+        .house h3:hover {
+            color: red; /* Change color to red when hovered */
         }
 
         .house p {
@@ -401,7 +406,7 @@
     </div>
 
     <div class="match-list" id="match-list">
-        <h2 style="font-size: 30px;">Match List</h2>
+        <h2 style="font-size: 40px;">Match List</h2>
         <ul></ul>
     </div>
 
@@ -536,7 +541,7 @@
                     const houseCard = `
                         <div class="house">
                             <img src="${house["img_url"]}" alt="${house["title"]}" >
-                            <h3 class="${house["url"]}">${house["title"]}</h3>
+                            <h3 class="${house["id"]}">${house["title"]}</h3>
                             <p>${house["price"]}</p>
                             <p>${house["age"]}</p>
                             <p>${house["address"]}</p>
@@ -576,8 +581,8 @@
                 .catch(error => {
                     console.error('Error tracking click:', error);
                 });
-                // Navigate to the house details page
-                window.location.href = houseId;
+                
+                window.location.href = '/user/house_detail/' + houseId;
             }
         });
 

@@ -69,10 +69,24 @@ def get_all_mgdb_info(collection):
     return []
 
 
+def get_next_house_id():
+    # Find and update the user_id counter
+    counter_doc = client['personal_project']['house'].counters.find_one_and_update(
+        {"_id": "house_id"},
+        {"$inc": {"seq": 1}},
+        upsert=True,  # Create the counter if it doesn't exist
+        return_document=True
+    )
+    return counter_doc["seq"]
+
+
 def insert_hap_info_to_mgdb(good_info_url, info):
 
     try:
+
+        house_id = get_next_house_id()
         transform_info_dict = {
+            "id": house_id,
             "url": good_info_url,
             "title": info["house_code"],
             "price": float(re.search(r'\d+', info["price"].replace(',', '')).group()),

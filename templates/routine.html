@@ -7,30 +7,60 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background: linear-gradient(to right, #b9bcd5, #ddd7e3); /* Gradient background */
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
+            background-color: #e4e1e1;
             margin: 0;
             padding: 0;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
             height: 100vh;
             zoom: 67%; 
         }
-        .container {
-            background: linear-gradient(to right, #8a2be2, #ff7f50); /* Purple to orange gradient */
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Shadow */
-            width: 800px; /* Double the width for two columns */
-            margin: 20px;
+
+        .header {
+            display: flex;
+            
+            align-items: center;
         }
+
+        .header h1 {
+            margin-left: 690px;
+            margin-top: 80px;
+            margin-bottom: 30px;
+            font-size: 60px; /* Adjust font size */
+            color: #800080; /* Set text color */
+        }
+
+        .logout-icon {
+            margin-top: 60px;
+            margin-left: 450px;
+
+        }
+        
+        .logout-icon img {
+            width: 50px; /* Adjust size as needed */
+            height: 50px; /* Adjust size as needed */
+            
+        }
+
+        .container {
+            background-color: #d8d8d8; /* Purple to orange gradient */
+            border-radius: 30px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 800px; 
+            height: 1600px;
+            margin: 20px;
+            display: flex;
+            flex-direction: column; /* Arrange children vertically */
+            align-items: stretch;
+        }
+
         h1 {
-            color: #fff; /* White color */
+            color: #555; 
             text-align: center;
             margin-bottom: 20px;
+            font-size: 45px;
         }
         form {
             display: grid;
@@ -38,9 +68,12 @@
             gap: 20px;
         }
         label {
-            color: #fff; /* White color */
+            display: flex;
+            margin-bottom: 15px;
+            margin-top: 30px;
+            color: #555; /* White color */
             font-weight: bold;
-            margin-bottom: 20px;
+            font-size: 25px;
         }
         input[type="text"],
         input[type="number"],
@@ -49,7 +82,7 @@
             width: 100%;
             padding: 10px;
             margin-bottom: 20px;
-            margin-top: 15px;
+            font-size: 20px;
             border: none;
             border-radius: 5px;
             box-sizing: border-box;
@@ -63,14 +96,20 @@
             box-sizing: border-box;
             resize: vertical; /* Allow vertical resizing */
         }
+
+        textarea::placeholder {
+            font-size: 20px; /* Adjust the font size as needed */
+            color: #999; /* Optionally adjust the color */
+        }
         input[type="submit"] {
             background-color: #8a2be2; /* Purple color */
             color: white;
             border: none;
             padding: 10px 20px;
-            margin-left: 0px; /* Center the button */
+            margin-top: 10px; /* Center the button */
             cursor: pointer;
-            border-radius: 5px;
+            font-size: 25px;
+            border-radius: 20px;
             transition: background-color 0.3s;
             justify-self: end; /* Align to the end of the grid cell */
         }
@@ -128,10 +167,11 @@
             </div>
             <div>
                 <label for="additionalNotes">Additional Notes:</label>
-                <textarea id="additionalNotes" name="additionalNotes" rows="4" placeholder="Type here..."></textarea>
+                <textarea style="height: 170px;"  id="additionalNotes" name="additionalNotes" rows="4" placeholder="Type here..."></textarea>
             </div>
-            <input type="submit" value="Submit">
+            
         </form>
+        <input type="submit" value="Submit">
     </div>
 
 </body>

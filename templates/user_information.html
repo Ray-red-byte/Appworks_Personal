@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f2f2f2;
+            background-color: #e4e1e1;
             margin: 0;
             padding: 0;
             display: flex;
@@ -16,37 +16,47 @@
             height: 100vh;
             zoom: 67%; 
         }
+
         .header {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            width: 100%;
-            padding: 20px;
         }
-        .greeting {
-            color: #000000;
-            font-size: 24px;
-            margin-right: auto;
-            margin-left: 100px;
+
+        .header h1 {
+            margin-left: 690px;
+            margin-top: 80px;
+            margin-bottom: 30px;
+            font-size: 60px; /* Adjust font size */
+            color: #800080; /* Set text color */
         }
+
         .logout-icon {
-            color: #000000;
-            font-size: 24px;
-            text-decoration: none;
-            margin-right: 100px;;
+            margin-top: 60px;
+            margin-left: 450px;
         }
+        
+        .logout-icon img {
+            width: 50px; /* Adjust size as needed */
+            height: 50px; /* Adjust size as needed */
+        }
+        
         .container {
-            background: linear-gradient(to right, #8a2be2, #ff7f50);
-            border-radius: 10px;
+            background-color: #d8d8d8; /* Purple to orange gradient */
+            border-radius: 30px;
             padding: 20px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            width: 400px;
-            margin: 20px;
+            width: 800px; 
+            height: 1600px;
+            margin: 40px;
+            display: flex;
+            flex-direction: column; /* Arrange children vertically */
+            align-items: stretch;
         }
         h1 {
-            color: #fff;
+            color: #555; 
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
+            font-size: 45px;
         }
         form {
             display: flex;
@@ -54,9 +64,12 @@
             align-items: stretch;
         }
         label {
-            color: #fff;
+            display: flex;
+            margin-bottom: 15px;
+            margin-top: 30px;
+            color: #555; /* White color */
             font-weight: bold;
-            margin-bottom: 10px;
+            font-size: 25px;
         }
         input[type="text"],
         textarea,
@@ -64,21 +77,23 @@
             width: 100%;
             padding: 10px;
             margin-bottom: 20px;
+            font-size: 20px;
             border: none;
             border-radius: 5px;
             box-sizing: border-box;
         }
         textarea {
-            height: 100px;
+            height: 200px;
             resize: none;
         }
         input[type="submit"] {
-            background-color: #fff;
-            color: #8a2be2;
+            background-color: #8a2be2; /* Purple color */
+            color: white;
             border: none;
             padding: 10px 20px;
+            font-size: 25px;
             cursor: pointer;
-            border-radius: 5px;
+            border-radius: 20px;
             transition: background-color 0.3s;
         }
         input[type="submit"]:hover {
@@ -87,11 +102,13 @@
     </style>
 </head>
 <body>
+    
     <div class="header">
         <h1 class="greeting">Hello, {{ username }}</h1>
         <a href="/logout" class="logout-icon"><img src="/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/icons/7124045_logout_icon.png" /></a>
         <a href="/routine" class="change-routine">next page</a>
     </div>
+
     <div class="container">
         <h1>Basic Information</h1>
         <form id="greetinForm" action='/user/info_insert' method="POST">

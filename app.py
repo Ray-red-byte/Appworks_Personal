@@ -455,12 +455,25 @@ def track_click():
     # Insert into MongoDB
     house_collection = client['personal_project']['house']
     house_collection.update_one(
-        {'url': house_id},
+        {'id': house_id},
         {'$inc': {'click': 1}}
     )
 
     return "Click tracked", 200
 # ------------------------------------------------------Track user click house------------------------------------------------------
+
+# ------------------------------------------------------Get user house------------------------------------------------------
+
+
+@app.route('/user/house/<string:house_id>', methods=['GET'])
+def get_user_house(house_id):
+    house_collection = client['personal_project']['house']
+    house = house_collection.find_one({"id": house_id})
+
+    if house:
+        return jsonify(house), 200
+    return jsonify({'error': 'House not found'}), 404
+# ------------------------------------------------------Get user house------------------------------------------------------
 
 
 @ app.route('/matches', methods=['GET'])
@@ -547,6 +560,20 @@ def house_type_page():
     if isinstance(user_id, int):
         username = get_user_name(user_id)
         return render_template('house_type.html', username=username)
+
+    return redirect(url_for('login'))
+
+
+@ app.route('/user/house_detail/<string:houseId>')
+def house_detail(houseId):
+    token = request.cookies.get('token')
+
+    # Call the authentication function to verify the token
+    user_id = authentication(token, jwt_secret_key)
+    print("get house detail")
+    if isinstance(user_id, int):
+        username = get_user_name(user_id)
+        return render_template('house_detail.html', username=username, houseId=houseId)
 
     return redirect(url_for('login'))
 

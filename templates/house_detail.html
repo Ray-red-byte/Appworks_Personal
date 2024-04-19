@@ -37,9 +37,18 @@
         function getHouseData() {
             const houseId = document.querySelector('.houseId').textContent
             fetch(`/user/house/${houseId}`)
-                .then(response => response.json())
-                .then(houseData => renderHouseData(houseData))
-                .catch(error => console.error('Error fetching house data:', error));
+            .then(response => {
+                console.log(response)
+                if (response.status === 200) {
+                    return response.json();
+                }
+                alert('House not found');
+            })
+            .then(houseData => {
+                renderHouseData(houseData)
+
+            })
+            .catch(error => console.error('Error fetching house data:', error));
         }
 
         // Function to render house data
@@ -52,11 +61,10 @@
                 <p>Address: ${houseData['address']}</p>
                 <p>Type: ${houseData['type']}</p>
                 <p>Age: ${houseData['age']} years</p>
-                <p>Size: ${houseData['size']} sq.m</p>
+                <p>Size: ${houseData['size']} 坪</p>
                 <p>Move-in Date: ${houseData['move_date']}</p>
                 <p>Layout: ${houseData['layout']}</p>
                 <p>Floor: ${houseData['floor']}</p>
-                <p>Clicks: ${houseData['click']}</p>
             `;
         }
 

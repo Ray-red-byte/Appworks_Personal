@@ -465,13 +465,15 @@ def track_click():
 # ------------------------------------------------------Get user house------------------------------------------------------
 
 
-@app.route('/user/house/<string:house_id>', methods=['GET'])
+@app.route('/user/house/<int:house_id>', methods=['GET'])
 def get_user_house(house_id):
     house_collection = client['personal_project']['house']
     house = house_collection.find_one({"id": house_id})
-
+    print(house)
     if house:
-        return jsonify(house), 200
+        # Convert ObjectId to string
+        search_house_json = {**house, '_id': str(house['_id'])}
+        return jsonify(search_house_json), 200
     return jsonify({'error': 'House not found'}), 404
 # ------------------------------------------------------Get user house------------------------------------------------------
 
@@ -564,7 +566,7 @@ def house_type_page():
     return redirect(url_for('login'))
 
 
-@ app.route('/user/house_detail/<string:houseId>')
+@ app.route('/user/house_detail/<int:houseId>')
 def house_detail(houseId):
     token = request.cookies.get('token')
 

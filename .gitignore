@@ -1,6 +1,7 @@
 data/
 log/
 .env
+fake_data/
 schedule/logs/
 schedule/plugins/
 schedule/.env

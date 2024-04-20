@@ -19,10 +19,13 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            width: 100%;
+            background-color: #a18ba1;
         }
 
         .header h1 {
             margin-left: 1200px; /* Remove default margin */
+            color: #f0eff0;
         }
 
         .logout-icon {
@@ -51,10 +54,10 @@
             position: sticky;
             flex-direction: column;
             font-size: large;
-            width: 35%;
+            width: 40%;
             height: 1560px;
             padding: 20px;
-            margin-top: -50px;
+            margin-top: -20px;
             margin-left: 60px;
             background-color: #eae6e6;
             border-radius: 10px;
@@ -86,7 +89,7 @@
             align-items: center;
         }
 
-        h1, h2 {
+        h2 {
             color: #800080;
             text-align: center;
         }
@@ -213,6 +216,7 @@
             color: #333;
             font-size: 25px;
             line-height: 1.5;
+            cursor: pointer;
         }
 
         /* Online icon style */
@@ -307,7 +311,7 @@
 <body>
     <div class="header">
         <h1 style="font-size: 100px;">Rent Right</h1>
-        <a href="/logout" class="logout-icon"><img src="Appworks_Personal/icons/7124045_logout_icon.png"/></a>
+        <a href="/logout" class="logout-icon"><img src="/icons/7124045_logout_icon.png"></a>
     </div>
 
     <div class="container">
@@ -326,10 +330,18 @@
                         <input type="range" id="houseAge" class="houseAge" name="houseAge" min="0" max="100" step="1" value="25">
                         <span id="houseAgeValue">25</span>
                     </div>
+
+                    <div class="city">
+                        <h3>City:</h3>
+                        <select id="city" name="city">
+                            <option value="Taipei">Taipei</option>
+                            <option value="New Taipei">New Taipei</option>
+                        </select>
+                    </div>
                     
                     <div style="margin-bottom: 80px;">
-                        <h3>Zone:</h3>
-                        <div>
+                        <h3>Taipei Zone:</h3>
+                        <div class="taipei">
                             <input type="checkbox" id="Zhongzheng" name="zone" value="中正區">
                             <label for="Zhongzheng">中正區</label>
      
@@ -367,6 +379,82 @@
                             <label for="Wenshan">文山區</label>
                             <br>
                         </div>
+
+                        <h3>New Taipei</h3>
+                        <div class="new-taipei">
+                            <input type="checkbox" id="Banqiao" name="zone" value="板橋區">
+                            <label for="Banqiao">板橋區</label>
+                            
+                            <input type="checkbox" id="Xizhi" name="zone" value="汐止區">
+                            <label for="Xizhi">汐止區</label>
+                            <br>
+                            <input type="checkbox" id="Xindian" name="zone" value="新店區">
+                            <label for="Xindian">新店區</label>
+                    
+                            <input type="checkbox" id="Tamsui" name="zone" value="淡水區">
+                            <label for="Tamsui">淡水區</label>
+                            <br>
+                            <input type="checkbox" id="Sanchong" name="zone" value="三重區">
+                            <label for="Sanchong">三重區</label>
+                    
+                            <input type="checkbox" id="Yonghe" name="zone" value="永和區">
+                            <label for="Yonghe">永和區</label>
+                            <br>
+                            <input type="checkbox" id="Zhonghe" name="zone" value="中和區">
+                            <label for="Zhonghe">中和區</label>
+                    
+                            <input type="checkbox" id="Yingge" name="zone" value="鶯歌區">
+                            <label for="Yingge">鶯歌區</label>
+                            <br>
+                            <input type="checkbox" id="Shulin" name="zone" value="樹林區">
+                            <label for="Shulin">樹林區</label>
+                        
+                            <input type="checkbox" id="Taishan" name="zone" value="泰山區">
+                            <label for="Taishan">泰山區</label>
+                            <br>
+                            <input type="checkbox" id="Linkou" name="zone" value="林口區">
+                            <label for="Linkou">林口區</label>
+                        
+                            <input type="checkbox" id="Bali" name="zone" value="八里區">
+                            <label for="Bali">八里區</label>
+                            <br>
+                            <input type="checkbox" id="Sanxia" name="zone" value="三峽區">
+                            <label for="Sanxia">三峽區</label>
+
+                            <input type="checkbox" id="Shenkeng" name="zone" value="深坑區">
+                            <label for="Shenkeng">深坑區</label>
+                            <br>
+                            <input type="checkbox" id="Shiding" name="zone" value="石碇區">
+                            <label for="Shiding">石碇區</label>
+
+                            <input type="checkbox" id="Pinglin" name="zone" value="坪林區">
+                            <label for="Pinglin">坪林區</label>
+                            <br>
+                            <input type="checkbox" id="Shuangxi" name="zone" value="雙溪區">
+                            <label for="Shuangxi">雙溪區</label>
+
+                            <input type="checkbox" id="Gongliao" name="zone" value="貢寮區">
+                            <label for="Gongliao">貢寮區</label>
+                            <br>
+                            <input type="checkbox" id="Jinshan" name="zone" value="金山區">
+                            <label for="Jinshan">金山區</label>
+
+                            <input type="checkbox" id="Wanli" name="zone" value="萬里區">
+                            <label for="Wanli">萬里區</label>
+                            <br>
+                            <input type="checkbox" id="Xizhi" name="zone" value="汐止區">
+                            <label for="Xizhi">汐止區</label>
+
+                            <input type="checkbox" id="Wugu" name="zone" value="五股區">
+                            <label for="Wugu">五股區</label>
+                            <br>
+                            <input type="checkbox" id="Tucheng" name="zone" value="土城區">
+                            <label for="Tucheng">土城區</label>
+
+                            <input type="checkbox" id="Xinzhuang" name="zone" value="新莊區">
+                            <label for="Xinzhuang">新莊區</label>
+                            <br>
+                        </div>                 
                     </div>
                     
 

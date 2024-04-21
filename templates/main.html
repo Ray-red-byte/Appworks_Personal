@@ -187,6 +187,20 @@
             line-height: 1.5;
         }
 
+        .select-match-type {
+            position: fixed;
+            top: 200px;
+            right: 20px;
+            width: 500px;
+            font-size: 30px;
+            background-color: #d3c7d3;
+            border: 2px solid #7d7777;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 150px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
         .match-list {
             position: fixed;
             top: 200px;
@@ -197,7 +211,7 @@
             border: 2px solid #7d7777;
             border-radius: 10px;
             padding: 20px;
-            margin-top: 200px;
+            margin-top: 400px;
 
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
@@ -207,6 +221,7 @@
             font-size: 30px;
             margin-bottom: 15px;
         }
+
 
         .match {
             margin-bottom: 15px;
@@ -492,6 +507,14 @@
         </div>
     </div>
 
+    <div class="select-match-type">
+        <h2 style="font-size: 40px;">Select Match Type</h2>
+        <select id="matchType" name="matchType">
+            <option value="zone">Similar Zone</option>
+            <option value="identity">Similar identity</option>
+        </select>
+        <input id="match-type" type="submit" value="Search">
+    </div>
     <div class="match-list" id="match-list">
         <h2 style="font-size: 40px;">Match List</h2>
         <ul></ul>
@@ -565,8 +588,8 @@
         });
 
         // Function to fetch user matches from Flask API
-        function fetchUserMatches() {
-            fetch('/matches')
+        function fetchUserMatches(match_type) {
+            fetch('/matches/' + match_type)
             .then(response => {
                 if (response.status === 200) {
                     return response.json();
@@ -719,7 +742,18 @@
         // Initial render
         // with DOM load 
         renderHouses('/search/hot');
-        fetchUserMatches();
+
+        //When trigger button clicked
+        document.getElementById('match-type').addEventListener('click', function() {
+            var selectElement = document.getElementById('matchType');
+
+            // Get the selected value
+            var selectedValue = selectElement.value;
+            fetchUserMatches(selectedValue);
+        });
+
+        // Default match list
+        fetchUserMatches("default");
     </script>
 </body>
 </html>

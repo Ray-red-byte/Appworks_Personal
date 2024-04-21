@@ -146,7 +146,7 @@
             <div>
                 <label for="cookOptions">Cook Options:</label>
                 <select id="cookOptions" name="cookOptions">
-                    <option value="seldom">Seldom</option>
+                    <option value="seldoms">Seldom</option>
                     <option value="sometimes">Sometimes</option>
                     <option value="always">Always</option>
                 </select>
@@ -169,10 +169,16 @@
                 <label for="additionalNotes">Additional Notes:</label>
                 <textarea style="height: 170px;"  id="additionalNotes" name="additionalNotes" rows="4" placeholder="Type here..."></textarea>
             </div>
-            
+            <input style="display: none;" type="submit" id="hiddenSubmit" value="trigger">
         </form>
-        <input type="submit" value="Submit">
+        <input type="submit" id="visibleSubmit" value="Submit">
     </div>
+
+    <script>
+        document.getElementById('visibleSubmit').addEventListener('click', function() {
+            document.getElementById('hiddenSubmit').click();
+        });
+    </script>
 
 </body>
 </html>

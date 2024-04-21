@@ -8,6 +8,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from function import get_user_id, check_exist_user, validate_email, create_token, authentication, get_user_password, get_user_name
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit, join_room, leave_room
+from user_model.user_data_process import transform_one_user, transform_all_user, match_ten_user, get_value_from_dict
 
 
 app = Flask(__name__)
@@ -216,6 +217,7 @@ def user_routine_insert():
         user_id = authentication(token, jwt_secret_key)
 
         if isinstance(user_id, int):
+            print(user_id)
 
             # Extract form data
             sleep_time = request.form['sleepTime']
@@ -241,6 +243,7 @@ def user_routine_insert():
                 'smokeOptions': smoke_options,
                 'additionalNotes': additional_notes
             }
+            print(routine_data)
 
             user_collection.update_one(
                 {'user_id': user_id},
@@ -410,9 +413,6 @@ def search():
         user = user_collection.find_one({"user_id": user_id})
         user_house_preference = user['house_preference']
 
-        '''
-            Wrong area
-        '''
         # Base on this preference to search for house
         zones = user_house_preference['zone']
         print(zones)
@@ -469,7 +469,6 @@ def track_click():
 def get_user_house(house_id):
     house_collection = client['personal_project']['house']
     house = house_collection.find_one({"id": house_id})
-    print(house)
     if house:
         # Convert ObjectId to string
         search_house_json = {**house, '_id': str(house['_id'])}
@@ -478,22 +477,66 @@ def get_user_house(house_id):
 # ------------------------------------------------------Get user house------------------------------------------------------
 
 
-@ app.route('/matches', methods=['GET'])
-def get_matches():
+@ app.route('/matches/<string:match_type>', methods=['GET'])
+def get_matches(match_type):
+
     # Get all users from mongodb
     db = client["personal_project"]
     user_collection = db["user"]
+    transform_all_user_collection = db["transform_all_user"]
 
-    # Get all users from the user collection
-    projection = {'_id': 0, 'user_id': 1, 'username': 1}
-    users = user_collection.find({}, projection)
+    # Get current user
+    token = request.cookies.get('token')
+    user_id = authentication(token, jwt_secret_key)
+    cur_user = user_collection.find_one({"user_id": int(user_id)})
+    user_prefer_zone = cur_user["house_preference"]["zone"]
 
+    # No matter what transform first
+    row, transform_cur_user_dat_dict = transform_one_user(cur_user)
+    print(transform_cur_user_dat_dict)
+    transform_all_user_collection.update_one(
+        {"user_id": int(user_id)},
+        {"$set": transform_cur_user_dat_dict},
+        upsert=True)
+
+    # Get all users from the user collection and share one or more zones with the current user
+    transform_cur_user_data = transform_all_user_collection.find_one(
+        {"user_id": int(user_id)})
+
+    if match_type == 'zone':
+        users_share_zone = user_collection.find(
+            {"house_preference.zone": {"$in": user_prefer_zone}})
+
+        print('users_share_zone', users_share_zone)
+
+        # Find users who share the same zone with the current user in the transform_all_user_collection
+        transform_select_user_data_dicts = []
+
+        for user in users_share_zone:
+            user_id = user["user_id"]
+            transform_user_data = transform_all_user_collection.find_one(
+                {"user_id": int(user_id)})
+            transform_select_user_data_dicts.append(transform_user_data)
+
+        transform_id_list, transform_value_lis = get_value_from_dict(
+            transform_select_user_data_dicts)
+
+        nearest_neighbors_id_list = match_ten_user(transform_id_list, transform_value_lis,
+                                                   transform_cur_user_data["value"])
+
+    else:
+        transform_all_user_dict = transform_all_user_collection.find()
+
+        transform_id_list, transform_value_list = get_value_from_dict(
+            transform_all_user_dict)
+
+        nearest_neighbors_id_list = match_ten_user(transform_id_list, transform_value_list,
+                                                   transform_cur_user_data["value"])
+
+    match_users = user_collection.find(
+        {"user_id": {"$in": nearest_neighbors_id_list}})
     matches_data = [{'user_id': user['user_id'], 'username': user['username']}
-                    for user in users]
-
-    '''
-     Think some algorithm to match user
-    '''
+                    for user in match_users]
 
     return jsonify(matches_data), 200
 
@@ -560,6 +603,7 @@ def house_type_page():
     user_id = authentication(token, jwt_secret_key)
 
     if isinstance(user_id, int):
+        print("house type page")
         username = get_user_name(user_id)
         return render_template('house_type.html', username=username)
 
@@ -615,7 +659,7 @@ def save_messages():
         return jsonify({'success': False, 'message': 'Failed to save messages'}), 500
 
 
-@app.route('/get/messages', methods=['POST'])
+@ app.route('/get/messages', methods=['POST'])
 def get_messages():
     room_id = request.json.get('room_id')
     room_collection = client['personal_project']['room']
@@ -633,7 +677,7 @@ def get_messages():
 online_users = []
 
 
-@socketio.on('online')
+@ socketio.on('online')
 def handle_online(data):
     user_id = data['user_id']
     online_users.append(user_id)
@@ -641,7 +685,7 @@ def handle_online(data):
     emit('show', online_users, broadcast=True)
 
 
-@socketio.on('offline')
+@ socketio.on('offline')
 def handle_offline(data):
     user_id = data['user_id']
     online_users.remove(user_id)
@@ -654,7 +698,7 @@ def handle_offline(data):
 room_count = {}
 
 
-@socketio.on('join_room')
+@ socketio.on('join_room')
 def on_join(data):
     user_id = data['user_id']
     username = get_user_name(int(user_id))
@@ -670,7 +714,7 @@ def on_join(data):
                      "recipientId": None, 'senderId': None, 'room_status': username}, room=room_id)
 
 
-@socketio.on('leave')
+@ socketio.on('leave')
 def on_leave(data):
     user_id = data['userId1']
     username = get_user_name(int(user_id))
@@ -695,7 +739,7 @@ def on_leave(data):
         leave_room(room_id)
 
 
-@socketio.on('send_message')
+@ socketio.on('send_message')
 def handle_message(data):
     senderId = data['senderId']
     recipientId = data['recipientId']

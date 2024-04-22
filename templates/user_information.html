@@ -107,6 +107,7 @@
         <h1 class="greeting">Hello, {{ username }}</h1>
         <a href="/logout" class="logout-icon"><img src="/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/icons/7124045_logout_icon.png" /></a>
         <a href="/routine" class="change-routine">next page</a>
+        <a href="/main" class="change-main">previous page</a>
     </div>
 
     <div class="container">
@@ -118,8 +119,20 @@
                 <option value="female">Female</option>
                 <option value="non-binary">Non-binary</option>
             </select>
+            
             <label for="identity">Identity:</label>
-            <input type="text" id="identity" name="identity" placeholder="Student/Office Worker/Teacher/...">
+            <select id="identity" name="identity">
+                <option value="teacher">Teacher</option>
+                <option value="worker">Worker</option>
+                <option value="student">Student</option>
+                <option value="retiree">Retiree</option>
+                <option value="doctor">Doctor</option>
+                <option value="engineer">Engineer</option>
+                <option value="designer">Designer</option>
+                <option value="artist">Artist</option>
+                <option value="other">Other</option>
+            </select>
+            
             <label for="partner">Do you have a partner?</label>
             <select id="partner" name="partner">
                 <option value="yes">Yes</option>

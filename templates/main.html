@@ -12,7 +12,7 @@
             margin: 0;
             padding: 0;
             background-color: #dbdada;
-            zoom: 67%; 
+            zoom: 100%; 
         }
 
         .header {
@@ -187,8 +187,19 @@
             line-height: 1.5;
         }
 
+        .right-section {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%; /* Ensure the right-section takes up the full height */
+        }
+
+
         .select-match-type {
             position: fixed;
+            flex: 1;
+            flex-shrink: 0;
+            flex-grow: 1;
             top: 200px;
             right: 20px;
             width: 500px;
@@ -197,12 +208,15 @@
             border: 2px solid #7d7777;
             border-radius: 10px;
             padding: 20px;
-            margin-top: 150px;
+            margin-top: 40px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .match-list {
             position: fixed;
+            flex: 1;
+            flex-shrink: 0;
+            flex-grow: 1;
             top: 200px;
             right: 20px;
             width: 500px;
@@ -211,10 +225,44 @@
             border: 2px solid #7d7777;
             border-radius: 10px;
             padding: 20px;
-            margin-top: 400px;
+            margin-top: 286px;
 
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+        .chat-room-container {
+            flex: 1;
+            flex-shrink: 0;
+            flex-grow: 1;
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            
+            zoom: 100%; 
+            border-radius: 10px;
+            box-shadow: 0 0 100px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .chat-room-container {
+            position: fixed;
+            flex: 1;
+            flex-shrink: 0;
+            flex-grow: 1;
+            top: 200px;
+            right: 20px;
+            width: 500px;
+            font-size: 30px;
+            background-color: #fdfdfd;
+            border: 2px solid #7d7777;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 600px;
+
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
 
         .match-list h2 {
             color: #800080;
@@ -319,14 +367,91 @@
             background: #a971ce;
             cursor: pointer; 
         }
+        
 
+
+        .chat-username, .cur-username, .uid, .cuid, .room_id {
+            color: #333;
+            text-align: center;
+            margin-bottom: 1px;
+        }
+
+        .message {
+            padding: 10px;
+            margin: 5px;
+            border-radius: 10px;
+            background-color: #e6f2ff;
+        }
+
+        .sent {
+            align-self: flex-end; /* Position messages sent by the current user on the right side */
+        }
+
+        .received {
+            align-self: flex-start; /* Position messages received by the current user on the left side */
+        }
+
+        .middle {
+            align-self: center; /* Position messages received by the current user on the left side */
+        }
+
+
+        .message .sender {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        #chatForm {
+            display: flex;
+            flex-direction: column;
+            width: 480px;
+            height: 600px;
+            border-radius: 10px;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #e5dada; /* Set background color */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add box shadow for depth */
+        }
+
+        .chat-input-container {
+            display: flex;
+            align-items: center;
+            width: 500px; /* Adjust the width as needed */
+        }
+
+        #chatInput {
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px 0 0 5px;
+            border-right: none;
+            height: 30px;
+            flex: 1; /* Takes up remaining space */
+            font-size: 16px;
+        }
+
+        .chat-room-btn {
+            padding: 10px 20px;
+            background-color: #a552dc;
+            color: #fff;
+            border: none;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 16px;
+        }
+
+
+        .chat-room-btn:hover {
+            background-color: #0056b3;
+        }
 
     </style>
 </head>
 <body>
     <div class="header">
         <h1 style="font-size: 100px;">Rent Right</h1>
-        <a href="/logout" class="logout-icon"><img src="/icons/7124045_logout_icon.png"></a>
+        <a href="/logout" class="logout-icon" onclick="handleLogout()"><img src="/icons/7124045_logout_icon.png"></a>
+        <a href="/user/information">user info</a>
     </div>
 
     <div class="container">
@@ -507,17 +632,45 @@
         </div>
     </div>
 
-    <div class="select-match-type">
-        <h2 style="font-size: 40px;">Select Match Type</h2>
-        <select id="matchType" name="matchType">
-            <option value="zone">Similar Zone</option>
-            <option value="identity">Similar identity</option>
-        </select>
-        <input id="match-type" type="submit" value="Search">
-    </div>
-    <div class="match-list" id="match-list">
-        <h2 style="font-size: 40px;">Match List</h2>
-        <ul></ul>
+
+    <div class="right-section">
+        <div class="select-match-type">
+            <h2 style="font-size: 40px;">Select Match Type</h2>
+            <select id="matchType" name="matchType">
+                <option value="zone">Similar Zone</option>
+                <option value="identity">Similar identity</option>
+            </select>
+            <input id="match-type" type="submit" value="Search">
+        </div>
+        <div class="match-list" id="match-list">
+            <h2 style="font-size: 40px;">Match List</h2>
+            <ul></ul>
+        </div>
+
+        <div id="chat-user-history">
+            <h2 style="font-size: 40px;">Chat History</h2>
+            <ul></ul>
+        </div>
+
+        <div class="chat-room-container">
+            <h2 class="chat-username" style="display: none;"></h2>
+            <h2 class="cur-username" style="display: none;"></h2>
+
+            <!-- User ID of the current user -->
+            <h2 class="uid" style="display: none;"></h2>
+            <h2 class="cuid" style="display: none;"></h2>
+            <h2 class="room_id" ></h2>
+
+            <h2>Chat Room</h2>
+            <button class="chat-room-btn" id="leave-btn" type="submit">leave</button>
+            <div id="chatForm">
+                <!-- Messages show here -->
+            </div>
+            <div class="chat-input-container">
+                <input type="text" id="chatInput" placeholder="Type your message...">
+                <button class="chat-room-btn" id="send-btn" type="submit">Send</button>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
@@ -525,43 +678,25 @@
 
         const socket = io();
 
+        let userId1 = '';
+        let userId2 = '';
+        let curUserName = '';
+        let chatUserName = '';
+        let roomId = '';
 
+        // Initially hide chat room
+        hideChatRoom();
 
-        // use socketIO Show I am online
-        const userId = document.querySelector('.cur-userId').innerHTML;
-        socket.emit('online', { user_id: userId });
-        
-        // Function to render match list
-        function renderMatchList(matches) {
-            const matchList = document.getElementById('match-list');
-            matchList.innerHTML = '';
-            matchList.innerHTML = '<h2>Match List</h2>';
-            matches.forEach(match => {
-
-                if (match["user_id"] !== userId) {
-                    const listItem = document.createElement('li');
-
-                    // Creating an icon element
-                    const icon = document.createElement('i');
-                    
-                    // Initially, assuming user is offline
-                    icon.className = `fas fa-circle text-danger`;
-                    icon.id = `${match["user_id"]}`;
-                    icon.textContent = 'offline';
-
-                    const usernameSpan = document.createElement('span');
-
-                    usernameSpan.textContent = match["username"];
-
-                    listItem.appendChild(icon);
-                    listItem.appendChild(usernameSpan);
-
-                    listItem.addEventListener('click', () => allocateChatRoom(match["user_id"]));
-
-                    matchList.appendChild(listItem);
-                }
-            });
+        // use socketIO Show I am offline if trigger logout button
+        function handleLogout() {
+            socket.emit('offline', { user_id: userId }); // Replace <user_id> with the actual user ID
         }
+
+        // use socketIO Show I am online Initially
+        const userId = document.querySelector('.cur-userId').innerHTML;
+
+
+        socket.emit('online', { user_id: userId });
 
         // Socket.io event listener to handle online status updates
         socket.on('show', function(online_users) {
@@ -587,6 +722,61 @@
             });
         });
 
+        // Function to render match list
+        function renderMatchList(matches, element) {
+
+            const matchList = document.getElementById(element);
+            matchList.innerHTML = '';
+
+            if (element === "chat-user-history") {
+                matchList.innerHTML = '<h2>Chat History</h2>';
+            } else {
+                matchList.innerHTML = '<h2>Match List</h2>';
+            }
+
+            if (matches.length === 0) {
+                matchList.innerHTML += '<p>Check out profile to get matches!</p>';
+                return;
+            }
+
+            console.log(matches)
+            matches.forEach(userList => {
+
+                const row = document.createElement('div');
+                row.classList.add('user-list-row');
+
+                userList.forEach(match => {
+                    if (match["user_id"] !== userId.toString()) {
+                        const listItem = document.createElement('li');
+
+                        // Creating an icon element
+                        const icon = document.createElement('i');
+
+                        // Initially, assuming user is offline
+                        icon.className = `fas fa-circle text-danger`;
+                        icon.id = `${match["user_id"]}`;
+                        icon.textContent = 'offline';
+
+                        const usernameSpan = document.createElement('span');
+
+                        usernameSpan.textContent = match["username"];
+
+                        listItem.appendChild(icon);
+                        listItem.appendChild(usernameSpan);
+
+                        listItem.addEventListener('click', () => allocateChatRoom(match["user_id"]));
+
+                        matchList.appendChild(listItem);
+
+                        row.appendChild(listItem);
+                    }
+                });
+
+                matchList.appendChild(row);
+            });
+        }
+
+
         // Function to fetch user matches from Flask API
         function fetchUserMatches(match_type) {
             fetch('/matches/' + match_type)
@@ -594,11 +784,12 @@
                 if (response.status === 200) {
                     return response.json();
                 }
-                throw new Error('Failed to fetch user matches');
             })
             .then(matches => {
                 // Update the match list with fetched matches data
-                renderMatchList(matches);
+                // Need to re fresh online user status if user change match type
+                renderMatchList(matches, 'match-list');
+                socket.emit('online', { user_id: userId });
             })
             .catch(error => {
                 console.error(error);
@@ -608,6 +799,15 @@
 
         // Send user info to the chat room
         function allocateChatRoom(userId) {
+
+            const constants = {
+                userId1: '',
+                userId2: '',
+                curUserName: '',
+                chatUserName: '',
+                roomId: ''
+            };
+
             fetch('/allocate_chat_room', {
                 method: 'POST',
                 headers: {
@@ -622,15 +822,46 @@
                 throw new Error('Failed to enter chat room');
             })
             .then(user => {
-                
+                console.log(user)
                 // Handle entering chat room with the user data
-                const chatUrl = `/chat/${user["user_id"]}`;
-                window.location.href = chatUrl;
+                //const chatUrl = `/chat/${user["user_id"]}`;
+                //window.location.href = chatUrl;
+
+                // If change people without leave room, leave room first
+
+                //Hide chatroom first
+                hideChatRoom();
+                showChatRoom();
+
+                userId1 = user['cur_user_id'];
+                userId2 = user['chat_user_id'];
+                curUserName = user['cur_username'];
+                chatUserName = user['chat_username'];
+                roomId = generateRoomId(userId1, userId2);
+
+                const chatRoomContainer = document.querySelector('.chat-room-container');
+                chatRoomContainer.querySelector('.chat-username').textContent = user['chat_username'];
+                chatRoomContainer.querySelector('.cur-username').textContent = user['cur_username'];
+                chatRoomContainer.querySelector('.uid').textContent = user['cur_user_id'];
+                chatRoomContainer.querySelector('.cuid').textContent = user['chat_user_id'];
+                        
+                document.querySelector('.room_id').innerHTML = roomId;
+
+
+                // Join a room
+                socket.emit('join_room', { user_id: userId1, room_id: roomId }, function() {
+                    // This function will be called once join_room is completed
+                    displayPreviousMessage(roomId);
+                });
+                
+                
             })
             .catch(error => {
                 console.error(error);
                 // Handle the error, e.g., show an error message to the user
             });
+
+            return constants;
         }
 
         // Function to render house cards
@@ -738,6 +969,24 @@
             });
         });
 
+        // Get chatting history to show existing room
+        function fetchChatHistory() {
+            fetch('/chat_history')
+            .then(response => {
+                if (response.status === 200) {
+                    return response.json();
+                }
+                throw new Error('Failed to fetch chat history');
+            })
+            .then(chatHistoryUsers => {
+                console.log(chatHistoryUsers)
+                renderMatchList(chatHistoryUsers, 'chat-user-history');
+            })
+            .catch(error => {
+                console.error(error);
+                // Handle the error, e.g., show an error message to the user
+            });
+        }
 
         // Initial render
         // with DOM load 
@@ -754,6 +1003,191 @@
 
         // Default match list
         fetchUserMatches("default");
+
+
+
+        // ------------------------------Chat room--------------------------------
+        // User ID of the current user
+        //const chatRoomConstants = allocateChatRoom(userId);
+
+
+
+        
+
+        function hideChatRoom() {
+            const chatRoomContainer = document.querySelector('.chat-room-container');
+            chatRoomContainer.style.display = 'none';
+
+            const chatForm = document.getElementById('chatForm');
+            chatForm.innerHTML = '';
+        }
+
+        function showChatRoom() {
+            const chatRoomContainer = document.querySelector('.chat-room-container');
+            chatRoomContainer.style.display = 'block';
+
+        }
+        
+        function displayPreviousMessage(roomId){
+            // Get all messages
+            fetch('/get/messages', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ "room_id": roomId })
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    return response.json();
+                } else {
+                    return { "messages": [], "last_updated_by": userId1 };
+                }
+            })
+            .then(data => {
+                const chatForm = document.getElementById('chatForm');
+                if (data['messages'].length === 0) {
+                    console.log("No previous messages");
+                    return;
+                } else if (data['last_updated_by'] === userId1) {
+                    console.log("data['last_updated_by'] === userId1");
+                    data['messages'].forEach(message => {
+                        const newMessage = document.createElement('div');
+                        newMessage.classList.add(message['class']);
+                        newMessage.textContent = message['text'];
+                        chatForm.appendChild(newMessage);
+                    });
+                } else {
+                    console.log("data['last_updated_by'] !== userId1");
+                    data['messages'].forEach(message => {
+                        const newMessage = document.createElement('div');
+
+                        if (message['class'] === 'sent') {
+                            newMessage.classList.add('received');
+                        }
+                        if (message['class'] === 'received') {
+                            newMessage.classList.add('sent');
+                        }
+
+                        newMessage.textContent = message['text'];
+                        chatForm.appendChild(newMessage);
+                    });
+                }    
+            });
+        }
+
+        // Save messages when the user leaves the room
+        function saveMessage(){
+            const chatForm = document.getElementById('chatForm');
+            const chatMessages = Array.from(chatForm.children).map(child => {
+                const messageText = child.innerText;
+                const messageClass = child.classList[0];
+                return { "text": messageText, "class": messageClass };
+            }).filter(message => message.class !== 'middle');     
+
+
+            fetch('/save/messages', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ "messages": chatMessages , "room_id": roomId, "user_id": userId1})
+            })
+            .then(response => {
+                console.log(response);
+                if (response.status !== 200) {
+                    throw new Error('Failed to save messages');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Messages saved:', data);
+            })
+            .catch(error => {
+                console.error('Error saving messages:', error);
+            });
+            
+        }
+
+        socket.on('save_messages', function(data) {
+            saveMessage();
+        });
+  
+        // ---------------------------------------- Leave a room -----------------------------------------------------
+        
+        function leaveRoom(roomId, userId1) {
+            socket.emit('leave', {'roomId': roomId, 'userId1': userId1});
+        }
+
+        const leaveRoomBtn = document.getElementById('leave-btn');
+
+        leaveRoomBtn.addEventListener('click', function() {
+            socket.emit('leave', {'roomId': roomId, 'userId1': userId1}, function() {
+                // Callback function to execute after leaving the room
+                hideChatRoom(); // Call hideChatRoom after leaving the room
+            });
+        });
+
+        // Handle incoming messages
+        socket.on('message', function(data) {
+
+            const { senderId, recipientId, message, room_status } = data;
+            const cur_room_id = document.querySelector('.room_id').innerHTML;
+            
+
+            // Display the incoming message in the chat room
+            const chatForm = document.getElementById('chatForm');
+            const newMessage = document.createElement('div');   
+
+            console.log('senderId type:', typeof senderId);
+            console.log('userId1 type:', typeof userId1);
+
+            // Check if the message is sent by the current user
+            if (recipientId === "None") {
+                newMessage.classList.add('middle'); 
+                newMessage.textContent = senderId + " " + message + "!";
+            }else if (senderId === userId1.toString()) {
+                newMessage.classList.add('sent'); 
+                newMessage.textContent = curUserName + ':' + message;
+            } else if (senderId !== userId1.toString()) {
+                newMessage.classList.add('received'); 
+                newMessage.textContent = chatUserName + ':' + message;  
+            } 
+            
+            chatForm.appendChild(newMessage);
+            chatForm.scrollTop = chatForm.scrollHeight; // Scroll to the bottom
+
+
+            // Save messages after message show on the form
+            if (room_status === "save_messages"){
+                console.log("User below room total users save messages");
+                saveMessage();
+            }
+        });
+
+        // Send message when the form is submitted
+        document.getElementById('send-btn').addEventListener('click', function(event) {
+            event.preventDefault();
+            const messageInput = document.getElementById('chatInput');
+            const message = messageInput.value.trim(); // Trim whitespace
+            const recip_user_id = document.querySelector('.cuid').innerHTML;
+            const send_user_id = document.querySelector('.uid').innerHTML;
+            
+            if (message !== '') {
+                socket.emit('send_message', { 'message': message, "senderId": send_user_id, "recipientId": recip_user_id, "room": roomId });
+                messageInput.value = '';
+            }
+        });
+
+
+        // Concatenate user IDs to create a unique room ID
+        function generateRoomId(userId1, userId2) {
+            const sortedUserIds = [userId1, userId2].sort((a, b) => a - b); // Sort the user IDs
+            return sortedUserIds.join('_');
+        }
+        
+
+        fetchChatHistory()
     </script>
 </body>
 </html>

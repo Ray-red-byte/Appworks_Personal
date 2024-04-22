@@ -493,7 +493,6 @@ def get_matches(match_type):
 
     # No matter what transform first
     row, transform_cur_user_dat_dict = transform_one_user(cur_user)
-    print(transform_cur_user_dat_dict)
     transform_all_user_collection.update_one(
         {"user_id": int(user_id)},
         {"$set": transform_cur_user_dat_dict},
@@ -502,6 +501,8 @@ def get_matches(match_type):
     # Get all users from the user collection and share one or more zones with the current user
     transform_cur_user_data = transform_all_user_collection.find_one(
         {"user_id": int(user_id)})
+
+    print("-----------------Start Search-----------------")
 
     if match_type == 'zone':
         users_share_zone = user_collection.find(
@@ -516,8 +517,10 @@ def get_matches(match_type):
             user_id = user["user_id"]
             transform_user_data = transform_all_user_collection.find_one(
                 {"user_id": int(user_id)})
-            transform_select_user_data_dicts.append(transform_user_data)
+            if transform_user_data:
+                transform_select_user_data_dicts.append(transform_user_data)
 
+        print("Selected users", len(transform_select_user_data_dicts))
         transform_id_list, transform_value_lis = get_value_from_dict(
             transform_select_user_data_dicts)
 
@@ -533,21 +536,33 @@ def get_matches(match_type):
         nearest_neighbors_id_list = match_ten_user(transform_id_list, transform_value_list,
                                                    transform_cur_user_data["value"])
 
-    match_users = user_collection.find(
-        {"user_id": {"$in": nearest_neighbors_id_list}})
-    matches_data = [{'user_id': user['user_id'], 'username': user['username']}
-                    for user in match_users]
+    try:
+        match_users = user_collection.find(
+            {"user_id": {"$in": nearest_neighbors_id_list}})
+        matches_data = [[{'user_id': user['user_id'], 'username': user['username']}]
+                        for user in match_users]
+    except Exception as e:
+        print(e)
+        return jsonify({'error': 'Failed to get matches'}), 500
 
     return jsonify(matches_data), 200
 
 # Route to enter chat room with a specific user
 
 
-@ app.route('/allocate_chat_room', methods=['POST'])
+@ app.route('/allocate_chat_room', methods=['GET', 'POST'])
 def allocate_chat_room():
 
     chat_user_id = request.json.get('user_id')
-    return {'user_id': chat_user_id}
+    chat_user_name = get_user_name(chat_user_id)
+
+    token = request.cookies.get('token')
+    cur_user_id = authentication(token, jwt_secret_key)
+    if isinstance(cur_user_id, int):
+        cur_username = get_user_name(cur_user_id)
+
+        return jsonify({'cur_user_id': cur_user_id, 'cur_username': cur_username, 'chat_user_id': chat_user_id, 'chat_username': chat_user_name}), 200
+    return redirect(url_for('login'))
 
 
 @ app.route('/chat/<int:user_id>')
@@ -626,6 +641,35 @@ def house_detail(houseId):
 # ------------------------------------- Render template-------------------------------------
 
 
+@app.route('/chat_history', methods=['GET', 'POST'])
+def chat_history():
+    token = request.cookies.get('token')
+    user_id = authentication(token, jwt_secret_key)
+
+    if isinstance(user_id, int):
+        room_collection = client['personal_project']['room']
+        user_collection = client['personal_project']["user"]
+        all_rooms = room_collection.find({}, {'room_id': 1})
+
+        other_user_id = []
+        for room in all_rooms:
+            seperate_room_id = list(map(int, room["room_id"].split("_")))
+            if user_id in seperate_room_id:
+                other_user_id.append(
+                    [user for user in seperate_room_id if user != user_id])
+
+        other_user_data = []
+        for users in other_user_id:
+            temp_user = []
+            for user_id in users:
+                chat_users = user_collection.find_one({"user_id": user_id})
+                temp_user.append(
+                    {"user_id": chat_users["user_id"], "username": chat_users["username"]})
+            other_user_data.append(temp_user)
+
+        return jsonify(other_user_data), 200
+
+
 @ app.route('/save/messages', methods=['POST'])
 def save_messages():
     room_collection = client['personal_project']['room']
@@ -652,7 +696,7 @@ def save_messages():
             upsert=True  # Create a new document if no matching document is found
         )
 
-        print("save messages successfully")
+        print(room_id, "save messages successfully")
         return jsonify({'success': True, 'message': 'Messages saved successfully'}), 200
     except Exception as e:
         print(e)
@@ -665,8 +709,11 @@ def get_messages():
     room_collection = client['personal_project']['room']
     room = room_collection.find_one({"room_id": room_id})
 
+    print("Get messages from room", room_id)
+
     if room:
         messages = room['messages']
+        print("messages", messages)
         last_updated_user_id = room['last_updated_by']
         return jsonify({'messages': messages, 'last_updated_by': last_updated_user_id}), 200
 
@@ -708,10 +755,10 @@ def on_join(data):
     room_count.setdefault(room_id, 0)
     room_count[room_id] += 1
 
-    print(f'{username} has join the room.')
+    print(f'{username} has join {room_id} the room.')
 
-    emit('message', {"message": 'joined the room.',
-                     "recipientId": None, 'senderId': None, 'room_status': username}, room=room_id)
+    emit('message', {'senderId': username,
+                     "recipientId": "None",  "message": 'joined the room.', 'room_status': "join room"}, room=room_id)
 
 
 @ socketio.on('leave')
@@ -727,16 +774,13 @@ def on_leave(data):
 
     # if the last one leave the room
 
-    print(f'{username} has left the room.')
+    print(f'{username} has left the {room_id} room.')
     if user_count == 0:
         print("last user left the room.")
-        emit('save_messages', {'last_user': user_id}, room=room_id)
-        leave_room(room_id)
-    else:
 
-        emit('message', {"message": 'left the room.',
-                         "recipientId": None, 'senderId': None, 'room_status': username}, room=room_id)
-        leave_room(room_id)
+    emit('message', {'senderId': username,
+                     "recipientId": "None",  "message": 'leave  room.', 'room_status': "leave room"}, room=room_id)
+    leave_room(room_id)
 
 
 @ socketio.on('send_message')
@@ -751,14 +795,8 @@ def handle_message(data):
     total_user = len(room_id.split("_"))
     user_count = room_count[room_id]
 
-    print("total_user", total_user, "user_count", user_count)
-
-    if user_count < total_user:
-        emit('message', {'senderId': senderId,
-                         "recipientId": recipientId, 'message': message, 'room_status': "save_messages"}, room=room_id)
-    else:
-        emit('message', {'senderId': senderId,
-                         "recipientId": recipientId, 'message': message, 'room_status': "user_join"}, room=room_id)
+    emit('message', {'senderId': senderId,
+                     'recipientId': recipientId, 'message': message, 'room_status': "save_messages"}, room=room_id)
 
 
 if __name__ == '__main__':

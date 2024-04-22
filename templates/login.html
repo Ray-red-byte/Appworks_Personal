@@ -120,7 +120,7 @@
                     expirationDate.setSeconds(expirationDate.getSeconds() + 6000); // Adding 10 mins
                     document.cookie = `token=${token}; expires=${expirationDate.toUTCString()}; path=/`;
 
-                    window.location.href = '/user/information';
+                    window.location.href = '/main';
 
                 } else {
                     alert('Login failed!');

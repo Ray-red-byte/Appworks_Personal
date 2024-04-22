@@ -5,19 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>House Search and Chat Room</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #c2c1c1;
-            zoom: 67%; 
-        }
 
-        .container {
+
+        .chat-room-container {
+            font-family: Arial, sans-serif;
             max-width: 800px;
             margin: 20px auto;
             padding: 20px;
             background-color: #fdfdfd;
+            zoom: 100%; 
             border-radius: 10px;
             box-shadow: 0 0 100px rgba(0, 0, 0, 0.1);
             display: flex;
@@ -25,7 +21,7 @@
             align-items: center;
         }
 
-        h2 {
+        .chat-username, .cur-username, .uid, .cuid, .room_id {
             color: #333;
             text-align: center;
             margin-bottom: 20px;
@@ -68,7 +64,7 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add box shadow for depth */
         }
 
-        .input-container {
+        .chat-input-container {
             display: flex;
             align-items: center;
             width: 500px; /* Adjust the width as needed */
@@ -84,7 +80,7 @@
             font-size: 16px;
         }
 
-        button {
+        .chat-room-btn {
             padding: 10px 20px;
             background-color: #a552dc;
             color: #fff;
@@ -96,13 +92,13 @@
         }
 
 
-        button:hover {
+        .chat-room-btn:hover {
             background-color: #0056b3;
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="chat-room-container">
         <h2 class="chat-username" style="display: none;">{{ chat_user_name }}</h2>
         <h2 class="cur-username" >{{ cur_user }}</h2>
 
@@ -114,13 +110,13 @@
 
         
         <h2>Chat Room</h2>
-        <button id="leave-btn" type="submit">leave</button>
+        <button class="chat-room-btn" id="leave-btn" type="submit">leave</button>
         <div id="chatForm">
             <!-- Messages show here -->
         </div>
-        <div class="input-container">
+        <div class="chat-input-container">
             <input type="text" id="chatInput" placeholder="Type your message...">
-            <button id="send-btn" type="submit">Send</button>
+            <button class="chat-room-btn" id="send-btn" type="submit">Send</button>
         </div>
     </div>
 
@@ -186,8 +182,7 @@
                 const messageClass = child.classList[0];
                 return { "text": messageText, "class": messageClass };
             }).filter(message => message.class !== 'middle');     
-            
-            console.log('Messages to save:', chatMessages);
+
 
             fetch('/save/messages', {
                 method: 'POST',

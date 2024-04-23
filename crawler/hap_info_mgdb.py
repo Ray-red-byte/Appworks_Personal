@@ -62,7 +62,8 @@ def download_from_s3(bucket_name, s3_path, local_file):
     return True
 
 
-def get_all_mgdb_info(collection):
+def get_all_mgdb_info():
+    collection = db["house"]
     data = collection.find({}, {"url": 1})
     if data:
         return data

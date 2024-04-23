@@ -18,11 +18,23 @@ from bs4 import BeautifulSoup
 import boto3
 from botocore.exceptions import NoCredentialsError
 import os
+import pymongo
+from hap_info_mgdb import get_all_mgdb_info, get_next_house_id, insert_hap_info_to_mgdb
+
 
 dotenv_path = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/.env'
 
 # Load environment variables from the specified .env file
 load_dotenv(dotenv_path)
+
+# Mongo Setting
+# Mongo atlas
+CONNECTION_STRING = os.getenv("MONGO_ATLAS_USER")
+client = pymongo.MongoClient(CONNECTION_STRING)
+
+# Select a database and collection
+db = client["personal_project"]
+collection = db["house"]
 
 # S3 setting
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
@@ -31,8 +43,11 @@ aws_access_key_id = os.getenv("S3_ACCESS_KEY")
 aws_bucket = os.getenv("S3_BUCKET_NAME")
 s3_hap_info_path = 'personal_project/house_detail/happy_detail/rent_hap_info.json'
 s3_hap_url_path = 'personal_project/urls/happy_urls/rent_hap_url.json'
+s3_uncrawler_url_path = 'personal_project/urls/uncrawler_urls/rent_hap_uncrawler_url.json'
 local_hap_info_file = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_hap_info.json'
 local_hap_url_file = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_hap_url.json'
+
+local_uncrawler_hap_url_file = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_hap_uncrawler_url.json'
 
 
 log_filename = 'log_file.log'
@@ -117,7 +132,14 @@ def store_url(infos, json_file):
     print(f"URL stored successfully.")
 
 
-def crawl_each_url(website_url, rent_info, driver):
+def store_uncrawler_url(urls, json_file):
+    with open(json_file, 'a') as f:
+        json.dump(urls, f, ensure_ascii=False)
+    print(f"Un crawler URL stored.")
+    time.sleep(2)
+
+
+def crawl_each_url(website_url, rent_info, driver, local_uncrawler_url_file):
 
     try:
 
@@ -154,9 +176,11 @@ def crawl_each_url(website_url, rent_info, driver):
         info_dict.update({"img_url": img_url})
 
         # Check if info have been extracted
+        '''
         if website_url in rent_info:
             print("Already exists", website_url)
             return True, rent_info, "success"
+        '''
 
         parent_element = driver.find_element(By.CLASS_NAME, "block__info-sub")
 
@@ -191,6 +215,12 @@ def crawl_each_url(website_url, rent_info, driver):
 
         # Update rent_info
         new_rent_info = {website_url: info_dict}
+        try:
+            insert_hap_info_to_mgdb(website_url, info_dict)
+        except Exception as e:
+            print("Cannot insert to mongoDB", website_url)
+            return False, rent_info, "cannot insert"
+
         new_rent_info.update(rent_info)
         rent_info = new_rent_info
 
@@ -199,6 +229,7 @@ def crawl_each_url(website_url, rent_info, driver):
 
     except Exception as e:
         print("Cannot crawl the website", website_url)
+        store_uncrawler_url(website_url, local_uncrawler_url_file)
         return False, rent_info, "cannot crawl"
 
 
@@ -220,9 +251,21 @@ def main():
         print(e)
         print("No info file on S3")
 
+        local_uncrawler_hap_url_file
+    try:
+        download_from_s3(aws_bucket, s3_uncrawler_url_path,
+                         local_uncrawler_hap_url_file)
+    except Exception as e:
+        print("No info file on S3")
+
     # Download the url and info file
     rent_hap_urls = load_from_json(local_hap_url_file)
     rent_hap_info = load_from_json(local_hap_info_file)
+    rent_uncrawler_urls = load_from_json(local_uncrawler_hap_url_file)
+
+    # Load from mongo
+    all_h_url = get_all_mgdb_info()
+    all_h_url = [doc["url"] for doc in all_h_url]
 
     # Log start time
     logger.info(f"Previous number : {len(rent_hap_info)}")
@@ -239,13 +282,17 @@ def main():
             print("Server error more than 5 times, stop crawling. Sorry")
             break
 
+        if rent_hap_url in all_h_url:
+            print("Already exists in DB. Skip.")
+            break
+
         driver = webdriver.Chrome(options=options)
         stop, rent_info, response = crawl_each_url(
-            rent_hap_url, rent_hap_info, driver)
+            rent_hap_url, rent_hap_info, driver, local_uncrawler_hap_url_file)
         driver.quit()
 
         if stop:
-            print("Stop crawling, already exists.")
+            print("Stop crawling, already exists.", title)
             break
 
         if response == "cannot crawl":
@@ -264,6 +311,9 @@ def main():
 
     # Upload the updated file to S3
     upload_to_s3(local_hap_info_file, aws_bucket, s3_hap_info_path)
+    upload_to_s3(local_uncrawler_hap_url_file,
+                 aws_bucket, s3_uncrawler_url_path)
+
     upload_to_s3(local_hap_url_file, aws_bucket, s3_hap_url_path)
 
 

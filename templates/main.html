@@ -190,69 +190,68 @@
         .right-section {
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: -210px;
+            margin-left: 2245px;
+            width: 600px;
             height: 100%; /* Ensure the right-section takes up the full height */
         }
 
 
         .select-match-type {
-            position: fixed;
-            flex: 1;
-            flex-shrink: 0;
-            flex-grow: 1;
-            top: 200px;
-            right: 20px;
-            width: 500px;
+            width: 530px;
             font-size: 30px;
             background-color: #d3c7d3;
             border: 2px solid #7d7777;
             border-radius: 10px;
             padding: 20px;
-            margin-top: 40px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .matchlist-history{
+            display: flex;
+            flex-direction: row;
+            align-items: flex-end;
+            margin-top: 110px; 
+            margin-right: 73px;
+            width: 500px;
+            height: 100%; /* Ensure the right-section takes up the full height */
         }
 
         .match-list {
             position: fixed;
-            flex: 1;
-            flex-shrink: 0;
-            flex-grow: 1;
-            top: 200px;
-            right: 20px;
-            width: 500px;
+            width: 255px;
             font-size: 30px;
             background-color: #d3c7d3;
             border: 2px solid #7d7777;
-            border-radius: 10px;
             padding: 20px;
-            margin-top: 286px;
-
+    
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-        .chat-room-container {
-            flex: 1;
-            flex-shrink: 0;
-            flex-grow: 1;
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
-            
-            zoom: 100%; 
-            border-radius: 10px;
-            box-shadow: 0 0 100px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        .chat-user-history {
+            position: fixed;
+            width: 250px;
+            font-size: 30px;
+            background-color: #d3c7d3;
+            border: 2px solid #7d7777;
+            margin-left: 295px;
+            padding: 12.5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+
+        .chat-user-history h2 {
+            color: #800080;
+            font-size: 30px;
+            margin-bottom: 15px;
+        }
+
         .chat-room-container {
             position: fixed;
             flex: 1;
             flex-shrink: 0;
             flex-grow: 1;
-            top: 200px;
+            bottom: 0;
             right: 20px;
-            width: 500px;
+            width: 1000px;
             font-size: 30px;
             background-color: #fdfdfd;
             border: 2px solid #7d7777;
@@ -642,14 +641,17 @@
             </select>
             <input id="match-type" type="submit" value="Search">
         </div>
-        <div class="match-list" id="match-list">
-            <h2 style="font-size: 40px;">Match List</h2>
-            <ul></ul>
-        </div>
 
-        <div id="chat-user-history">
-            <h2 style="font-size: 40px;">Chat History</h2>
-            <ul></ul>
+        <div class="matchlist-history">
+            <div class="match-list" id="match-list">
+                <h2>Match List</h2>
+                <ul></ul>
+            </div>
+            
+            <div class="chat-user-history" id="chat-user-history">
+                <h2>Chat History</h2>
+                <ul></ul>
+            </div>
         </div>
 
         <div class="chat-room-container">
@@ -1125,6 +1127,7 @@
             socket.emit('leave', {'roomId': roomId, 'userId1': userId1}, function() {
                 // Callback function to execute after leaving the room
                 hideChatRoom(); // Call hideChatRoom after leaving the room
+                fetchChatHistory() // Because user leave room, need to refresh chat history
             });
         });
 
@@ -1186,7 +1189,7 @@
             return sortedUserIds.join('_');
         }
         
-
+        // Initially
         fetchChatHistory()
     </script>
 </body>

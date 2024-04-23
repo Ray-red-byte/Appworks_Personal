@@ -24,18 +24,22 @@
         }
 
         .header h1 {
-            margin-left: 1200px; /* Remove default margin */
+            margin-left: 1700px; /* Remove default margin */
             color: #f0eff0;
         }
 
-        .logout-icon {
-            margin-top: 60px;
-            margin-right: 100px; /* Push logout icon to the right */
+        .logout-text {
+            color: #f0eff0;
+            margin-left: 1000px;
+            margin-top:100px;
+            font-size: 40px;
         }
-        /* Optional: Adjust styles for the logout icon */
-        .logout-icon img {
-            width: 50px; /* Adjust size as needed */
-            height: 50px; /* Adjust size as needed */
+
+        .user-info {
+            color: #f0eff0;
+            margin-right: 100px;
+            margin-top:100px;
+            font-size: 40px;
         }
 
         .container {
@@ -51,11 +55,11 @@
         }
 
         .left-main-section {
-            position: sticky;
             flex-direction: column;
+            position: fixed;
             font-size: large;
-            width: 40%;
-            height: 1560px;
+            width: 15%;
+            height: 1600px;
             padding: 20px;
             margin-top: -20px;
             margin-left: 60px;
@@ -68,11 +72,12 @@
 
         .right-main-section {
             display: flex;
+            
             flex-direction: column;
             margin-left: 300px;
             width: 80%;
             padding: 10px;
-            margin-top: -1700px;
+            margin-top: -120px;
             background-attachment: fixed;
             align-items: center;
         }
@@ -189,52 +194,60 @@
 
         .right-section {
             display: flex;
+            position: fixed;
             flex-direction: column;
             align-items: flex-end;
-            margin-top: -210px;
-            margin-left: 2245px;
+            margin-left: 3000px;
+            top: 100px; /* Adjust as needed */
+            right: 20px; /* Adjust as needed */
             width: 600px;
-            height: 100%; /* Ensure the right-section takes up the full height */
+            height: calc(100% - 100px); 
+        
         }
 
-
         .select-match-type {
-            width: 530px;
+            position: fixed;
+            width: 700px;
             font-size: 30px;
             background-color: #d3c7d3;
             border: 2px solid #7d7777;
             border-radius: 10px;
+            margin-top: 165px;
+            margin-right: 110px;
             padding: 20px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         .matchlist-history{
+            position: fix;
             display: flex;
             flex-direction: row;
             align-items: flex-end;
-            margin-top: 110px; 
-            margin-right: 73px;
+            margin-top: -1530px; 
+            margin-right: 185px;
             width: 500px;
             height: 100%; /* Ensure the right-section takes up the full height */
         }
 
         .match-list {
             position: fixed;
-            width: 255px;
-            font-size: 30px;
-            background-color: #d3c7d3;
-            border: 2px solid #7d7777;
-            padding: 20px;
-    
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        .chat-user-history {
-            position: fixed;
             width: 250px;
             font-size: 30px;
             background-color: #d3c7d3;
             border: 2px solid #7d7777;
-            margin-left: 295px;
+            padding: 20px;
+            align-items: flex-start;
+            margin-left: -170px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .chat-user-history {
+            position: fixed;
+            width: 420px;
+            font-size: 30px;
+            background-color: #d3c7d3;
+            border: 2px solid #7d7777;
+            margin-left: 125px;
             padding: 12.5px;
+            align-items: flex-end;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
@@ -449,8 +462,8 @@
 <body>
     <div class="header">
         <h1 style="font-size: 100px;">Rent Right</h1>
-        <a href="/logout" class="logout-icon" onclick="handleLogout()"><img src="/icons/7124045_logout_icon.png"></a>
-        <a href="/user/information">user info</a>
+        <a href="/logout" class="logout-text" onclick="handleLogout()">logout</a>
+        <a href="/user/information" class="user-info">user info</a>
     </div>
 
     <div class="container">
@@ -461,7 +474,7 @@
                     <div style="margin-bottom: 50px;">
                         <h3>Price:</h3>
                         <input type="range" id="price" class="price" name="price" min="0" max="200000" step="1" value="50">
-                        <span id="priceValue">50</span>
+                        <span id="priceValue">50
                     </div>
 
                     <div style="margin-bottom: 80px;">
@@ -627,6 +640,77 @@
 
             <div class="houses">
                 <!-- House cards will be displayed here -->
+                   <!-- House cards will be displayed here -->
+                    <div class="house">
+                        <img src="house1.jpg" alt="Beautiful House in the City Center">
+                        <h3 class="1">Beautiful House in the City Center</h3>
+                        <p>$2000/month</p>
+                        <p>5 years</p>
+                        <p>123 Main Street, City Center</p>
+                    </div>
+                    <div class="house">
+                        <img src="house2.jpg" alt="Cozy Apartment with Garden View">
+                        <h3 class="2">Cozy Apartment with Garden View</h3>
+                        <p>$1500/month</p>
+                        <p>2 years</p>
+                        <p>456 Park Avenue, Garden District</p>
+                    </div>
+                    <div class="house">
+                        <img src="house2.jpg" alt="Cozy Apartment with Garden View">
+                        <h3 class="2">Cozy Apartment with Garden View</h3>
+                        <p>$1500/month</p>
+                        <p>2 years</p>
+                        <p>456 Park Avenue, Garden District</p>
+                    </div>
+                    <div class="house">
+                        <img src="house2.jpg" alt="Cozy Apartment with Garden View">
+                        <h3 class="2">Cozy Apartment with Garden View</h3>
+                        <p>$1500/month</p>
+                        <p>2 years</p>
+                        <p>456 Park Avenue, Garden District</p>
+                    </div>
+                    <div class="house">
+                        <img src="house2.jpg" alt="Cozy Apartment with Garden View">
+                        <h3 class="2">Cozy Apartment with Garden View</h3>
+                        <p>$1500/month</p>
+                        <p>2 years</p>
+                        <p>456 Park Avenue, Garden District</p>
+                    </div>
+                    <div class="house">
+                        <img src="house3.jpg" alt="Spacious Villa with Pool">
+                        <h3 class="3">Spacious Villa with Pool</h3>
+                        <p>$3000/month</p>
+                        <p>10 years</p>
+                        <p>789 Villa Road, Suburbia</p>
+                    </div>
+                    <div class="house">
+                        <img src="house1.jpg" alt="Beautiful House in the City Center">
+                        <h3 class="1">Beautiful House in the City Center</h3>
+                        <p>$2000/month</p>
+                        <p>5 years</p>
+                        <p>123 Main Street, City Center</p>
+                    </div>
+                    <div class="house">
+                        <img src="house1.jpg" alt="Beautiful House in the City Center">
+                        <h3 class="1">Beautiful House in the City Center</h3>
+                        <p>$2000/month</p>
+                        <p>5 years</p>
+                        <p>123 Main Street, City Center</p>
+                    </div>
+                    <div class="house">
+                        <img src="house1.jpg" alt="Beautiful House in the City Center">
+                        <h3 class="1">Beautiful House in the City Center</h3>
+                        <p>$2000/month</p>
+                        <p>5 years</p>
+                        <p>123 Main Street, City Center</p>
+                    </div>
+                    <div class="house">
+                        <img src="house1.jpg" alt="Beautiful House in the City Center">
+                        <h3 class="1">Beautiful House in the City Center</h3>
+                        <p>$2000/month</p>
+                        <p>5 years</p>
+                        <p>123 Main Street, City Center</p>
+                    </div>
             </div>
         </div>
     </div>
@@ -645,12 +729,40 @@
         <div class="matchlist-history">
             <div class="match-list" id="match-list">
                 <h2>Match List</h2>
-                <ul></ul>
+                <!-- Match User -->
+                <ul>
+                    <li>
+                        <i class="fas fa-circle text-danger" id="1">offline</i>
+                        <span>User1</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-circle text-danger" id="2">offline</i>
+                        <span>User2</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-circle text-danger" id="3">offline</i>
+                        <span>User3</span>
+                    </li>
+                </ul>
             </div>
             
             <div class="chat-user-history" id="chat-user-history">
                 <h2>Chat History</h2>
-                <ul></ul>
+                <!-- Match User -->
+                <ul>
+                    <li>
+                        <i class="fas fa-circle text-danger" id="4">offline</i>
+                        <span>User4</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-circle text-danger" id="5">offline</i>
+                        <span>User5</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-circle text-danger" id="6">offline</i>
+                        <span>User6</span>
+                    </li>
+                </ul>
             </div>
         </div>
 
@@ -666,8 +778,22 @@
             <h2>Chat Room</h2>
             <button class="chat-room-btn" id="leave-btn" type="submit">leave</button>
             <div id="chatForm">
+
                 <!-- Messages show here -->
+                <!-- Example message 1 -->
+                <div class="sent">
+                    Hello there!
+                </div>
+                <!-- Example message 2 -->
+                <div class="received">
+                    Hi User1!
+                </div>
+                <!-- Example message 3 -->
+                <div class="middle">
+                    This is a middle message.
+                </div>
             </div>
+
             <div class="chat-input-container">
                 <input type="text" id="chatInput" placeholder="Type your message...">
                 <button class="chat-room-btn" id="send-btn" type="submit">Send</button>
@@ -1166,6 +1292,8 @@
                 console.log("User below room total users save messages");
                 saveMessage();
             }
+
+            fetchChatHistory();
         });
 
         // Send message when the form is submitted

@@ -331,6 +331,38 @@ def user_filter_insert():
         return redirect(url_for('login'))
 
 
+@app.route('/save_house', methods=["GET", "POST"])
+def save_hosue():
+    token = request.cookies.get('token')
+    user_id = authentication(token, jwt_secret_key)
+
+    if request.method == 'POST':
+        data = request.get_json()
+        house_id = data.get('save_house')
+
+        print('house_id', house_id)
+
+        if house_id is None:
+            return jsonify({'error': 'House ID not provided'}), 400
+
+        save_house_ls = []
+        if isinstance(user_id, int):
+            user_collection = client['personal_project']['user']
+            cur_user = user_collection.find_one({"user_id": user_id})
+            cur_user_save_house_ls = cur_user.get('saved_house', [])
+
+            if house_id not in cur_user_save_house_ls:
+                save_house_ls.append(house_id)
+
+            user_collection.update_one(
+                {'user_id': user_id},
+                {'$set': {'saved_house': save_house_ls}},
+                upsert=True
+            )
+            print("-------------------------------", cur_user_save_house_ls)
+            return "House saved successfully", 200
+
+
 translations = {
     "basic_info": "基本資訊",
     "house_preference": "房屋偏好",
@@ -448,8 +480,8 @@ def search():
 # ------------------------------------------------------Track user click house------------------------------------------------------
 
 
-@ app.route('/track/click', methods=['POST'])
-def track_click():
+@ app.route('/track/hot/click', methods=['POST'])
+def track_hot_click():
     house_id = request.json.get('house_id')
 
     token = request.cookies.get('token')
@@ -458,6 +490,24 @@ def track_click():
     # Insert into MongoDB
     house_collection = client['personal_project']['house']
     print(type(house_id))
+    house_collection.update_one(
+        {'id': int(house_id)},
+        {'$inc': {'click': 1}},
+        upsert=True
+    )
+
+    return "Click tracked", 200
+
+
+@ app.route('/track/search/click', methods=['POST'])
+def track_search_click():
+    house_id = request.json.get('house_id')
+
+    token = request.cookies.get('token')
+    user_id = authentication(token, jwt_secret_key)
+
+    # Insert into MongoDB
+    house_collection = client['personal_project']['house']
     house_collection.update_one(
         {'id': int(house_id)},
         {'$inc': {'click': 1}},
@@ -493,8 +543,13 @@ def get_matches(match_type):
     # Get current user
     token = request.cookies.get('token')
     user_id = authentication(token, jwt_secret_key)
-    cur_user = user_collection.find_one({"user_id": int(user_id)})
-    user_prefer_zone = cur_user["house_preference"]["zone"]
+
+    try:
+        cur_user = user_collection.find_one({"user_id": int(user_id)})
+        user_prefer_zone = cur_user["house_preference"]["zone"]
+    except Exception as e:
+        print(e)
+        return jsonify({'error': 'No match'}), 500
 
     # No matter what transform first
     row, transform_cur_user_dat_dict = transform_one_user(cur_user)
@@ -546,9 +601,10 @@ def get_matches(match_type):
             {"user_id": {"$in": nearest_neighbors_id_list}})
         matches_data = [[{'user_id': user['user_id'], 'username': user['username']}]
                         for user in match_users]
+
     except Exception as e:
         print(e)
-        return jsonify({'error': 'Failed to get matches'}), 500
+        return jsonify({'error': 'No match'}), 500
 
     return jsonify(matches_data), 200
 
@@ -665,10 +721,9 @@ def chat_history():
 
                 status_messages = "unread"
                 if room["last_updated_by"] == user_id:
-                    print("read")
-                    status_messages == "read"
+                    status_messages = "read"
                 else:
-                    status_messages == "unread"
+                    status_messages = "unread"
 
                 other_user_id.append({
                     "message_status": status_messages,
@@ -687,8 +742,6 @@ def chat_history():
                     {"user_id": chat_users["user_id"], "username": chat_users["username"]})
             other_user_data.append(temp_user)
 
-        print(other_user_data)
-
         return jsonify(other_user_data), 200
 
 
@@ -699,12 +752,6 @@ def save_messages():
     messages = request.json.get('messages')
     room_id = request.json.get('room_id')
     user_id = request.json.get('user_id')
-
-    save_messages = {
-        'room_id': room_id,
-        'last_updated_by': int(user_id),
-        'messages': messages
-    }
 
     print("only one user save messages", messages)
 
@@ -792,8 +839,6 @@ def on_leave(data):
     room_count[room_id] -= 1
     user_count = room_count[room_id]
 
-    print(user_count)
-
     # if the last one leave the room
 
     print(f'{username} has left the {room_id} room.')
@@ -801,7 +846,7 @@ def on_leave(data):
         print("last user left the room.")
 
     emit('message', {'senderId': username,
-                     "recipientId": "None",  "message": 'leave  room.', 'room_status': "leave room"}, room=room_id)
+                     "recipientId": "None",  "message": 'leave  room.', 'room_status': "leave_room"}, room=room_id)
     leave_room(room_id)
 
 
@@ -824,4 +869,3 @@ def handle_message(data):
 if __name__ == '__main__':
 
     socketio.run(app)
-    # start_websocket_server()

@@ -117,7 +117,7 @@
                     const token = response.headers.get('Authorization').split(' ')[1]; // Assuming token is in the format "Bearer <token>"
                     // Set cookie to expire after 10 seconds
                     const expirationDate = new Date();
-                    expirationDate.setSeconds(expirationDate.getSeconds() + 6000); // Adding 10 mins
+                    expirationDate.setSeconds(expirationDate.getSeconds() + 600); // Adding 10 mins
                     document.cookie = `token=${token}; expires=${expirationDate.toUTCString()}; path=/`;
 
                     window.location.href = '/main';

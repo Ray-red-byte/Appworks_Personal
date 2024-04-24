@@ -728,7 +728,7 @@
             <h2 class="uid" style="display: none;"></h2>
             <h2 class="cuid" style="display: none;"></h2>
             <h2 class="room_id" style="display: none;"></h2>
-            <h2 id="chat-username">Ray</h2>
+            <h2 id="chat-username"></h2>
 
             <button class="chat-room-btn" id="leave-btn" type="submit">leave</button>
             <div id="chatForm">
@@ -767,7 +767,7 @@
         let roomId = '';
 
         // Initially hide chat room
-        //hideChatRoom();
+        hideChatRoom();
 
         // use socketIO Show I am offline if trigger logout button
         function handleLogout() {
@@ -780,17 +780,28 @@
 
         socket.emit('online', { user_id: userId });
 
-        // Socket.io event listener to handle online status updates
+
         socket.on('show', function(online_users) {
-            // Find the corresponding list item and update its online status
-            online_users.forEach(user_id => {
-                const icon = document.getElementById(user_id);            
-                if (icon) {
-                    icon.textContent = 'online  ';
-                    icon.className = `fas fa-circle text-success`;
+            // Select all <i> elements with the class "fas fa-circle text-danger"
+            const icons = document.querySelectorAll('.fas.fa-circle.text-danger');
+
+            // Iterate over each icon element
+            icons.forEach(icon => {
+                const userId = icon.getAttribute('id');
+
+                // Check if the current user is online
+                if (online_users.includes(userId)) {
+                    // Update the icon to indicate online status
+                    icon.textContent = 'online';
+                    icon.className = 'fas fa-circle text-success';
+                } else {
+                    // Update the icon to indicate offline status
+                    icon.textContent = 'offline';
+                    icon.className = 'fas fa-circle text-danger';
                 }
             });
         });
+
 
         // Socket.io event listener to handle offline status updates
         socket.on('hide', function(offline_users) {
@@ -861,8 +872,12 @@
             matchList.innerHTML = '';
             matchList.innerHTML = '<h2>Chat History</h2>';
 
+            if (matches.length === 0) {
+                matchList.innerHTML += '<p>Check out profile to get matches!</p>';
+                return;
+            }
 
-            console.log(matches)
+
             matches.forEach(userList => {
                 const messageStatus = userList["message_status"]
                 const otherUserId = userList["other_user"]
@@ -871,7 +886,7 @@
                 row.classList.add('user-list-row');
 
                 otherUserId.forEach(match => {
-                    if (match["user_id"] !== userId.toString()) {
+                    if (match["user_id"] !== userId1.toString()) {
                         const listItem = document.createElement('li');
                         listItem.style.display = 'flex';
                         listItem.style.alignItems = 'center';
@@ -890,22 +905,23 @@
                         usernameSpan.className = 'match-username';
                         usernameSpan.textContent = match["username"];
 
-                        const messageStatusSpan = document.createElement('span');
-                        messageStatusSpan.textContent = messageStatus;
-                        messageStatusSpan.className = 'message-status';
-
-                        if (messageStatus === "unread") {
-                            messageStatusSpan.style = "background-color: #00FF00;"
-                        }
-                        messageStatusSpan.style = "background-color: #ff5733;"
-                        
-
                         listItem.appendChild(icon);
                         listItem.appendChild(usernameSpan);
-                        listItem.appendChild(messageStatusSpan);
+                        
 
                         listItem.addEventListener('click', () => allocateChatRoom(match["user_id"]));
 
+                        const messageStatusSpan = document.createElement('span');
+                        messageStatusSpan.className = 'message-status';
+                        messageStatusSpan.textContent = '';
+
+                        // If unread message is current chat user, no show unread message
+                        if (messageStatus === "unread" && match["user_id"] !== userId2.toString()) {
+                            messageStatusSpan.textContent = messageStatus;
+                            messageStatusSpan.style = "background-color: #00FF00;"
+                        }
+
+                        listItem.appendChild(messageStatusSpan);
                         matchList.appendChild(listItem);
 
                         row.appendChild(listItem);
@@ -947,6 +963,7 @@
                 if (response.status === 200) {
                     return response.json();
                 }
+                return [];
             })
             .then(matches => {
                 // Update the match list with fetched matches data
@@ -985,7 +1002,6 @@
                 throw new Error('Failed to enter chat room');
             })
             .then(user => {
-                console.log(user)
                 // Handle entering chat room with the user data
                 //const chatUrl = `/chat/${user["user_id"]}`;
                 //window.location.href = chatUrl;
@@ -1009,13 +1025,29 @@
                 chatRoomContainer.querySelector('.cuid').textContent = user['chat_user_id'];
                         
                 document.querySelector('.room_id').innerHTML = roomId;
-                document.getElementById('.chat-username').innerHTML = chatUserName;
+                document.getElementById('chat-username').innerHTML = chatUserName;
 
 
                 // Join a room
                 socket.emit('join_room', { user_id: userId1, room_id: roomId }, function() {
                     // This function will be called once join_room is completed
                     displayPreviousMessage(roomId);
+                });
+
+                // Mark message as read
+                const chatUserHistory = document.getElementById('chat-user-history');
+                const userListItems = chatUserHistory.querySelectorAll('.user-list-row');
+                userListItems.forEach(listItem => {
+                    const liElement = listItem.querySelector('li');
+                    const histUserStatus = liElement.querySelector('.message-status').textContent;
+                    const circleIcon = liElement.querySelector('i');
+                    const userId = circleIcon.getAttribute('id');
+                    
+                    console.log("histUserStatus", histUserStatus, userId, userId2)
+                    if (histUserStatus === 'unread' && userId.toString() === userId2.toString()) {
+                        liElement.querySelector('.message-status').textContent = '';
+                    }
+                    
                 });
                 
                 
@@ -1054,6 +1086,10 @@
                                 <p>屋齡: ${house["age"]} 年</p>
                                 <p>地址: ${house["address"]}</p>
                             </div>
+
+                            <div class="save-house" style="z-index:10002;">
+                                <button class="save-house-btn" id="${house["id"]}">Save</button>
+                            </div>
                         </div>
                     `;
                     housesContainer.innerHTML += houseCard;
@@ -1073,7 +1109,7 @@
                     const houseId = h3Element.classList[0];
                     console.log(houseId)
                     // Make an AJAX request to track click
-                    fetch('/track/click', {
+                    fetch('/track/hot/click', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -1098,6 +1134,37 @@
             }
         });
 
+        // Save house event listener
+        const saveButtons = document.querySelectorAll('.save-house-btn');
+        saveButtons.forEach(button => {
+                button.addEventListener('click', function(event) { // Extract house ID from the button's id attribute
+                    event.stopPropagation();    
+
+                    const houseId = button.id;
+                    console.log(houseId);
+                    fetch('/save_house', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ save_house: houseId })
+                    })
+                    .then(response => {
+                        if (response.status === 200) {
+                            return response.json();
+                        }
+                        throw new Error('Failed to save house');
+                    })
+                    .then(data => {
+                        // Handle successful response
+                        console.log('House saved successfully:', data);
+                    })
+                    .catch(error => {
+                        // Handle error
+                        console.error('Error saving house:', error);
+                    });
+                });
+            });
 
         // Price range input
         const priceInput = document.getElementById('price');
@@ -1161,12 +1228,7 @@
 
 
         // ------------------------------Chat room--------------------------------
-        // User ID of the current user
-        //const chatRoomConstants = allocateChatRoom(userId);
 
-
-
-        
 
         function hideChatRoom() {
             const chatRoomContainer = document.querySelector('.chat-room-container');
@@ -1277,9 +1339,8 @@
 
         leaveRoomBtn.addEventListener('click', function() {
             socket.emit('leave', {'roomId': roomId, 'userId1': userId1}, function() {
-                // Callback function to execute after leaving the room
-                hideChatRoom(); // Call hideChatRoom after leaving the room
-                fetchChatHistory() // Because user leave room, need to refresh chat history
+                hideChatRoom(); 
+                fetchChatHistory();
             });
         });
 
@@ -1294,8 +1355,6 @@
             const chatForm = document.getElementById('chatForm');
             const newMessage = document.createElement('div');   
 
-            console.log('senderId type:', typeof senderId);
-            console.log('userId1 type:', typeof userId1);
 
             // Check if the message is sent by the current user
             if (recipientId === "None") {

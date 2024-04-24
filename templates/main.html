@@ -1086,10 +1086,9 @@
                                 <p>屋齡: ${house["age"]} 年</p>
                                 <p>地址: ${house["address"]}</p>
                             </div>
-
-                            <div class="save-house" style="z-index:10002;">
+                        </div>
+                        <div class="save-house" style="z-index:10002;">
                                 <button class="save-house-btn" id="${house["id"]}">Save</button>
-                            </div>
                         </div>
                     `;
                     housesContainer.innerHTML += houseCard;
@@ -1132,13 +1131,39 @@
                     window.location.href = '/user/house_detail/' + houseId;
                 }
             }
+
+            if (event.target.closest('.save-house')){
+                const houseId = event.target.closest('.save-house').querySelector('.save-house-btn').id;
+                console.log(houseId);
+                    fetch('/save_house', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ save_house: houseId })
+                    })
+                    .then(response => {
+                        if (response.status === 200) {
+                            return response.json();
+                        }
+                        throw new Error('Failed to save house');
+                    })
+                    .then(data => {
+                        // Handle successful response
+                        console.log('House saved successfully:', data);
+                    })
+                    .catch(error => {
+                        // Handle error
+                        console.error('Error saving house:', error);
+                    });
+            }
         });
 
         // Save house event listener
+        /*
         const saveButtons = document.querySelectorAll('.save-house-btn');
         saveButtons.forEach(button => {
-                button.addEventListener('click', function(event) { // Extract house ID from the button's id attribute
-                    event.stopPropagation();    
+                button.addEventListener('click', function(event) { // Extract house ID from the button's id attribute    
 
                     const houseId = button.id;
                     console.log(houseId);
@@ -1165,6 +1190,7 @@
                     });
                 });
             });
+        */
 
         // Price range input
         const priceInput = document.getElementById('price');

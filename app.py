@@ -155,6 +155,8 @@ def user_information():
     # Retrieve the parameters from the query string
     token = request.cookies.get('token')
 
+    print("-----------------User information page-----------------")
+
     # Call the authentication function to verify the token
     user_id = authentication(token, jwt_secret_key)
 
@@ -384,6 +386,8 @@ def search_hot():
         for house in top_houses
     ]
 
+    print(top_houses_json)
+
     if top_houses_json:
         return jsonify(top_houses_json), 200
     else:
@@ -415,7 +419,6 @@ def search():
 
         # Base on this preference to search for house
         zones = user_house_preference['zone']
-        print(zones)
         zone_pattern = '|'.join(zones)
         regex_pattern = re.compile(f'({zone_pattern})', re.IGNORECASE)
 
@@ -425,8 +428,8 @@ def search():
             'price': {'$lte': float(user_house_preference['price'])},
             'age': {'$lte': int(user_house_preference['house_age'])},
             "address": {"$regex": regex_pattern},
-            'stay_landlord': True if user_house_preference['stay_with_landlord'] == "yes" else False,
-            'park': True if user_house_preference['park_nearby'] == "yes" else False,
+            'stay_landlord': user_house_preference['stay_with_landlord'] == "yes",
+            'park': user_house_preference['park_nearby'] == "yes",
         })
 
         # Convert matching houses to a list before returning
@@ -454,9 +457,11 @@ def track_click():
     print("click", house_id)
     # Insert into MongoDB
     house_collection = client['personal_project']['house']
+    print(type(house_id))
     house_collection.update_one(
-        {'id': house_id},
-        {'$inc': {'click': 1}}
+        {'id': int(house_id)},
+        {'$inc': {'click': 1}},
+        upsert=True
     )
 
     return "Click tracked", 200
@@ -465,7 +470,7 @@ def track_click():
 # ------------------------------------------------------Get user house------------------------------------------------------
 
 
-@app.route('/user/house/<int:house_id>', methods=['GET'])
+@ app.route('/user/house/<int:house_id>', methods=['GET'])
 def get_user_house(house_id):
     house_collection = client['personal_project']['house']
     house = house_collection.find_one({"id": house_id})
@@ -641,31 +646,48 @@ def house_detail(houseId):
 # ------------------------------------- Render template-------------------------------------
 
 
-@app.route('/chat_history', methods=['GET', 'POST'])
+@ app.route('/chat_history', methods=['GET', 'POST'])
 def chat_history():
     token = request.cookies.get('token')
     user_id = authentication(token, jwt_secret_key)
+    username = get_user_name(user_id)
 
     if isinstance(user_id, int):
         room_collection = client['personal_project']['room']
         user_collection = client['personal_project']["user"]
-        all_rooms = room_collection.find({}, {'room_id': 1})
+        all_rooms = room_collection.find({})
 
         other_user_id = []
+
         for room in all_rooms:
             seperate_room_id = list(map(int, room["room_id"].split("_")))
             if user_id in seperate_room_id:
-                other_user_id.append(
-                    [user for user in seperate_room_id if user != user_id])
+
+                status_messages = "unread"
+                if room["last_updated_by"] == user_id:
+                    print("read")
+                    status_messages == "read"
+                else:
+                    status_messages == "unread"
+
+                other_user_id.append({
+                    "message_status": status_messages,
+                    "other_user_id": [user for user in seperate_room_id if user != user_id]
+                })
 
         other_user_data = []
         for users in other_user_id:
-            temp_user = []
-            for user_id in users:
+
+            temp_user = {"message_status": users["message_status"],
+                         "other_user": []}
+
+            for user_id in users["other_user_id"]:
                 chat_users = user_collection.find_one({"user_id": user_id})
-                temp_user.append(
+                temp_user["other_user"].append(
                     {"user_id": chat_users["user_id"], "username": chat_users["username"]})
             other_user_data.append(temp_user)
+
+        print(other_user_data)
 
         return jsonify(other_user_data), 200
 
@@ -680,7 +702,7 @@ def save_messages():
 
     save_messages = {
         'room_id': room_id,
-        'last_updated_by': user_id,
+        'last_updated_by': int(user_id),
         'messages': messages
     }
 

@@ -160,6 +160,7 @@
             identy: "Identified feature",
             pet: "Pets allowed",
             short_stay: "Short stay available",
+            stay_landlord: "yes",
             cook: true,
             equip: ["Internet", "TV", "Washing Machine", "Dryer", "Water Dispenser"],
             furniture: ["Wardrobe", "Dining Table", "Dining Chair", "Cabinet", "Single Bed"]
@@ -195,31 +196,32 @@
                     </div>
                     <div class="right-section">
                         <h2>House Info</h2>
-                        <p>Price: ${houseData['price']}</p>
-                        <p>Address: ${houseData['address']}</p>
-                        <p>Type: ${houseData['type']}</p>
-                        <p>Age: ${houseData['age']} years</p>
-                        <p>Size: ${houseData['size']} 坪</p>
-                        <p>Move-in Date: ${houseData['move_date']}</p>
-                        <p>Layout: ${houseData['layout']}</p>
-                        <p>Floor: ${houseData['floor']}</p>
+                        <p>租金: ${houseData['price']} 月</p>
+                        <p>地址: ${houseData['address']}</p>
+                        <p>型態: ${houseData['type']}</p>
+                        <p>屋齡: ${houseData['age']} years</p>
+                        <p>坪數: ${houseData['size']} 坪</p>
+                        <p>遷入日期: ${houseData['move_date']}</p>
+                        <p>格局: ${houseData['layout']}</p>
+                        <p>樓層: ${houseData['floor']}</p>
                     </div>
                 </div>
                 <div class="bottom-seciton">
                     <h2>House Features</h2>
-                    <p>Identy: ${houseData['identy']}</p>
-                    <p>Pet: ${houseData['pet']}</p>
-                    <p>Short Stay: ${houseData['short_stay']}</p>
-                    <p>Cook: ${houseData['cook']}</p>
+                    <p>身份要求: ${houseData['identy']}</p>
+                    <p>房東同住: ${houseData['stay_landlord']}</p>
+                    <p>寵物: ${houseData['pet']}</p>
+                    <p>最短租期: ${houseData['short_stay']}</p>
+                    <p>廚房: ${houseData['cook']}</p>
 
 
-                    <p>Equipment:</p>
+                    <p>設備:</p>
                     <ul>
                         ${houseData['equip'].map(equipment => `<li>${equipment}</li>`).join('')}
                     </ul>
 
 
-                    <p>Furniture:</p>
+                    <p>家俱:</p>
                     <ul>
                         ${houseData['furniture'].map(furniture => `<li>${furniture}</li>`).join('')}
                     </ul>

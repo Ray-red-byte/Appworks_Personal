@@ -15,6 +15,7 @@
             zoom: 100%; 
         }
 
+
         .header {
             display: flex;
             justify-content: space-between;
@@ -33,6 +34,7 @@
             margin-left: 1000px;
             margin-top:100px;
             font-size: 40px;
+            z-index: 10001;
         }
 
         .user-info {
@@ -40,6 +42,8 @@
             margin-right: 100px;
             margin-top:100px;
             font-size: 40px;
+            cursor:pointer;
+            z-index: 10001;
         }
 
         .container {
@@ -86,7 +90,7 @@
             max-width: 1500px;
             margin: 50px auto;
             padding: 20px;
-            width: 2500px;
+            width: 1500px;
             background-color: #eae6e6;
             border-radius: 10px;
             border: 2px solid #7d7777;
@@ -155,19 +159,35 @@
             cursor: pointer;
         }
 
-        .houses {
+        .houses-container {
             display: flex;
             flex-wrap: wrap;
             gap: 20px;
         }
 
+        .houses-container p {
+            font-size: 30px; /* Adjust the font size as desired */
+        }
+
         .house {
-            width: calc(50% - 10px);
+            display: flex;
+            flex-direction: row;
+            width: calc(100% - 10px);
             border: 1px solid #ccc;
             border-radius: 10px;
             padding: 20px;
             background-color: #fff;
+            margin: 10px auto;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .house-details {
+            flex: 1; /* Allow it to grow to fill available space */
+            margin-right: 10px; /* Add some space between the two divs */
+        }
+
+        .house-info {
+            flex: 1; /* Allow it to grow to fill available space */
         }
 
         .house img {
@@ -197,59 +217,59 @@
             position: fixed;
             flex-direction: column;
             align-items: flex-end;
-            margin-left: 3000px;
             top: 100px; /* Adjust as needed */
             right: 20px; /* Adjust as needed */
-            width: 600px;
+            width: 1000px;
             height: calc(100% - 100px); 
-        
         }
 
         .select-match-type {
             position: fixed;
             width: 700px;
             font-size: 30px;
-            background-color: #d3c7d3;
+            background-color: #c89ec8;
             border: 2px solid #7d7777;
             border-radius: 10px;
             margin-top: 165px;
             margin-right: 110px;
             padding: 20px;
+            z-index: 9999;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         .matchlist-history{
-            position: fix;
+            position: fixed;
             display: flex;
             flex-direction: row;
-            align-items: flex-end;
-            margin-top: -1530px; 
-            margin-right: 185px;
-            width: 500px;
-            height: 100%; /* Ensure the right-section takes up the full height */
+
+            margin-top: 410px; 
+            margin-right: 105px;
+            width: 750px;
+            height:800px; /* Ensure the right-section takes up the full height */
         }
 
+        .chat-user-history {
+            position: fixed;
+            width: 400px;
+            font-size: 30px;
+            background-color: #d3c7d3;
+            border: 2px solid #7d7777;
+            margin-left: 320px;
+            margin-top: 0px;
+            padding: 12.5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
         .match-list {
             position: fixed;
-            width: 250px;
+            width: 270px;
             font-size: 30px;
             background-color: #d3c7d3;
             border: 2px solid #7d7777;
             padding: 20px;
-            align-items: flex-start;
-            margin-left: -170px;
+            margin-left: 0px;
+            margin-bottom: 100px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-        .chat-user-history {
-            position: fixed;
-            width: 420px;
-            font-size: 30px;
-            background-color: #d3c7d3;
-            border: 2px solid #7d7777;
-            margin-left: 125px;
-            padding: 12.5px;
-            align-items: flex-end;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
+        
 
         .chat-user-history h2 {
             color: #800080;
@@ -294,14 +314,36 @@
             cursor: pointer;
         }
 
+        .message-status {
+            font-size: 18px; /* Adjust font size */
+             /* Set background color */
+            color: white; /* Set text color */
+            padding: 3px 8px; /* Add padding */
+            margin-left: 70px;
+            margin-top: -40px;
+            border-radius: 8px; /* Add border radius for rounded corners */
+        }
+
+
+        .match-username {
+            padding-bottom: 10px;
+            margin-left: 20px;
+            cursor: pointer;
+        }
+        .match-username:hover{
+            color: gray;
+        }
+
         /* Online icon style */
         .fa-circle.text-success {
             color: green; /* Change the color as needed */
+            margin-right: 2px;
         }
 
         /* Offline icon style */
         .fa-circle.text-danger {
             color: red; /* Change the color as needed */
+            margin-right: 2px;
         }
 
         .section {
@@ -322,20 +364,22 @@
             display: flex;
             margin-bottom: 5px;
             color: #555; /* White color */
+            font-size: 30px;
         }
         input[type="range"],
         select,
         input[type="checkbox"] {
             width: calc(100% - 22px); /* Adjust width */
+            height: 30px;
             margin-bottom: 10px;
             border: none;
             border-radius: 5px;
             padding: 10px;
             box-sizing: border-box;
-            background-color: #fffefe;
+            background-color: #c7bbc2;
         }
         input[type="checkbox"] {
-            display: inline-block;
+            
             vertical-align: middle; /* Align checkboxes vertically */
             margin-right: 10px;
         }
@@ -374,8 +418,8 @@
         .price::-webkit-slider-thumb, .houseAge::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 18px;
-            height: 18px;
+            width: 35px;
+            height: 35px;
             background: #a971ce;
             cursor: pointer; 
         }
@@ -416,11 +460,14 @@
         #chatForm {
             display: flex;
             flex-direction: column;
-            width: 480px;
-            height: 600px;
+            width: 950px;
+            height: 900px;
+            margin-left: 5px;
+            margin-bottom: 40px;
             border-radius: 10px;
             padding: 20px;
             overflow-y: auto;
+            z-index: 10000;
             background-color: #e5dada; /* Set background color */
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add box shadow for depth */
         }
@@ -428,7 +475,7 @@
         .chat-input-container {
             display: flex;
             align-items: center;
-            width: 500px; /* Adjust the width as needed */
+            width: 1000px; /* Adjust the width as needed */
         }
 
         #chatInput {
@@ -436,10 +483,12 @@
             border: 1px solid #ccc;
             border-radius: 5px 0 0 5px;
             border-right: none;
-            height: 30px;
+            height: 70px;
             flex: 1; /* Takes up remaining space */
-            font-size: 16px;
+            font-size: 40px;
         }
+
+
 
         .chat-room-btn {
             padding: 10px 20px;
@@ -448,13 +497,23 @@
             border: none;
             border-radius: 0 5px 5px 0;
             cursor: pointer;
+            height: 80px;
             transition: background-color 0.3s;
-            font-size: 16px;
+            font-size: 30px;
         }
 
+        #leave-btn {
+            margin-bottom:50px;
+            margin-left: -17px;
+        }
 
         .chat-room-btn:hover {
             background-color: #0056b3;
+        }
+
+        input::placeholder {
+            font-size: 30px; /* Adjust the font size as needed */
+            padding-left: 20px;
         }
 
     </style>
@@ -462,38 +521,31 @@
 <body>
     <div class="header">
         <h1 style="font-size: 100px;">Rent Right</h1>
-        <a href="/logout" class="logout-text" onclick="handleLogout()">logout</a>
+        <a href="/logout" class="logout-text" style="cursor:pointer" onclick="handleLogout()">logout</a>
         <a href="/user/information" class="user-info">user info</a>
     </div>
 
     <div class="container">
         <div class="left-main-section">
-            <h1 style="font-size: 25px;">House Preference</h1>
+            <h1 style="font-size:40px;">House Preference</h1>
             <form id="housePreferenceForm" method="POST">
                 <div class="left-section">
                     <div style="margin-bottom: 50px;">
-                        <h3>Price:</h3>
+                        <h3 style="font-size: 30px;">Price:</h3>
                         <input type="range" id="price" class="price" name="price" min="0" max="200000" step="1" value="50">
                         <span id="priceValue">50
                     </div>
 
                     <div style="margin-bottom: 80px;">
-                        <h3>House Age:</h3>
+                        <h3 style="font-size: 30px;">House Age:</h3>
                         <input type="range" id="houseAge" class="houseAge" name="houseAge" min="0" max="100" step="1" value="25">
                         <span id="houseAgeValue">25</span>
                     </div>
-
-                    <div class="city">
-                        <h3>City:</h3>
-                        <select id="city" name="city">
-                            <option value="Taipei">Taipei</option>
-                            <option value="New Taipei">New Taipei</option>
-                        </select>
-                    </div>
                     
                     <div style="margin-bottom: 80px;">
-                        <h3>Taipei Zone:</h3>
+                        <h3 style="font-size: 30px;">Taipei</h3>
                         <div class="taipei">
+                            
                             <input type="checkbox" id="Zhongzheng" name="zone" value="中正區">
                             <label for="Zhongzheng">中正區</label>
      
@@ -532,7 +584,7 @@
                             <br>
                         </div>
 
-                        <h3>New Taipei</h3>
+                        <h3 style="font-size: 30px;">New Taipei</h3>
                         <div class="new-taipei">
                             <input type="checkbox" id="Banqiao" name="zone" value="板橋區">
                             <label for="Banqiao">板橋區</label>
@@ -611,7 +663,7 @@
                     
 
                     <div style="margin-bottom: 80px;">
-                        <h3>Stay with Landlord:</h3>
+                        <h3 style="font-size: 30px;">Stay with Landlord:</h3>
                         <select id="stayWithLandlord" name="stayWithLandlord">
                             <option value="yes">Yes</option>
                             <option value="no">No</option>
@@ -619,7 +671,7 @@
                     </div>
                     
                     <div style="margin-bottom: 80px;">
-                        <h3>Park Nearby:</h3>
+                        <h3 style="font-size: 30px;">Park Nearby:</h3>
                         <select id="park" name="park">
                             <option value="yes">Yes</option>
                             <option value="no">No</option>
@@ -636,81 +688,11 @@
     <div class="right-main-section">
         <div class="inside-container">
             <h1 class="cur-userId" style="display: none;">{{ user_id }}</h1>
-            <h2 style="font-size: 40px;">Hello {{ username }} , Find your future</h2>
+            <h2 style="font-size: 50px;">Hello {{ username }} , Find your future</h2>
 
-            <div class="houses">
+            <div class="houses-container">
                 <!-- House cards will be displayed here -->
-                   <!-- House cards will be displayed here -->
-                    <div class="house">
-                        <img src="house1.jpg" alt="Beautiful House in the City Center">
-                        <h3 class="1">Beautiful House in the City Center</h3>
-                        <p>$2000/month</p>
-                        <p>5 years</p>
-                        <p>123 Main Street, City Center</p>
-                    </div>
-                    <div class="house">
-                        <img src="house2.jpg" alt="Cozy Apartment with Garden View">
-                        <h3 class="2">Cozy Apartment with Garden View</h3>
-                        <p>$1500/month</p>
-                        <p>2 years</p>
-                        <p>456 Park Avenue, Garden District</p>
-                    </div>
-                    <div class="house">
-                        <img src="house2.jpg" alt="Cozy Apartment with Garden View">
-                        <h3 class="2">Cozy Apartment with Garden View</h3>
-                        <p>$1500/month</p>
-                        <p>2 years</p>
-                        <p>456 Park Avenue, Garden District</p>
-                    </div>
-                    <div class="house">
-                        <img src="house2.jpg" alt="Cozy Apartment with Garden View">
-                        <h3 class="2">Cozy Apartment with Garden View</h3>
-                        <p>$1500/month</p>
-                        <p>2 years</p>
-                        <p>456 Park Avenue, Garden District</p>
-                    </div>
-                    <div class="house">
-                        <img src="house2.jpg" alt="Cozy Apartment with Garden View">
-                        <h3 class="2">Cozy Apartment with Garden View</h3>
-                        <p>$1500/month</p>
-                        <p>2 years</p>
-                        <p>456 Park Avenue, Garden District</p>
-                    </div>
-                    <div class="house">
-                        <img src="house3.jpg" alt="Spacious Villa with Pool">
-                        <h3 class="3">Spacious Villa with Pool</h3>
-                        <p>$3000/month</p>
-                        <p>10 years</p>
-                        <p>789 Villa Road, Suburbia</p>
-                    </div>
-                    <div class="house">
-                        <img src="house1.jpg" alt="Beautiful House in the City Center">
-                        <h3 class="1">Beautiful House in the City Center</h3>
-                        <p>$2000/month</p>
-                        <p>5 years</p>
-                        <p>123 Main Street, City Center</p>
-                    </div>
-                    <div class="house">
-                        <img src="house1.jpg" alt="Beautiful House in the City Center">
-                        <h3 class="1">Beautiful House in the City Center</h3>
-                        <p>$2000/month</p>
-                        <p>5 years</p>
-                        <p>123 Main Street, City Center</p>
-                    </div>
-                    <div class="house">
-                        <img src="house1.jpg" alt="Beautiful House in the City Center">
-                        <h3 class="1">Beautiful House in the City Center</h3>
-                        <p>$2000/month</p>
-                        <p>5 years</p>
-                        <p>123 Main Street, City Center</p>
-                    </div>
-                    <div class="house">
-                        <img src="house1.jpg" alt="Beautiful House in the City Center">
-                        <h3 class="1">Beautiful House in the City Center</h3>
-                        <p>$2000/month</p>
-                        <p>5 years</p>
-                        <p>123 Main Street, City Center</p>
-                    </div>
+
             </div>
         </div>
     </div>
@@ -730,39 +712,11 @@
             <div class="match-list" id="match-list">
                 <h2>Match List</h2>
                 <!-- Match User -->
-                <ul>
-                    <li>
-                        <i class="fas fa-circle text-danger" id="1">offline</i>
-                        <span>User1</span>
-                    </li>
-                    <li>
-                        <i class="fas fa-circle text-danger" id="2">offline</i>
-                        <span>User2</span>
-                    </li>
-                    <li>
-                        <i class="fas fa-circle text-danger" id="3">offline</i>
-                        <span>User3</span>
-                    </li>
-                </ul>
             </div>
             
             <div class="chat-user-history" id="chat-user-history">
                 <h2>Chat History</h2>
                 <!-- Match User -->
-                <ul>
-                    <li>
-                        <i class="fas fa-circle text-danger" id="4">offline</i>
-                        <span>User4</span>
-                    </li>
-                    <li>
-                        <i class="fas fa-circle text-danger" id="5">offline</i>
-                        <span>User5</span>
-                    </li>
-                    <li>
-                        <i class="fas fa-circle text-danger" id="6">offline</i>
-                        <span>User6</span>
-                    </li>
-                </ul>
             </div>
         </div>
 
@@ -773,9 +727,9 @@
             <!-- User ID of the current user -->
             <h2 class="uid" style="display: none;"></h2>
             <h2 class="cuid" style="display: none;"></h2>
-            <h2 class="room_id" ></h2>
+            <h2 class="room_id" style="display: none;"></h2>
+            <h2 id="chat-username">Ray</h2>
 
-            <h2>Chat Room</h2>
             <button class="chat-room-btn" id="leave-btn" type="submit">leave</button>
             <div id="chatForm">
 
@@ -813,11 +767,11 @@
         let roomId = '';
 
         // Initially hide chat room
-        hideChatRoom();
+        //hideChatRoom();
 
         // use socketIO Show I am offline if trigger logout button
         function handleLogout() {
-            socket.emit('offline', { user_id: userId }); // Replace <user_id> with the actual user ID
+            socket.emit('offline', { user_id: userId1 }); // Replace <user_id> with the actual user ID
         }
 
         // use socketIO Show I am online Initially
@@ -851,16 +805,12 @@
         });
 
         // Function to render match list
-        function renderMatchList(matches, element) {
+        function renderMatchList(matches) {
 
-            const matchList = document.getElementById(element);
+            const matchList = document.getElementById('match-list');
             matchList.innerHTML = '';
+            matchList.innerHTML = '<h2>Match List</h2>';
 
-            if (element === "chat-user-history") {
-                matchList.innerHTML = '<h2>Chat History</h2>';
-            } else {
-                matchList.innerHTML = '<h2>Match List</h2>';
-            }
 
             if (matches.length === 0) {
                 matchList.innerHTML += '<p>Check out profile to get matches!</p>';
@@ -886,7 +836,7 @@
                         icon.textContent = 'offline';
 
                         const usernameSpan = document.createElement('span');
-
+                        usernameSpan.className = 'match-username';
                         usernameSpan.textContent = match["username"];
 
                         listItem.appendChild(icon);
@@ -904,6 +854,91 @@
             });
         }
 
+        // Function to render match list
+        function renderChatHistoryList(matches) {
+
+            const matchList = document.getElementById('chat-user-history');
+            matchList.innerHTML = '';
+            matchList.innerHTML = '<h2>Chat History</h2>';
+
+
+            console.log(matches)
+            matches.forEach(userList => {
+                const messageStatus = userList["message_status"]
+                const otherUserId = userList["other_user"]
+
+                const row = document.createElement('div');
+                row.classList.add('user-list-row');
+
+                otherUserId.forEach(match => {
+                    if (match["user_id"] !== userId.toString()) {
+                        const listItem = document.createElement('li');
+                        listItem.style.display = 'flex';
+                        listItem.style.alignItems = 'center';
+                        listItem.style = "padding-bottom: 10px;"
+                        listItem.style = "cursor: pointer;"
+
+                        // Creating an icon element
+                        const icon = document.createElement('i');
+
+                        // Initially, assuming user is offline
+                        icon.className = `fas fa-circle text-danger`;
+                        icon.id = `${match["user_id"]}`;
+                        icon.textContent = 'offline';
+
+                        const usernameSpan = document.createElement('span');
+                        usernameSpan.className = 'match-username';
+                        usernameSpan.textContent = match["username"];
+
+                        const messageStatusSpan = document.createElement('span');
+                        messageStatusSpan.textContent = messageStatus;
+                        messageStatusSpan.className = 'message-status';
+
+                        if (messageStatus === "unread") {
+                            messageStatusSpan.style = "background-color: #00FF00;"
+                        }
+                        messageStatusSpan.style = "background-color: #ff5733;"
+                        
+
+                        listItem.appendChild(icon);
+                        listItem.appendChild(usernameSpan);
+                        listItem.appendChild(messageStatusSpan);
+
+                        listItem.addEventListener('click', () => allocateChatRoom(match["user_id"]));
+
+                        matchList.appendChild(listItem);
+
+                        row.appendChild(listItem);
+                    }
+                });
+
+                matchList.appendChild(row);
+            });
+        }
+
+        // Get chatting history to show existing room
+        function fetchChatHistory() {
+            fetch('/chat_history')
+            .then(response => {
+                if (response.status === 200) {
+                    return response.json();
+                }
+                throw new Error('Failed to fetch chat history');
+            })
+            .then(chatHistoryUsers => {
+
+
+                renderChatHistoryList(chatHistoryUsers);
+
+                // Show online cause it may be cover
+                socket.emit('online', { user_id: userId1 });
+            })
+            .catch(error => {
+                console.error(error);
+                // Handle the error, e.g., show an error message to the user
+            });
+        }
+
 
         // Function to fetch user matches from Flask API
         function fetchUserMatches(match_type) {
@@ -916,7 +951,7 @@
             .then(matches => {
                 // Update the match list with fetched matches data
                 // Need to re fresh online user status if user change match type
-                renderMatchList(matches, 'match-list');
+                renderMatchList(matches);
                 socket.emit('online', { user_id: userId });
             })
             .catch(error => {
@@ -974,6 +1009,7 @@
                 chatRoomContainer.querySelector('.cuid').textContent = user['chat_user_id'];
                         
                 document.querySelector('.room_id').innerHTML = roomId;
+                document.getElementById('.chat-username').innerHTML = chatUserName;
 
 
                 // Join a room
@@ -1004,16 +1040,20 @@
                 throw new Error('Failed to fetch houses');
             })
             .then(housesData => {
-                const housesContainer = document.querySelector('.houses');
+                const housesContainer = document.querySelector('.houses-container');
                 housesContainer.innerHTML = '';
                 housesData.forEach(house => {
                     const houseCard = `
                         <div class="house">
-                            <img src="${house["img_url"]}" alt="${house["title"]}" >
-                            <h3 class="${house["id"]}">${house["title"]}</h3>
-                            <p>${house["price"]}</p>
-                            <p>${house["age"]}</p>
-                            <p>${house["address"]}</p>
+                            <div class="house-details">
+                                <img src="${house["img_url"]}" alt="${house["title"]}" >
+                            </div>
+                            <div class="house-info">
+                                <h3 class="${house["id"]}" style="cursor:pointer">${house["title"]}</h3>
+                                <p>租金: ${house["price"]} 元/月</p>
+                                <p>屋齡: ${house["age"]} 年</p>
+                                <p>地址: ${house["address"]}</p>
+                            </div>
                         </div>
                     `;
                     housesContainer.innerHTML += houseCard;
@@ -1026,32 +1066,35 @@
         }
 
         // Event listener to handle house card click
-        document.querySelector('.houses').addEventListener('click', function(event) {
-            const houseElement = event.target.closest('.house h3');
-            if (houseElement) {
-                const houseId = houseElement.classList[0];
-                // Make an AJAX request to track click
-                fetch('/track/click', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        house_id: houseId,
+        document.querySelector('.houses-container').addEventListener('click', function(event) {
+            if (event.target.closest('.house')) {
+                const h3Element = event.target.closest('.house').querySelector('.house-info h3');
+                if (h3Element) {
+                    const houseId = h3Element.classList[0];
+                    console.log(houseId)
+                    // Make an AJAX request to track click
+                    fetch('/track/click', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            house_id: houseId,
+                        })
                     })
-                })
-                .then(response => {
-                    if (response.status !== 200) {
-                        throw new Error('Failed to track click');
-                    }
-                    // Optionally handle successful response here
-                    console.log('Click tracked successfully');
-                })
-                .catch(error => {
-                    console.error('Error tracking click:', error);
-                });
-                
-                window.location.href = '/user/house_detail/' + houseId;
+                    .then(response => {
+                        if (response.status !== 200) {
+                            throw new Error('Failed to track click');
+                        }
+                        // Optionally handle successful response here
+                        console.log('Click tracked successfully');
+                    })
+                    .catch(error => {
+                        console.error('Error tracking click:', error);
+                    });
+                    
+                    window.location.href = '/user/house_detail/' + houseId;
+                }
             }
         });
 
@@ -1097,24 +1140,7 @@
             });
         });
 
-        // Get chatting history to show existing room
-        function fetchChatHistory() {
-            fetch('/chat_history')
-            .then(response => {
-                if (response.status === 200) {
-                    return response.json();
-                }
-                throw new Error('Failed to fetch chat history');
-            })
-            .then(chatHistoryUsers => {
-                console.log(chatHistoryUsers)
-                renderMatchList(chatHistoryUsers, 'chat-user-history');
-            })
-            .catch(error => {
-                console.error(error);
-                // Handle the error, e.g., show an error message to the user
-            });
-        }
+
 
         // Initial render
         // with DOM load 
@@ -1293,6 +1319,7 @@
                 saveMessage();
             }
 
+            // If someone send messages , update chat history
             fetchChatHistory();
         });
 

@@ -352,7 +352,7 @@ def save_hosue():
             cur_user_save_house_ls = cur_user.get('saved_house', [])
 
             if house_id not in cur_user_save_house_ls:
-                save_house_ls.append(house_id)
+                save_house_ls.append(int(house_id))
 
             user_collection.update_one(
                 {'user_id': user_id},

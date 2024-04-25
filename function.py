@@ -83,7 +83,7 @@ def validate_email(email):
 def create_token(user_id, jwt_secret_key):
     # Token expiresuser_id in 1 minutes
 
-    expiration_time = datetime.now() + timedelta(seconds=60)
+    expiration_time = datetime.now() + timedelta(seconds=600)
     payload = {'user_id': user_id, 'exp': expiration_time}
     token = jwt.encode(payload, str(jwt_secret_key), algorithm='HS256')
     return token

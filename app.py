@@ -1,9 +1,14 @@
 from flask import Flask, render_template, request, jsonify, make_response, redirect, url_for
+import requests
 import os
 import re
 from dotenv import load_dotenv
 from datetime import datetime
+from celery import Celery
 import pymongo
+import time
+import signal
+import subprocess
 from werkzeug.security import generate_password_hash, check_password_hash
 from function import get_user_id, check_exist_user, validate_email, create_token, authentication, get_user_password, get_user_name
 from flask_cors import CORS
@@ -13,6 +18,13 @@ from user_model.user_data_process import transform_one_user, transform_all_user,
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET')
+app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379/0'
+app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/0'
+
+# Initialize Celery
+celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
+celery.conf.update(app.config)
+
 CORS(app)
 
 socketio = SocketIO(app)
@@ -27,6 +39,12 @@ jwt_secret_key = os.getenv('JWT_SECRET_KEY')
 # Mongo atlas
 CONNECTION_STRING = os.getenv("MONGO_ATLAS_USER")
 client = pymongo.MongoClient(CONNECTION_STRING)
+
+
+# LINE notify
+LINE_SUBSCRIBE_URL = os.getenv("LINE_SUBSCRIBE_URL")
+LINE_CLIENT_ID = os.getenv("LINE_CLIENT_ID")
+LINE_CLIENT_SECRET = os.getenv("LINE_CLIENT_SECRET")
 
 
 @app.route('/login')
@@ -204,10 +222,8 @@ def user_info_insert():
             return redirect(url_for('routine_page'))
 
         return redirect(url_for('login'))
-# -------------------------------------------------------User information page-------------------------------------------------------
 
 
-# -------------------------------------------------------User routine page-------------------------------------------------------
 @ app.route('/user/routine_insert', methods=["GET", "POST"])
 def user_routine_insert():
 
@@ -256,10 +272,7 @@ def user_routine_insert():
 
         return redirect(url_for('login'))
 
-# -------------------------------------------------------User routine page-------------------------------------------------------
 
-
-# -------------------------------------------------------User house type page-------------------------------------------------------
 @app.route('/user/furniture_insert', methods=["GET", "POST"])
 def furniture_insert():
     # Retrieve the parameters from the query string
@@ -330,6 +343,10 @@ def user_filter_insert():
 
         return redirect(url_for('login'))
 
+# -------------------------------------------------------User information page-------------------------------------------------------
+
+# -------------------------------------------------------User house save page-------------------------------------------------------
+
 
 @app.route('/save_house', methods=["GET", "POST"])
 def save_hosue():
@@ -399,6 +416,8 @@ translations = {
     "routine": "例行公事",
     "petOptions": "寵物選項"
 }
+
+# -------------------------------------------------------User house save page-------------------------------------------------------
 
 
 @app.route('/search/hot', methods=['GET'])
@@ -866,6 +885,99 @@ def handle_message(data):
                      'recipientId': recipientId, 'message': message, 'room_status': "save_messages"}, room=room_id)
 
 
-if __name__ == '__main__':
+# --------------------------------------------------------LINE Notify--------------------------------------------------------
+# Function to start the Celery worker
+def start_celery():
+    # Check if Celery is already running
+    if not is_celery_running():
+        subprocess.Popen(['celery', '-A', 'app.celery',
+                         'worker', '--loglevel=info', '--concurrency=2'])
 
+
+# Check if Celery worker is running
+def is_celery_running():
+    pid = get_celery_pid()
+    return pid is not None
+
+
+# Get Celery worker process ID
+def get_celery_pid():
+    ps_output = subprocess.check_output(['ps', 'aux'])
+    for line in ps_output.decode().split('\n'):
+        if 'celery worker' in line and 'python3' in line:
+            return int(line.split()[1])
+    return None
+
+
+def getNotifyToken(AuthorizeCode, user_id):
+    body = {
+        "grant_type": "authorization_code",
+        "code": AuthorizeCode,
+        "redirect_uri": f'http://18.178.32.143:80',
+        "client_id": 'bvtTFwMkqG5LiWFJIq3aXb',
+        "client_secret": 'saHb9IQBraM3Rm76iNMModraELZAjx7YJUiibpfEfUh'
+    }
+    r = requests.post("https://notify-bot.line.me/oauth/token", data=body)
+    return r.json()["access_token"]
+
+
+def lineNotifyMessage(token, msg):
+    headers = {
+        "Authorization": "Bearer " + token,
+        "Content-Type": "application/x-www-form-urlencoded"
+    }
+
+    payload = {'message': msg}
+    r = requests.post("https://notify-api.line.me/api/notify",
+                      headers=headers, data=payload)
+    return r.status_code
+
+
+@celery.task
+def monitor(user_id, access_token):
+    print('hi', access_token)
+    while True:
+        print(user_id)
+        lineNotifyMessage(access_token, f"This is a test messag {user_id}")
+        time.sleep(10)  # Sleep for 10 seconds before sending the next message
+
+
+@app.route('/send', methods=['POST'])
+def send():
+    token = request.cookies.get('token')
+    user_id = authentication(token, jwt_secret_key)
+
+    # Get user access_token from mongoDB
+    db = client["personal_project"]
+    user_collection = db["user"]
+    cur_user = user_collection.find({"user_id": user_id})
+    access_token = cur_user["access_token"]
+
+    monitor.delay(user_id, access_token)
+    return "Start to send"
+
+
+@app.route('/', methods=['POST', 'GET'])
+def hello_world():
+    # Get user id from cookies
+    token = request.cookies.get('token')
+    user_id = authentication(token, jwt_secret_key)
+
+    authorizeCode = request.args.get('code')
+    token = getNotifyToken(authorizeCode, user_id)
+
+    print(user_id, token)
+    # Save in mongo DB
+    db = client["personal_project"]
+    user_collection = db["user"]
+    user_collection.update_one(
+        {"user_id": int(user_id)},
+        {"$set": {'access_token': token}},
+        upsert=True)
+
+    return f"恭喜你 註冊完成"
+
+
+if __name__ == '__main__':
+    start_celery()
     socketio.run(app)

@@ -41,6 +41,7 @@
             color: #f0eff0;
             margin-left: 0px;
             margin-top:100px;
+            cursor:pointer;
             font-size: 40px;
             z-index: 10001;
         }
@@ -812,13 +813,7 @@
         // use socketIO Show I am offline if trigger logout button
         function handleLogout() {
             socket.emit('offline', { user_id: userId1 }); 
-            receiveUserId = '/send/' + userId1;
-            fetch(receiveUserId) 
-            .then(response => {
-                if (response.status === 200) {
-                    window.location.href = '/logout';
-                }
-            })
+            window.location.href = '/logout';
         }
 
         // use socketIO Show I am online Initially

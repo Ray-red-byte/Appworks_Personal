@@ -718,6 +718,19 @@ def house_detail(houseId):
 
     return redirect(url_for('login'))
 
+
+@app.route('/line_page', methods=['GET', 'POST'])
+def line_page():
+    token = request.cookies.get('token')
+
+    # Call the authentication function to verify the token
+    user_id = authentication(token, jwt_secret_key)
+
+    if isinstance(user_id, int):
+        username = get_user_name(user_id)
+        return render_template('line.html')
+
+    return redirect(url_for('login'))
 # ------------------------------------- Render template-------------------------------------
 
 
@@ -933,13 +946,53 @@ def lineNotifyMessage(token, msg):
     return r.status_code
 
 
+@app.route('/line/preference', methods=['POST'])
+def line_house_preference():
+    token = request.cookies.get('token')
+    user_id = authentication(token, jwt_secret_key)
+
+    if isinstance(user_id, int):
+        price = request.form.get('price')
+        house_age = request.form.get('houseAge')
+        zone = request.form.getlist('zone')
+        stay_with_landlord = request.form.get('stayWithLandlord')
+        park_nearby = request.form.get('park')
+
+        db = client["personal_project"]
+        user_collection = db["user"]
+        user_collection.update_one(
+            {"user_id": user_id},
+            {"$set": {'line_preference': {'price': price, 'house_age': house_age, 'zone': zone,
+                                          'stay_with_landlord': stay_with_landlord, 'park_nearby': park_nearby}}}
+        )
+        print("save successfully")
+    return jsonify("Line preference saved successfully"), 200
+
+
+@app.route('/send', methods=['GET', 'POST'])
+def send():
+    token = request.cookies.get('token')
+    user_id = authentication(token, jwt_secret_key)
+
+    # Get user access_token from mongoDB
+    db = client["personal_project"]
+    user_collection = db["user"]
+    cur_user = user_collection.find_one({"user_id": user_id})
+    access_token = cur_user["access_token"]
+
+    print("start to send")
+
+    # monitor.delay(user_id, access_token)
+    return jsonify("Start to send"), 200
+
+
 @celery.task
 def monitor(user_id, access_token):
     print('hi', access_token)
     db = client["personal_project"]
     user_collection = db["user"]
     cur_user = user_collection.find_one({"user_id": user_id})
-    cur_user_house_preference = cur_user["house_preference"]
+    cur_user_house_preference = cur_user["line_preference"]
 
     while True:
         # Query MongoDB to get the latest houses
@@ -964,23 +1017,6 @@ def monitor(user_id, access_token):
         time.sleep(30)
 
 
-@app.route('/send/<int:user_id>', methods=['GET', 'POST'])
-def send(user_id):
-    token = request.cookies.get('token')
-    user_id = authentication(token, jwt_secret_key)
-
-    # Get user access_token from mongoDB
-    db = client["personal_project"]
-    user_collection = db["user"]
-    cur_user = user_collection.find_one({"user_id": user_id})
-    access_token = cur_user["access_token"]
-
-    print("start to send")
-
-    monitor.delay(user_id, access_token)
-    return jsonify("Start to send"), 200
-
-
 @app.route('/', methods=['POST', 'GET'])
 def hello_world():
     # Get user id from cookies
@@ -998,9 +1034,9 @@ def hello_world():
         {"$set": {'access_token': token}},
         upsert=True)
 
-    return f"恭喜你 註冊完成"
+    return redirect(url_for('line_page'))
 
 
 if __name__ == '__main__':
-    start_celery()
+    # start_celery()
     socketio.run(app)

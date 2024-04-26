@@ -994,27 +994,45 @@ def monitor(user_id, access_token):
     cur_user = user_collection.find_one({"user_id": user_id})
     cur_user_house_preference = cur_user["line_preference"]
 
+    zones = cur_user_house_preference['zone']
+    zone_pattern = '|'.join(zones)
+    regex_pattern = re.compile(f'({zone_pattern})', re.IGNORECASE)
+
+    last_update_at = ''
+    count = 0
     while True:
         # Query MongoDB to get the latest houses
 
         house_collection = db["house"]
-        last_house = house_collection.find().sort(
-            [("updated_at", -1)]).limit(1)
+        if count == 0:
+            last_house_list = house_collection.find().sort(
+                [("updated_at", -1)]).limit(1)
+            last_update_at = last_house_list[0]['updated_at']
+        else:
+            last_house_list = house_collection.find(
+                {"updated_at": {"$gt": last_update_at}})
 
-        zones = cur_user_house_preference['zone']
-        zone_pattern = '|'.join(zones)
-        regex_pattern = re.compile(f'({zone_pattern})', re.IGNORECASE)
+            if last_house_list.count() == 0:
+                lineNotifyMessage(
+                    access_token, f"No house is available")
+                time.sleep(30)
+                continue
+            last_update_at = last_house_list[-1]['updated_at']
 
         # Check if last house match user's preference
-        if last_house:
-            last_house = last_house[0]
-            if float(last_house['price']) <= float(cur_user_house_preference['price']) and int(last_house['age']) <= int(cur_user_house_preference['house_age']) and re.search(regex_pattern, last_house['address']) and last_house['stay_landlord'] == (cur_user_house_preference['stay_with_landlord'] == "yes") and last_house['park'] == (cur_user_house_preference['park_nearby'] == "yes"):
-                lineNotifyMessage(
-                    access_token, f"New house is available {last_house}")
+        if last_house_list:
+            for last_house in last_house_list:
+                if float(last_house['price']) <= float(cur_user_house_preference['price']) and int(last_house['age']) <= int(cur_user_house_preference['house_age']) and re.search(regex_pattern, last_house['address']) and last_house['stay_landlord'] == (cur_user_house_preference['stay_with_landlord'] == "yes") and last_house['park'] == (cur_user_house_preference['park_nearby'] == "yes"):
+                    house_title = last_house["title"]
+                    lineNotifyMessage(
+                        access_token, f"New house is available {house_title}")
 
+        house_title = last_house["title"]
         lineNotifyMessage(
-            access_token, f"No house is available {last_house}")
+            access_token, f"No house is available {house_title}")
+
         time.sleep(30)
+        count += 1
 
 
 @app.route('/', methods=['POST', 'GET'])

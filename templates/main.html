@@ -235,54 +235,70 @@
 
         .select-match-type {
             position: fixed;
-            width: 700px;
+            width: 900px;
             font-size: 30px;
-            background-color: #c89ec8;
+            background-color: #a18ba1;
             border: 2px solid #7d7777;
             border-radius: 10px;
-            margin-top: 165px;
-            margin-right: 110px;
+            margin-top: 180px;
+            margin-right: 30px;
             padding: 20px;
             z-index: 9999;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #match-type{
+            margin-top: 15px;
+            margin-left:55px;
+            font-size: 30px;
+            width: 800px;
+            border-radius: 10px;
+        }
+
+        #matchType{
+            width: 800px;
+            height: 50px;
+            margin-left:55px;
+            border-radius: 10px;
+            font-size: 30px;
         }
         
         .matchlist-history{
             position: fixed;
             display: flex;
             flex-direction: row;
-            margin-top: 410px; 
+            margin-top: 480px; 
             margin-right: 105px;
-            width: 750px;
+            width: 800px;
             height:800px; /* Ensure the right-section takes up the full height */
         }
 
         .chat-user-history {
             position: fixed;
-            width: 400px;
+            width: 420px;
             font-size: 30px;
             background-color: #d3c7d3;
             border: 2px solid #7d7777;
-            margin-left: 320px;
+            margin-left: 424px;
             margin-top: 0px;
             padding: 12.5px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         .match-list {
             position: fixed;
-            width: 270px;
+            width: 450px;
             font-size: 30px;
             background-color: #d3c7d3;
             border: 2px solid #7d7777;
             padding: 20px;
-            margin-left: 0px;
+            margin-left: -68px;
             margin-bottom: 100px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         
 
         .chat-user-history h2 {
-            color: #800080;
+            color: #ffffff;
             font-size: 30px;
             margin-bottom: 15px;
         }
@@ -307,7 +323,7 @@
 
 
         .match-list h2 {
-            color: #800080;
+            color: #ffffff;
             font-size: 30px;
             margin-bottom: 15px;
         }
@@ -389,9 +405,10 @@
             background-color: #c7bbc2;
         }
         input[type="checkbox"] {
-            
+            width:30px;
             vertical-align: middle; /* Align checkboxes vertically */
             margin-right: 10px;
+            margin-left: 50px;
         }
         input[type="checkbox"] + label {
             display: inline-block;
@@ -498,8 +515,6 @@
             font-size: 40px;
         }
 
-
-
         .chat-room-btn {
             padding: 10px 20px;
             background-color: #a552dc;
@@ -526,13 +541,25 @@
             padding-left: 20px;
         }
 
+        #stayWithLandlord{
+            height: 55px;
+            border-radius: 10px;
+            font-size: 30px;
+        }
+
+        #park{
+            height: 55px;
+            border-radius: 10px;
+            font-size: 30px;
+        }
+
 
     </style>
 </head>
 <body>
     <div class="header">
         <h1 style="font-size: 100px;">Rent Right</h1>
-        <a href="https://notify-bot.line.me/oauth/authorize?response_type=code&client_id=bvtTFwMkqG5LiWFJIq3aXb&redirect_uri=http://18.178.32.143:80&scope=notify&state=NO_STATE" style="cursor:pointer" class="line-text">LINE</a>
+        <a  href="/line_register" style="cursor:pointer" class="line-text">LINE</a>
         <a class="logout-text" onclick="handleLogout()">LOGOUT</a>
         <a href="/user/information" class="user-info">PROFILE</a>
     </div>
@@ -741,7 +768,7 @@
 
     <div class="right-section">
         <div class="select-match-type">
-            <h2 style="font-size: 40px;">Select Match Type</h2>
+            <h2 style="font-size: 50px; color:#f0eff0;">Select Match Type</h2>
             <select id="matchType" name="matchType">
                 <option value="zone">Similar Zone</option>
                 <option value="identity">Similar identity</option>
@@ -755,9 +782,10 @@
                 <!-- Match User -->
             </div>
             
+            
             <div class="chat-user-history" id="chat-user-history">
                 <h2>Chat History</h2>
-                <!-- Match User -->
+                <!-- Existing content will be here -->
             </div>
         </div>
 
@@ -769,7 +797,7 @@
             <h2 class="uid" style="display: none;"></h2>
             <h2 class="cuid" style="display: none;"></h2>
             <h2 class="room_id" style="display: none;"></h2>
-            <h2 id="chat-username"></h2>
+            <h2 id="chat-username">Ray</h2>
 
             <button class="chat-room-btn" id="leave-btn" type="submit">leave</button>
             <div id="chatForm">
@@ -797,6 +825,7 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+    
     <script>
 
         const socket = io();
@@ -806,6 +835,26 @@
         let curUserName = '';
         let chatUserName = '';
         let roomId = '';
+        
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const dropdownButton = document.getElementById("dropdownButton");
+            const dropdownMenu = document.getElementById("dropdownMenu");
+
+            dropdownButton.addEventListener("click", function() {
+                const isExpanded = dropdownButton.getAttribute("aria-expanded") === "true";
+                if (isExpanded) {
+                dropdownButton.setAttribute("aria-expanded", "false");
+                dropdownMenu.style.display = "none";
+                } else {
+                dropdownButton.setAttribute("aria-expanded", "true");
+                dropdownMenu.style.display = "block";
+                }
+            });
+
+
+        });
+
 
         // Initially hide chat room
         hideChatRoom();
@@ -866,7 +915,7 @@
 
 
             if (matches.length === 0) {
-                matchList.innerHTML += '<p>Check out profile to get matches!</p>';
+                matchList.innerHTML += '<p>Check out profile!</p>';
                 return;
             }
 

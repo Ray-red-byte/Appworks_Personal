@@ -731,6 +731,19 @@ def line_page():
         return render_template('line.html')
 
     return redirect(url_for('login'))
+
+
+@app.route('/line_register', methods=['GET', 'POST'])
+def line_register_page():
+    token = request.cookies.get('token')
+    user_id = authentication(token, jwt_secret_key)
+
+    if isinstance(user_id, int):
+        username = get_user_name(user_id)
+        return render_template('line_register.html')
+
+    return redirect(url_for('login'))
+
 # ------------------------------------- Render template-------------------------------------
 
 

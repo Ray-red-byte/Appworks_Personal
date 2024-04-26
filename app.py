@@ -988,15 +988,8 @@ def send():
 
 @celery.task
 def monitor(user_id, access_token):
-    print('hi', access_token)
+    print('hi monitor', access_token)
     db = client["personal_project"]
-    user_collection = db["user"]
-    cur_user = user_collection.find_one({"user_id": user_id})
-    cur_user_house_preference = cur_user["line_preference"]
-
-    zones = cur_user_house_preference['zone']
-    zone_pattern = '|'.join(zones)
-    regex_pattern = re.compile(f'({zone_pattern})', re.IGNORECASE)
 
     last_update_at = ''
     count = 0
@@ -1004,39 +997,51 @@ def monitor(user_id, access_token):
         # Query MongoDB to get the latest houses
 
         house_collection = db["house"]
-        if count == 0:
+        user_collection = db["user"]
+        cur_user = user_collection.find_one({"user_id": user_id})
+        cur_user_house_preference = cur_user["line_preference"]
+
+        zones = cur_user_house_preference['zone']
+        zone_pattern = '|'.join(zones)
+        regex_pattern = re.compile(f'({zone_pattern})', re.IGNORECASE)
+
+        if count == 0:  # At first find the last one
             last_house_list = house_collection.find().sort(
                 [("updated_at", -1)]).limit(1)
-            last_update_at = last_house_list[0]['updated_at']
+            for i in last_house_list:
+                last_update_at = i['updated_at']
         else:
-            last_house_list = house_collection.find(
-                {"updated_at": {"$gt": last_update_at}})
 
-            if last_house_list.count() == 0:
+            try:
+                last_house_list = house_collection.find(
+                    {"updated_at": {"$gt": last_update_at}})
+                last_update_at = house_collection.find().sort(
+                    [("updated_at", -1)]).limit(1)[0]['updated_at']
+
+            except Exception as e:
+                print(e)
                 lineNotifyMessage(
                     access_token, f"No house is available")
                 time.sleep(30)
                 continue
-            last_update_at = last_house_list[-1]['updated_at']
 
         # Check if last house match user's preference
-        if last_house_list:
-            for last_house in last_house_list:
-                if float(last_house['price']) <= float(cur_user_house_preference['price']) and int(last_house['age']) <= int(cur_user_house_preference['house_age']) and re.search(regex_pattern, last_house['address']) and last_house['stay_landlord'] == (cur_user_house_preference['stay_with_landlord'] == "yes") and last_house['park'] == (cur_user_house_preference['park_nearby'] == "yes"):
-                    house_title = last_house["title"]
-                    lineNotifyMessage(
-                        access_token, f"New house is available {house_title}")
+        for last_house in last_house_list:
+            print(last_house["title"])
+            if float(last_house['price']) <= float(cur_user_house_preference['price']) and int(last_house['age']) <= int(cur_user_house_preference['house_age']) and re.search(regex_pattern, last_house['address']) and last_house['stay_landlord'] == (cur_user_house_preference['stay_with_landlord'] == "yes") and last_house['park'] == (cur_user_house_preference['park_nearby'] == "yes"):
+                house_title = last_house["title"]
+                lineNotifyMessage(
+                    access_token, f"New house is available {house_title}")
 
-        house_title = last_house["title"]
         lineNotifyMessage(
-            access_token, f"No house is available {house_title}")
+            access_token, f"No house is available .......")
 
         time.sleep(30)
         count += 1
 
 
 @app.route('/', methods=['POST', 'GET'])
-def hello_world():
+def line_register():
     # Get user id from cookies
     token = request.cookies.get('token')
     user_id = authentication(token, jwt_secret_key)

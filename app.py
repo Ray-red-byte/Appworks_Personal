@@ -29,7 +29,7 @@ CORS(app)
 
 socketio = SocketIO(app)
 
-dotenv_path = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/.env'
+dotenv_path = '/home/ec2-user/Appworks_Personal/.env'
 load_dotenv(dotenv_path)
 
 # JWT secret key
@@ -936,25 +936,49 @@ def lineNotifyMessage(token, msg):
 @celery.task
 def monitor(user_id, access_token):
     print('hi', access_token)
+    db = client["personal_project"]
+    user_collection = db["user"]
+    cur_user = user_collection.find_one({"user_id": user_id})
+    cur_user_house_preference = cur_user["house_preference"]
+
     while True:
-        print(user_id)
-        lineNotifyMessage(access_token, f"This is a test messag {user_id}")
-        time.sleep(10)  # Sleep for 10 seconds before sending the next message
+        # Query MongoDB to get the latest houses
+
+        house_collection = db["house"]
+        last_house = house_collection.find().sort(
+            [("updated_at", -1)]).limit(1)
+
+        zones = cur_user_house_preference['zone']
+        zone_pattern = '|'.join(zones)
+        regex_pattern = re.compile(f'({zone_pattern})', re.IGNORECASE)
+
+        # Check if last house match user's preference
+        if last_house:
+            last_house = last_house[0]
+            if float(last_house['price']) <= float(cur_user_house_preference['price']) and int(last_house['age']) <= int(cur_user_house_preference['house_age']) and re.search(regex_pattern, last_house['address']) and last_house['stay_landlord'] == (cur_user_house_preference['stay_with_landlord'] == "yes") and last_house['park'] == (cur_user_house_preference['park_nearby'] == "yes"):
+                lineNotifyMessage(
+                    access_token, f"New house is available {last_house}")
+
+        lineNotifyMessage(
+            access_token, f"No house is available {last_house}")
+        time.sleep(30)
 
 
-@app.route('/send', methods=['POST'])
-def send():
+@app.route('/send/<int:user_id>', methods=['GET', 'POST'])
+def send(user_id):
     token = request.cookies.get('token')
     user_id = authentication(token, jwt_secret_key)
 
     # Get user access_token from mongoDB
     db = client["personal_project"]
     user_collection = db["user"]
-    cur_user = user_collection.find({"user_id": user_id})
+    cur_user = user_collection.find_one({"user_id": user_id})
     access_token = cur_user["access_token"]
 
+    print("start to send")
+
     monitor.delay(user_id, access_token)
-    return "Start to send"
+    return jsonify("Start to send"), 200
 
 
 @app.route('/', methods=['POST', 'GET'])
@@ -966,7 +990,6 @@ def hello_world():
     authorizeCode = request.args.get('code')
     token = getNotifyToken(authorizeCode, user_id)
 
-    print(user_id, token)
     # Save in mongo DB
     db = client["personal_project"]
     user_collection = db["user"]

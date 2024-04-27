@@ -198,6 +198,7 @@
                 alert('Recommend house not found');
             })
             .then(houseData => {
+                console.log(houseData)
                 renderRecommendHouseData(houseData)
 
             })
@@ -206,13 +207,13 @@
 
         // Function to render recommend house data
         function renderRecommendHouseData(houseDatas) {
-            const recommendHouseContainer = document.querySelector('.recommend-house');
+            const recommendHouseContainer = document.querySelector('.recommend-house-container');
             houseDatas.forEach(houseData => {
                 recommendHouseContainer.innerHTML += `
-                    <h2>Recommend House</h2>
-                    <div class="recommend-left-right">
+                    <div class="house">
+                        <h2>Recommend House</h2>
                         <div class="recommend-left">
-                            <h3><a href="${houseData['house_id']}" target="_blank">${houseData['title']}</a></h3>
+                            <h3 class="${house["id"]}"><a href="${houseData['house_id']}" target="_blank">${houseData['title']}</a></h3>
                             <img src="${houseData['img_url']}" alt="${houseData['title']}">
                         </div>
                         <div class="recommend-right">
@@ -223,6 +224,9 @@
                             <p>坪數: ${houseData['size']} 坪</p>
                         </div>
                     </div>
+                    <div class="save-house" style="z-index:10002;">
+                        <button class="save-house-btn" id="${house["id"]}">Save</button>
+                    </div>
                 `;
             })
         }
@@ -230,7 +234,7 @@
         // Event listener to handle house card click
         document.querySelector('.recommend-house-container').addEventListener('click', function(event) {
             if (event.target.closest('.house')) {
-                const h3Element = event.target.closest('.house').querySelector('.house-info h3');
+                const h3Element = event.target.closest('.house').querySelector('.recommend-left h3');
                 if (h3Element) {
                     const houseId = h3Element.classList[0];
                     console.log(houseId)
@@ -254,8 +258,6 @@
                     .catch(error => {
                         console.error('Error tracking click:', error);
                     });
-                    
-                    window.location.href = '/user/house_detail/' + houseId;
                 }
             }
 

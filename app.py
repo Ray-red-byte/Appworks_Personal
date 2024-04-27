@@ -567,16 +567,16 @@ def get_user_recommend_house(house_id):
             if transform_house_data:
                 transform_select_house_data_dicts.append(transform_house_data)
 
-        transform_house_id_list, transform_house_value_list = get_value_from_dict(
+        transform_house_id_list, transform_house_value_list = get_value_from_house_dict(
             transform_select_house_data_dicts)
 
         nearest_neighbors_id_list = match_five_house(transform_house_id_list, transform_house_value_list,
                                                      cur_transform_house["value"])
-        print(nearest_neighbors_id_list)
         try:
             match_houses = house_collection.find(
                 {"id": {"$in": nearest_neighbors_id_list}})
-            matches_houses_data = [[{'house_id': match_house['id'], 'title': match_house['title'], 'price': match_house['price'], 'address': match_house['address'], 'age': match_house['age'], 'size': match_house['size'], 'img_url': match_house['img_url']}]
+
+            matches_houses_data = [{'house_id': match_house['id'], 'title': match_house['title'], 'price': match_house['price'], 'address': match_house['address'], 'age': match_house['age'], 'size': match_house['size'], 'img_url': match_house['img_url']}
                                    for match_house in match_houses if match_house['id'] != house_id]
 
         except Exception as e:
@@ -637,7 +637,7 @@ def get_matches(match_type):
                 transform_select_user_data_dicts.append(transform_user_data)
 
         print("Selected users", len(transform_select_user_data_dicts))
-        transform_id_list, transform_value_lis = get_value_from_dict(
+        transform_id_list, transform_value_lis = get_value_from_user_dict(
             transform_select_user_data_dicts)
 
         nearest_neighbors_id_list = match_ten_user(transform_id_list, transform_value_lis,
@@ -646,7 +646,7 @@ def get_matches(match_type):
     else:
         transform_all_user_dict = transform_all_user_collection.find()
 
-        transform_id_list, transform_value_list = get_value_from_dict(
+        transform_id_list, transform_value_list = get_value_from_user_dict(
             transform_all_user_dict)
 
         nearest_neighbors_id_list = match_ten_user(transform_id_list, transform_value_list,

@@ -115,15 +115,8 @@ def match_five_house(id_list, transform_select_house_data, cur_house_data):
     print(cur_house_data)
     distances, indices = kdtree.query([cur_house_data], k=5)
 
-    # Print the indices of the nearest neighbors
-    print("Indices of nearest neighbors:")
-    print(indices)
-
     # Optionally, you can retrieve the actual data points corresponding to the indices
     nearest_neighbors = [id_list[i] for i in indices[0]]
-
-    print("Nearest neighbors:")
-    print(nearest_neighbors)
 
     return nearest_neighbors
 
@@ -135,7 +128,6 @@ def insert_transform_all_house_to_mongo(transform_all_user_collection, transform
 def get_value_from_house_dict(transform_all_house_data_dicts):
     id_list = []
     value_list = []
-    print(transform_all_house_data_dicts)
     for transform_all_hosue_data_dict in transform_all_house_data_dicts:
         id_list.append(transform_all_hosue_data_dict['house_id'])
         value_list.append(transform_all_hosue_data_dict['value'])

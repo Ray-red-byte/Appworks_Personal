@@ -13,7 +13,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from function import get_user_id, check_exist_user, validate_email, create_token, authentication, get_user_password, get_user_name
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit, join_room, leave_room
-from user_model.user_data_process import transform_one_user, transform_all_user, match_ten_user, get_value_from_dict
+from user_model.user_data_process import transform_one_user, transform_all_user, match_ten_user, get_value_from_user_dict
+from user_model.house_data_process import transform_one_house, transform_all_house, match_five_house, get_value_from_house_dict, one_hot_gender
 
 
 app = Flask(__name__)
@@ -369,7 +370,7 @@ def save_hosue():
             cur_user_save_house_ls = cur_user.get('saved_house', [])
 
             if house_id not in cur_user_save_house_ls:
-                save_house_ls.append(house_id)
+                save_house_ls.append(int(house_id))
 
             user_collection.update_one(
                 {'user_id': user_id},
@@ -536,7 +537,7 @@ def track_search_click():
     return "Click tracked", 200
 # ------------------------------------------------------Track user click house------------------------------------------------------
 
-# ------------------------------------------------------Get user house------------------------------------------------------
+# ------------------------------------------------------house detail page------------------------------------------------------
 
 
 @ app.route('/user/house/<int:house_id>', methods=['GET'])
@@ -548,7 +549,62 @@ def get_user_house(house_id):
         search_house_json = {**house, '_id': str(house['_id'])}
         return jsonify(search_house_json), 200
     return jsonify({'error': 'House not found'}), 404
-# ------------------------------------------------------Get user house------------------------------------------------------
+
+
+@app.route('/user/house/recommend/<int:house_id>', methods=['GET'])
+def get_user_recommend_house(house_id):
+    token = request.cookies.get('token')
+    user_id = authentication(token, jwt_secret_key)
+
+    if isinstance(user_id, int):
+        db = client['personal_project']
+        house_collection = db['house']
+        transform_all_house_collection = db['transform_all_house']
+
+        # Get current house
+        cur_transform_house = transform_all_house_collection.find_one(
+            {"house_id": house_id})
+        cur_house = house_collection.find_one({"id": house_id})
+
+        print("-----------------Start Search-----------------")
+        cur_house_zone = cur_house["address"]
+        district = cur_house_zone.split('市')[-1]
+        district = district.split('區')[0]
+
+        regex_pattern = re.compile(f'({district})', re.IGNORECASE)
+        matching_zone_houses = house_collection.find({
+            "address": {"$regex": regex_pattern},
+        })
+        print("matching_zone_houses", matching_zone_houses)
+
+        transform_select_house_data_dicts = []
+
+        for matching_zone_house in matching_zone_houses:
+            house_id = matching_zone_house["id"]
+            transform_house_data = transform_all_house_collection.find_one(
+                {"house_id": int(house_id)})
+            if transform_house_data:
+                transform_select_house_data_dicts.append(transform_house_data)
+
+        transform_house_id_list, transform_house_value_list = get_value_from_house_dict(
+            transform_select_house_data_dicts)
+
+        nearest_neighbors_id_list = match_five_house(transform_house_id_list, transform_house_value_list,
+                                                     cur_transform_house["value"])
+        try:
+            match_houses = house_collection.find(
+                {"id": {"$in": nearest_neighbors_id_list}})
+
+            matches_houses_data = [{'house_id': match_house['id'], 'title': match_house['title'], 'price': match_house['price'], 'address': match_house['address'], 'age': match_house['age'], 'size': match_house['size'], 'img_url': match_house['img_url']}
+                                   for match_house in match_houses if match_house['id'] != house_id]
+
+        except Exception as e:
+            print(e)
+            return jsonify({'error': 'No match'}), 500
+
+        return jsonify(matches_houses_data), 200
+
+        # ------------------------------------------------------Get user house------------------------------------------------------
 
 
 @ app.route('/matches/<string:match_type>', methods=['GET'])
@@ -600,7 +656,7 @@ def get_matches(match_type):
                 transform_select_user_data_dicts.append(transform_user_data)
 
         print("Selected users", len(transform_select_user_data_dicts))
-        transform_id_list, transform_value_lis = get_value_from_dict(
+        transform_id_list, transform_value_lis = get_value_from_user_dict(
             transform_select_user_data_dicts)
 
         nearest_neighbors_id_list = match_ten_user(transform_id_list, transform_value_lis,
@@ -609,7 +665,7 @@ def get_matches(match_type):
     else:
         transform_all_user_dict = transform_all_user_collection.find()
 
-        transform_id_list, transform_value_list = get_value_from_dict(
+        transform_id_list, transform_value_list = get_value_from_user_dict(
             transform_all_user_dict)
 
         nearest_neighbors_id_list = match_ten_user(transform_id_list, transform_value_list,
@@ -619,7 +675,7 @@ def get_matches(match_type):
         match_users = user_collection.find(
             {"user_id": {"$in": nearest_neighbors_id_list}})
         matches_data = [[{'user_id': user['user_id'], 'username': user['username']}]
-                        for user in match_users]
+                        for user in match_users if user['user_id'] != user_id]
 
     except Exception as e:
         print(e)

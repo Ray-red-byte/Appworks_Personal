@@ -14,8 +14,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from function import get_user_id, check_exist_user, validate_email, create_token, authentication, get_user_password, get_user_name
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit, join_room, leave_room
-from user_model.user_data_process import transform_one_user, transform_all_user, match_ten_user, get_value_from_user_dict
-from user_model.house_data_process import transform_one_house, transform_all_house, match_five_house, get_value_from_house_dict, one_hot_gender
+from user_model.user_data_process import transform_one_user, transform_all_user, match_user, get_value_from_user_dict
+from user_model.house_data_process import transform_one_house, transform_all_house, match_house, get_value_from_house_dict, one_hot_gender
 
 
 app = Flask(__name__)
@@ -526,41 +526,46 @@ def ai_recommend():
             user_save_house_dict['click'].apped(transform_all_house_collection.find(
                 {"house_id": user_click_house_id})['value'])
 
-        np_save = np.array(user_save_house_dict['save'])
-        highest_save_price, lowest_save_price = np_save[:, 0].max(
-        ), np_save[:, 0].min()
-        highest_save_age, lowest_save_age = np_save[:, 1].max(
-        ), np_save[:, 1].min()
-        highest_save_size, lowest_save_size = np_save[:, 2].max(
-        ), np_save[:, 2].min()
+        np_save, np_click = np.array(user_save_house_dict['save']), np.array(
+            user_save_house_dict['click'])
+        highest_save_price, lowest_save_price, highest_click_price, lowest_click_price = np_save[:, 0].max(
+        ), np_save[:, 0].min(), np_click[:, 0].max(), np_click[:, 0].min()
+        highest_save_age, lowest_save_age, highest_click_age, lowest_click_age = np_save[:, 1].max(
+        ), np_save[:, 1].min(), np_click[:, 1].max(), np_click[:, 1].min()
+        highest_save_size, lowest_save_size, highest_click_size, lowest_click_size = np_save[:, 2].max(
+        ), np_save[:, 2].min(), np_click[:, 2].max(), np_click[:, 2].min()
+
+        lowest_price = (lowest_save_price * 2 + lowest_click_price) / 3
+        highest_price = (highest_save_price * 2 + highest_click_price) / 3
+        lowest_age = (lowest_save_age * 2 + lowest_click_age) / 3
+        highest_age = (highest_save_age * 2 + highest_click_age) / 3
+        lowest_size = (lowest_save_size * 2 + lowest_click_size) / 3
+        highest_size = (highest_save_size * 2 + highest_click_size) / 3
 
         # Base on above information to search for house
         matching_houses = transform_all_house_collection.find({
-            'value.0': {'$lte': highest_save_price, '$gte': lowest_save_price},
-            'value.1': {'$lte': highest_save_age, '$gte': lowest_save_age},
-            'value.2': {'$lte': highest_save_size, '$gte': lowest_save_size}
+            'value.0': {'$lte': highest_price, '$gte': lowest_price},
+            'value.1': {'$lte': highest_age, '$gte': lowest_age},
+            'value.2': {'$lte': highest_size, '$gte': lowest_size}
         })
 
         transform_id_list, transform_value_list = get_value_from_house_dict(
             matching_houses)
 
-        if len(transform_value_list) > 10:
-            return jsonify({'error': 'Not enough data'}), 500
-        nearest_neighbors_id_list = match_five_house(transform_id_list, transform_value_list,
-                                                     cur_transform_user["value"])
+        nearest_neighbors_id_list = [
+            transform_id for transform_id in transform_id_list if transform_id not in cur_user['saved_house'] and transform_id not in cur_user['click_house']][:10]
+
+        print(nearest_neighbors_id_list)
 
         try:
             match_houses = house_collection.find(
                 {"id": {"$in": nearest_neighbors_id_list}})
 
-            matches_houses_data = [{'house_id': match_house['id'], 'title': match_house['title'], 'price': match_house['price'], 'address': match_house['address'], 'age': match_house['age'], 'size': match_house['size'], 'img_url': match_house['img_url']}
-                                   for match_house in match_houses]
-
         except Exception as e:
             print(e)
             return jsonify({'error': 'No match'}), 500
 
-        return jsonify(matches_houses_data), 200
+        return jsonify(match_houses), 200
 
 # -------------------------------------------------------User house type page-------------------------------------------------------
 
@@ -620,7 +625,7 @@ def get_user_house(house_id):
     return jsonify({'error': 'House not found'}), 404
 
 
-@app.route('/user/house/recommend/<int:house_id>', methods=['GET'])
+@ app.route('/user/house/recommend/<int:house_id>', methods=['GET'])
 def get_user_recommend_house(house_id):
     token = request.cookies.get('token')
     user_id = authentication(token, jwt_secret_key)
@@ -658,8 +663,8 @@ def get_user_recommend_house(house_id):
         transform_house_id_list, transform_house_value_list = get_value_from_house_dict(
             transform_select_house_data_dicts)
 
-        nearest_neighbors_id_list = match_five_house(transform_house_id_list, transform_house_value_list,
-                                                     cur_transform_house["value"])
+        nearest_neighbors_id_list = match_house(transform_house_id_list, transform_house_value_list,
+                                                cur_transform_house["value"], 5)
         try:
             match_houses = house_collection.find(
                 {"id": {"$in": nearest_neighbors_id_list}})
@@ -724,12 +729,11 @@ def get_matches(match_type):
             if transform_user_data:
                 transform_select_user_data_dicts.append(transform_user_data)
 
-        print("Selected users", len(transform_select_user_data_dicts))
         transform_id_list, transform_value_lis = get_value_from_user_dict(
             transform_select_user_data_dicts)
 
-        nearest_neighbors_id_list = match_ten_user(transform_id_list, transform_value_lis,
-                                                   transform_cur_user_data["value"])
+        nearest_neighbors_id_list = match_user(transform_id_list, transform_value_lis,
+                                               transform_cur_user_data["value"], 10)
 
     else:
         transform_all_user_dict = transform_all_user_collection.find()
@@ -737,8 +741,8 @@ def get_matches(match_type):
         transform_id_list, transform_value_list = get_value_from_user_dict(
             transform_all_user_dict)
 
-        nearest_neighbors_id_list = match_ten_user(transform_id_list, transform_value_list,
-                                                   transform_cur_user_data["value"])
+        nearest_neighbors_id_list = match_user(transform_id_list, transform_value_list,
+                                               transform_cur_user_data["value"], 10)
 
     try:
         match_users = user_collection.find(
@@ -844,7 +848,7 @@ def house_detail(houseId):
     return redirect(url_for('login'))
 
 
-@app.route('/line_page', methods=['GET', 'POST'])
+@ app.route('/line_page', methods=['GET', 'POST'])
 def line_page():
     token = request.cookies.get('token')
 
@@ -858,7 +862,7 @@ def line_page():
     return redirect(url_for('login'))
 
 
-@app.route('/line_register', methods=['GET', 'POST'])
+@ app.route('/line_register', methods=['GET', 'POST'])
 def line_register_page():
     token = request.cookies.get('token')
     user_id = authentication(token, jwt_secret_key)
@@ -1084,7 +1088,7 @@ def lineNotifyMessage(token, msg):
     return r.status_code
 
 
-@app.route('/line/preference', methods=['POST'])
+@ app.route('/line/preference', methods=['POST'])
 def line_house_preference():
     token = request.cookies.get('token')
     user_id = authentication(token, jwt_secret_key)
@@ -1107,7 +1111,7 @@ def line_house_preference():
     return jsonify("Line preference saved successfully"), 200
 
 
-@app.route('/send', methods=['GET', 'POST'])
+@ app.route('/send', methods=['GET', 'POST'])
 def send():
     token = request.cookies.get('token')
     user_id = authentication(token, jwt_secret_key)
@@ -1124,7 +1128,7 @@ def send():
     return jsonify("Start to send"), 200
 
 
-@celery.task
+@ celery.task
 def monitor(user_id, access_token):
     print('hi monitor', access_token)
     db = client["personal_project"]
@@ -1178,7 +1182,7 @@ def monitor(user_id, access_token):
         count += 1
 
 
-@app.route('/', methods=['POST', 'GET'])
+@ app.route('/', methods=['POST', 'GET'])
 def line_register():
     # Get user id from cookies
     token = request.cookies.get('token')

@@ -109,11 +109,11 @@ def transform_all_house(house_data):
     return transform_all_house_data_dict, transform_all_house_data
 
 
-def match_five_house(id_list, transform_select_house_data, cur_house_data):
+def match_house(id_list, transform_select_house_data, cur_house_data, match_num):
     transform_select_house_data = np.array(transform_select_house_data)
     kdtree = KDTree(transform_select_house_data)
     print(cur_house_data)
-    distances, indices = kdtree.query([cur_house_data], k=5)
+    distances, indices = kdtree.query([cur_house_data], k=match_num)
 
     # Optionally, you can retrieve the actual data points corresponding to the indices
     nearest_neighbors = [id_list[i] for i in indices[0]]

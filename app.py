@@ -494,13 +494,38 @@ def ai_recommend():
         cur_user = user_collection.find_one({"user_id": user_id})
 
         # Summarize user save house and click house
-        user_save_house = cur_user.get('saved_house', [])
+        user_save_house_dict = {'save': [], 'click': []}
 
-        transform_all_house_dict = transform_all_house_collection.find()
+        user_save_house_ids = cur_user.get('saved_house', [])
+        for user_save_house_id in user_save_house_ids:
+            user_save_house_dict['save'].append(transform_all_house_collection.find(
+                {"house_id": user_save_house_id})['value'])
+
+        user_click_houses = cur_user.get('click_house', [])
+        for user_click_house_id in user_click_houses:
+            user_save_house_dict['click'].apped(transform_all_house_collection.find(
+                {"house_id": user_click_house_id})['value'])
+
+        np_save = np.array(user_save_house_dict['save'])
+        highest_save_price, lowest_save_price = np_save[:, 0].max(
+        ), np_save[:, 0].min()
+        highest_save_age, lowest_save_age = np_save[:, 1].max(
+        ), np_save[:, 1].min()
+        highest_save_size, lowest_save_size = np_save[:, 2].max(
+        ), np_save[:, 2].min()
+
+        # Base on above information to search for house
+        matching_houses = transform_all_house_collection.find({
+            'value.0': {'$lte': highest_save_price, '$gte': lowest_save_price},
+            'value.1': {'$lte': highest_save_age, '$gte': lowest_save_age},
+            'value.2': {'$lte': highest_save_size, '$gte': lowest_save_size}
+        })
 
         transform_id_list, transform_value_list = get_value_from_house_dict(
-            transform_all_house_dict)
+            matching_houses)
 
+        if len(transform_value_list) > 10:
+            return jsonify({'error': 'Not enough data'}), 500
         nearest_neighbors_id_list = match_five_house(transform_id_list, transform_value_list,
                                                      cur_transform_user["value"])
 

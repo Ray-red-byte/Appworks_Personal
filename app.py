@@ -353,7 +353,7 @@ def save_hosue():
             cur_user = user_collection.find_one({"user_id": user_id})
             cur_user_save_house_ls = cur_user.get('saved_house', [])
 
-            if house_id not in cur_user_save_house_ls:
+            if int(house_id) not in cur_user_save_house_ls:
                 save_house_ls.append(int(house_id))
 
             save_house_ls.extend(cur_user_save_house_ls)
@@ -365,44 +365,6 @@ def save_hosue():
             )
             print("-------------------------------", cur_user_save_house_ls)
             return "House saved successfully", 200
-
-
-translations = {
-    "basic_info": "基本資訊",
-    "house_preference": "房屋偏好",
-    "price": "價格",
-    "house_age": "房屋年齡",
-    "zone": "區域",
-    "stay_with_landlord": "與房東同住",
-    "park_nearby": "附近有公園",
-    "equipment": "設備",
-    "Internet": "網路",
-    "cableTV": "有線電視",
-    "washingMachine": "洗衣機",
-    "dryer": "烘乾機",
-    "dryingMachine": "乾衣機",
-    "waterDispenser": "飲水機",
-    "waterFilter": "淨水器",
-    "lcdTV": "電視",
-    "refrigerator": "冰箱",
-    "microwave": "微波爐",
-    "gasStove": "瓦斯爐",
-    "naturalGas": "天然瓦斯",
-    "inductionCooker": "電磁爐",
-    "electricFan": "電風扇",
-    "oven": "烤箱",
-    "furniture": "家具",
-    "wardrobe": "衣櫃",
-    "diningTable": "餐桌",
-    "diningChair": "餐椅",
-    "singleBed": "單人床",
-    "doubleBed": "雙人床",
-    "desk": "桌子",
-    "chair": "椅子",
-    "sofa": "沙發",
-    "routine": "例行公事",
-    "petOptions": "寵物選項"
-}
 
 
 @app.route('/search/hot', methods=['GET'])
@@ -499,13 +461,15 @@ def ai_recommend():
 
         user_save_house_ids = cur_user.get('saved_house', [])
         for user_save_house_id in user_save_house_ids:
-            user_save_house_dict['save'].append(transform_all_house_collection.find(
+            user_save_house_dict['save'].append(transform_all_house_collection.find_one(
                 {"house_id": user_save_house_id})['value'])
 
         user_click_houses = cur_user.get('click_house', [])
         for user_click_house_id in user_click_houses:
-            user_save_house_dict['click'].apped(transform_all_house_collection.find(
+            user_save_house_dict['click'].append(transform_all_house_collection.find_one(
                 {"house_id": user_click_house_id})['value'])
+
+        print("------------------Start AI search-------------------------")
 
         np_save, np_click = np.array(user_save_house_dict['save']), np.array(
             user_save_house_dict['click'])
@@ -523,7 +487,12 @@ def ai_recommend():
         lowest_size = (lowest_save_size * 2 + lowest_click_size) / 3
         highest_size = (highest_save_size * 2 + highest_click_size) / 3
 
+        print(lowest_price, highest_price)
+
         # Base on above information to search for house
+        '''
+            問題在這
+        '''
         matching_houses = transform_all_house_collection.find({
             'value.0': {'$lte': highest_price, '$gte': lowest_price},
             'value.1': {'$lte': highest_age, '$gte': lowest_age},
@@ -542,11 +511,17 @@ def ai_recommend():
             match_houses = house_collection.find(
                 {"id": {"$in": nearest_neighbors_id_list}})
 
+            search_houses_json = [
+                # Convert ObjectId to string
+                {**house, '_id': str(house['_id'])}
+                for house in match_houses
+            ]
+
         except Exception as e:
             print(e)
             return jsonify({'error': 'No match'}), 500
 
-        return jsonify(match_houses), 200
+        return jsonify(search_houses_json), 200
 
 # -------------------------------------------------------User house type page-------------------------------------------------------
 
@@ -577,7 +552,7 @@ def track_click():
         cur_user = user_collection.find_one({"user_id": user_id})
         cur_user_click_house_ls = cur_user.get('click_house', [])
 
-        if house_id not in cur_user_click_house_ls:
+        if int(house_id) not in cur_user_click_house_ls:
             click_house_ls.append(int(house_id))
 
         click_house_ls.extend(cur_user_click_house_ls)
@@ -649,6 +624,8 @@ def get_user_recommend_house(house_id):
         try:
             match_houses = house_collection.find(
                 {"id": {"$in": nearest_neighbors_id_list}})
+
+            print(nearest_neighbors_id_list)
 
             matches_houses_data = [{'house_id': match_house['id'], 'title': match_house['title'], 'price': match_house['price'], 'address': match_house['address'], 'age': match_house['age'], 'size': match_house['size'], 'img_url': match_house['img_url']}
                                    for match_house in match_houses if match_house['id'] != house_id]

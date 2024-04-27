@@ -213,7 +213,7 @@
                     <div class="house">
                         <h2>Recommend House</h2>
                         <div class="recommend-left">
-                            <h3 class="${house["house_id"]}"><a href="${houseData['house_id']}" target="_blank">${houseData['title']}</a></h3>
+                            <h3 class="${houseData["house_id"]}"><a href="${houseData['house_id']}" target="_blank">${houseData['title']}</a></h3>
                             <img src="${houseData['img_url']}" alt="${houseData['title']}">
                         </div>
                         <div class="recommend-right">
@@ -225,7 +225,7 @@
                         </div>
                     </div>
                     <div class="save-house" style="z-index:10002;">
-                        <button class="save-house-btn" id="${house["id"]}">Save</button>
+                        <button class="save-house-btn" id="${houseData["id"]}">Save</button>
                     </div>
                 `;
             })

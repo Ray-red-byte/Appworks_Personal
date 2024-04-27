@@ -372,6 +372,8 @@ def save_hosue():
             if house_id not in cur_user_save_house_ls:
                 save_house_ls.append(int(house_id))
 
+            save_house_ls.extend(cur_user_save_house_ls)
+
             user_collection.update_one(
                 {'user_id': user_id},
                 {'$set': {'saved_house': save_house_ls}},
@@ -495,19 +497,59 @@ def search():
 
         return jsonify(search_houses_json), 200
 
+
+@app.route('/ai_recommend', methods=['GET'])
+def ai_recommend():
+    token = request.cookies.get('token')
+    user_id = authentication(token, jwt_secret_key)
+
+    if isinstance(user_id, int):
+        db = client['personal_project']
+        user_collection = db['user']
+        house_collection = db['house']
+        transform_all_house_collection = db['transform_all_house']
+
+        # Get current user
+        cur_user = user_collection.find_one({"user_id": user_id})
+
+        # Summarize user save house and click house
+        user_save_house = cur_user.get('saved_house', [])
+
+        transform_all_house_dict = transform_all_house_collection.find()
+
+        transform_id_list, transform_value_list = get_value_from_house_dict(
+            transform_all_house_dict)
+
+        nearest_neighbors_id_list = match_five_house(transform_id_list, transform_value_list,
+                                                     cur_transform_user["value"])
+
+        try:
+            match_houses = house_collection.find(
+                {"id": {"$in": nearest_neighbors_id_list}})
+
+            matches_houses_data = [{'house_id': match_house['id'], 'title': match_house['title'], 'price': match_house['price'], 'address': match_house['address'], 'age': match_house['age'], 'size': match_house['size'], 'img_url': match_house['img_url']}
+                                   for match_house in match_houses]
+
+        except Exception as e:
+            print(e)
+            return jsonify({'error': 'No match'}), 500
+
+        return jsonify(matches_houses_data), 200
+
 # -------------------------------------------------------User house type page-------------------------------------------------------
 
 # ------------------------------------------------------Track user click house------------------------------------------------------
 
 
-@ app.route('/track/hot/click', methods=['POST'])
-def track_hot_click():
+@ app.route('/track/click', methods=['POST'])
+def track_click():
     house_id = request.json.get('house_id')
 
     token = request.cookies.get('token')
     user_id = authentication(token, jwt_secret_key)
+
+    # Save house click
     print("click", house_id)
-    # Insert into MongoDB
     house_collection = client['personal_project']['house']
     print(type(house_id))
     house_collection.update_one(
@@ -516,25 +558,26 @@ def track_hot_click():
         upsert=True
     )
 
+    # Save user click
+    click_house_ls = []
+    if isinstance(user_id, int):
+        user_collection = client['personal_project']['user']
+        cur_user = user_collection.find_one({"user_id": user_id})
+        cur_user_click_house_ls = cur_user.get('click_house', [])
+
+        if house_id not in cur_user_click_house_ls:
+            click_house_ls.append(int(house_id))
+
+        click_house_ls.extend(cur_user_click_house_ls)
+
+        user_collection.update_one(
+            {'user_id': user_id},
+            {'$set': {'click_house': click_house_ls}},
+            upsert=True
+        )
+
     return "Click tracked", 200
 
-
-@ app.route('/track/search/click', methods=['POST'])
-def track_search_click():
-    house_id = request.json.get('house_id')
-
-    token = request.cookies.get('token')
-    user_id = authentication(token, jwt_secret_key)
-
-    # Insert into MongoDB
-    house_collection = client['personal_project']['house']
-    house_collection.update_one(
-        {'id': int(house_id)},
-        {'$inc': {'click': 1}},
-        upsert=True
-    )
-
-    return "Click tracked", 200
 # ------------------------------------------------------Track user click house------------------------------------------------------
 
 # ------------------------------------------------------house detail page------------------------------------------------------

@@ -140,9 +140,12 @@
     <div class="house-details">
         <div class="house-info"></div>
 
-
     </div>
     <h2 class="houseId" style="display: none;">{{ houseId }}</h2>
+
+    <div class="recommend-house-container">
+
+    </div>
     <script>
 
         const fakeHouseData = {
@@ -184,6 +187,104 @@
             .catch(error => console.error('Error fetching house data:', error));
         }
 
+        function getRecommendHouseData() {
+            const houseId = document.querySelector('.houseId').textContent
+            fetch(`/user/house/recommend/${houseId}`)
+            .then(response => {
+                console.log(response)
+                if (response.status === 200) {
+                    return response.json();
+                }
+                alert('Recommend house not found');
+            })
+            .then(houseData => {
+                renderRecommendHouseData(houseData)
+
+            })
+            .catch(error => console.error('Error fetching house data:', error));
+        }
+
+        // Function to render recommend house data
+        function renderRecommendHouseData(houseDatas) {
+            const recommendHouseContainer = document.querySelector('.recommend-house');
+            houseDatas.forEach(houseData => {
+                recommendHouseContainer.innerHTML += `
+                    <h2>Recommend House</h2>
+                    <div class="recommend-left-right">
+                        <div class="recommend-left">
+                            <h3><a href="${houseData['house_id']}" target="_blank">${houseData['title']}</a></h3>
+                            <img src="${houseData['img_url']}" alt="${houseData['title']}">
+                        </div>
+                        <div class="recommend-right">
+                            <h2>House Info</h2>
+                            <p>租金: ${houseData['price']} 月</p>
+                            <p>地址: ${houseData['address']}</p>
+                            <p>屋齡: ${houseData['age']} years</p>
+                            <p>坪數: ${houseData['size']} 坪</p>
+                        </div>
+                    </div>
+                `;
+            })
+        }
+
+        // Event listener to handle house card click
+        document.querySelector('.recommend-house-container').addEventListener('click', function(event) {
+            if (event.target.closest('.house')) {
+                const h3Element = event.target.closest('.house').querySelector('.house-info h3');
+                if (h3Element) {
+                    const houseId = h3Element.classList[0];
+                    console.log(houseId)
+                    // Make an AJAX request to track click
+                    fetch('/track/hot/click', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            house_id: houseId,
+                        })
+                    })
+                    .then(response => {
+                        if (response.status !== 200) {
+                            throw new Error('Failed to track click');
+                        }
+                        // Optionally handle successful response here
+                        console.log('Click tracked successfully');
+                    })
+                    .catch(error => {
+                        console.error('Error tracking click:', error);
+                    });
+                    
+                    window.location.href = '/user/house_detail/' + houseId;
+                }
+            }
+
+            if (event.target.closest('.save-house')){
+                const houseId = event.target.closest('.save-house').querySelector('.save-house-btn').id;
+                console.log(houseId);
+                    fetch('/save_house', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ save_house: houseId })
+                    })
+                    .then(response => {
+                        if (response.status === 200) {
+                            return response.json();
+                        }
+                        throw new Error('Failed to save house');
+                    })
+                    .then(data => {
+                        // Handle successful response
+                        console.log('House saved successfully:', data);
+                    })
+                    .catch(error => {
+                        // Handle error
+                        console.error('Error saving house:', error);
+                    });
+            }
+        });
 
         // Function to render house data
         function renderHouseData(houseData) {
@@ -232,9 +333,12 @@
 
         // Fetch house data and render it
         getHouseData()
+        getRecommendHouseData()
 
         // Testing
         //renderHouseData(fakeHouseData)
+
+        
     </script>
 
 </body>

@@ -176,7 +176,7 @@ def insert_transform_all_user_to_mongo(transform_all_user_collection, transform_
     transform_all_user_collection.insert_many(transform_all_user_data_dict)
 
 
-def get_value_from_dict(transform_all_user_data_dicts):
+def get_value_from_user_dict(transform_all_user_data_dicts):
     id_list = []
     value_list = []
     print(transform_all_user_data_dicts)

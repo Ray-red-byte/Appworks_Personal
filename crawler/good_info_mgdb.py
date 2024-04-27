@@ -9,6 +9,8 @@ import os
 import boto3
 import re
 from botocore.exceptions import NoCredentialsError
+from user_model.house_data_process import transform_one_house, transform_all_house, match_ten_house, get_value_from_dict
+
 
 dotenv_path = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/.env'
 load_dotenv(dotenv_path)
@@ -26,7 +28,8 @@ client = pymongo.MongoClient(CONNECTION_STRING)
 
 # Select a database and collection
 db = client["personal_project"]
-collection = db["house"]
+house_collection = db["house"]
+transform_house_collection = db["transform_all_house"]
 
 # S3 setting
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
@@ -121,7 +124,11 @@ def insert_good_info_to_mgdb(good_info_url, info):
             'updated_at': datetime.datetime.now()
         }
 
-        collection.insert_one(transform_info_dict)
+        house_collection.insert_one(transform_info_dict)
+
+        # Transform into value
+        row, house_dict = transform_one_house(transform_info_dict)
+        transform_house_collection.insert_one(house_dict)
 
         # Close the connection
         client.close()

@@ -7,6 +7,7 @@ import re
 import logging
 import boto3
 from botocore.exceptions import NoCredentialsError
+from user_model.house_data_process import transform_one_house, transform_all_house, match_ten_house, get_value_from_dict
 
 
 dotenv_path = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/.env'
@@ -16,9 +17,11 @@ load_dotenv(dotenv_path)
 CONNECTION_STRING = os.getenv("MONGO_ATLAS_USER")
 client = pymongo.MongoClient(CONNECTION_STRING)
 
+
 # Select a database and collection
 db = client["personal_project"]
-collection = db["house"]
+house_collection = db["house"]
+transform_house_collection = db["transform_all_house"]
 
 # logging
 log_file_path = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/log/log_file_hap_info_insert.log'
@@ -119,7 +122,11 @@ def insert_hap_info_to_mgdb(good_info_url, info):
             "'updated_at'": datetime.now()
         }
 
-        collection.insert_one(transform_info_dict)
+        house_collection.insert_one(transform_info_dict)
+
+        # Transform into value
+        row, house_dict = transform_one_house(transform_info_dict)
+        transform_house_collection.insert_one(house_dict)
 
         # Close the connection
         client.close()

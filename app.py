@@ -7,6 +7,7 @@ from datetime import datetime
 from celery import Celery
 import pymongo
 import numpy as np
+import numpy as np
 import time
 import signal
 import subprocess

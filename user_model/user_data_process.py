@@ -153,11 +153,19 @@ def transform_all_user(user_data):
     return transform_all_user_data_dict, transform_all_user_data
 
 
+<<<<<<< HEAD
 def match_user(id_list, transform_select_user_data, cur_user_data, match_num):
     transform_select_user_data = np.array(transform_select_user_data)
     kdtree = KDTree(transform_select_user_data)
     print(cur_user_data)
     distances, indices = kdtree.query([cur_user_data], k=match_num)
+=======
+def match_user(id_list, transform_select_user_data, cur_user_data, num_match):
+    transform_select_user_data = np.array(transform_select_user_data)
+    kdtree = KDTree(transform_select_user_data)
+    print(cur_user_data)
+    distances, indices = kdtree.query([cur_user_data], k=num_match)
+>>>>>>> feature/mainpage
 
     # Optionally, you can retrieve the actual data points corresponding to the indices
     nearest_neighbors = [id_list[i] for i in indices[0]]

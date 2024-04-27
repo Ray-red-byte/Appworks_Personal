@@ -682,13 +682,17 @@
                 
                 <input id="search-input" type="submit" value="search">
             </form>
+            <div class="search-ai">
+                <h2 style="font-size: 40px;">AI Recommendation</h2>
+                <button id="ai-recommend" type="submit">Recommend</button>
+            </div>
         </div>
     </div>
 
     <div class="right-main-section">
         <div class="inside-container">
             <h1 class="cur-userId" style="display: none;">{{ user_id }}</h1>
-            <h2 style="font-size: 50px;">Hello {{ username }} , Find your future</h2>
+            <h2 style="font-size: 50px;">Hello {{ username }}</h2>
 
             <div class="houses-container">
                 <!-- House cards will be displayed here -->
@@ -765,6 +769,12 @@
         let curUserName = '';
         let chatUserName = '';
         let roomId = '';
+
+        // AI Recommendation
+        const aiRecommend = document.getElementById('ai-recommend');
+        aiRecommend.addEventListener('click', () => {
+            renderHouses('/ai_recommend');
+        });
 
         // Initially hide chat room
         hideChatRoom();
@@ -1108,7 +1118,7 @@
                     const houseId = h3Element.classList[0];
                     console.log(houseId)
                     // Make an AJAX request to track click
-                    fetch('/track/hot/click', {
+                    fetch('/track/click', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'

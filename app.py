@@ -457,22 +457,27 @@ def ai_recommend():
         cur_user = user_collection.find_one({"user_id": user_id})
 
         # Summarize user save house and click house
-        user_save_house_dict = {'save': [], 'click': []}
+        user_house_transform_dict = {'save': [], 'click': []}
+        user_house_address_dict = {'address': []}
 
         user_save_house_ids = cur_user.get('saved_house', [])
         for user_save_house_id in user_save_house_ids:
-            user_save_house_dict['save'].append(transform_all_house_collection.find_one(
+            user_house_transform_dict['save'].append(transform_all_house_collection.find_one(
                 {"house_id": user_save_house_id})['value'])
+            user_house_address_dict['address'].append(house_collection.find_one(
+                {"id": user_save_house_id})['address'])
 
         user_click_houses = cur_user.get('click_house', [])
         for user_click_house_id in user_click_houses:
-            user_save_house_dict['click'].append(transform_all_house_collection.find_one(
+            user_house_transform_dict['click'].append(transform_all_house_collection.find_one(
                 {"house_id": user_click_house_id})['value'])
+            user_house_address_dict['address'].append(house_collection.find_one(
+                {"id": user_click_house_id})['address'])
 
         print("------------------Start AI search-------------------------")
 
-        np_save, np_click = np.array(user_save_house_dict['save']), np.array(
-            user_save_house_dict['click'])
+        np_save, np_click = np.array(user_house_transform_dict['save']), np.array(
+            user_house_transform_dict['click'])
         highest_save_price, lowest_save_price, highest_click_price, lowest_click_price = np_save[:, 0].max(
         ), np_save[:, 0].min(), np_click[:, 0].max(), np_click[:, 0].min()
         highest_save_age, lowest_save_age, highest_click_age, lowest_click_age = np_save[:, 1].max(
@@ -487,20 +492,31 @@ def ai_recommend():
         lowest_size = (lowest_save_size * 2 + lowest_click_size) / 3
         highest_size = (highest_save_size * 2 + highest_click_size) / 3
 
-        print(lowest_price, highest_price)
-
         # Base on above information to search for house
         '''
             問題在這
         '''
-        matching_houses = transform_all_house_collection.find({
-            'value.0': {'$lte': highest_price, '$gte': lowest_price},
-            'value.1': {'$lte': highest_age, '$gte': lowest_age},
-            'value.2': {'$lte': highest_size, '$gte': lowest_size}
-        })
 
-        transform_id_list, transform_value_list = get_value_from_house_dict(
-            matching_houses)
+        # Search similar zone
+        zones = []
+        for address in user_house_address_dict['address']:
+            district = address.split('市')[-1]
+            district = district.split('區')[0] + '區'
+            zones.append(district)
+
+        print(zones)
+
+        zone_pattern = '|'.join(zones)
+        regex_pattern = re.compile(f'({zone_pattern})', re.IGNORECASE)
+        zone_id_list = [house['id'] for house in house_collection.find(
+            {"address": {"$regex": regex_pattern}})]
+
+        print(zone_id_list)
+
+        transform_id_list = []
+        for matching_house in transform_all_house_collection.find({"house_id": {"$in": zone_id_list}}):
+            if (matching_house['value'][0] <= highest_price and matching_house['value'][0] >= lowest_price) and ((matching_house['value'][1] <= highest_age and matching_house['value'][1] >= lowest_age) or (matching_house['value'][2] <= highest_size and matching_house['value'][2] >= lowest_size)):
+                transform_id_list.append(matching_house['house_id'])
 
         nearest_neighbors_id_list = [
             transform_id for transform_id in transform_id_list if transform_id not in cur_user['saved_house'] and transform_id not in cur_user['click_house']][:10]
@@ -581,7 +597,7 @@ def get_user_house(house_id):
     return jsonify({'error': 'House not found'}), 404
 
 
-@app.route('/user/house/recommend/<int:house_id>', methods=['GET'])
+@ app.route('/user/house/recommend/<int:house_id>', methods=['GET'])
 def get_user_recommend_house(house_id):
     token = request.cookies.get('token')
     user_id = authentication(token, jwt_secret_key)

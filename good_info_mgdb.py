@@ -9,7 +9,7 @@ import os
 import boto3
 import re
 from botocore.exceptions import NoCredentialsError
-from user_model.house_data_process import transform_one_house, transform_all_house, match_ten_house, get_value_from_dict
+from user_model.house_data_process import transform_one_house, transform_all_house, get_value_from_house_dict, one_hot_gender
 
 
 dotenv_path = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/.env'

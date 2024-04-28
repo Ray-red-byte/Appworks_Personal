@@ -23,6 +23,7 @@ import re
 import unicodedata
 from good_info_mgdb import get_all_mgdb_good_info, get_next_house_id, insert_good_info_to_mgdb
 
+
 dotenv_path = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/.env'
 
 # Load environment variables from the specified .env file

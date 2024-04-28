@@ -191,14 +191,12 @@
             const houseId = document.querySelector('.houseId').textContent
             fetch(`/user/house/recommend/${houseId}`)
             .then(response => {
-                console.log(response)
                 if (response.status === 200) {
                     return response.json();
                 }
                 alert('Recommend house not found');
             })
             .then(houseData => {
-                console.log(houseData)
                 renderRecommendHouseData(houseData)
 
             })
@@ -213,7 +211,7 @@
                     <div class="house">
                         <h2>Recommend House</h2>
                         <div class="recommend-left">
-                            <h3 class="${house["house_id"]}"><a href="${houseData['house_id']}" target="_blank">${houseData['title']}</a></h3>
+                            <h3 class="${houseData["house_id"]}"><a href="${houseData['house_id']}" target="_blank">${houseData['title']}</a></h3>
                             <img src="${houseData['img_url']}" alt="${houseData['title']}">
                         </div>
                         <div class="recommend-right">
@@ -225,7 +223,7 @@
                         </div>
                     </div>
                     <div class="save-house" style="z-index:10002;">
-                        <button class="save-house-btn" id="${house["id"]}">Save</button>
+                        <button class="save-house-btn" id="${houseData["house_id"]}">Save</button>
                     </div>
                 `;
             })
@@ -333,9 +331,42 @@
             `;
         }
 
+        function trackClickAfterDelay() {
+            const houseId = document.querySelector('.houseId').textContent
+            // Set a timeout to trigger after 5 seconds
+            setTimeout(function() {
+                // Fetch the '/track/click' API
+                fetch('/track/click', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        house_id: houseId,
+                    })
+                })
+                .then(response => {
+                    if (response.status !== 200) {
+                        throw new Error('Failed to track click');
+                    }
+                    // Optionally handle successful response here
+                    console.log('Click tracked successfully');
+                })
+                .catch(error => {
+                    console.error('Error tracking click:', error);
+                });
+            }, 5000); // 5 seconds delay
+
+            // Optionally, return the timeoutId if you want to cancel the timeout before it triggers
+        }
+
+
+
+
         // Fetch house data and render it
         getHouseData()
         getRecommendHouseData()
+        trackClickAfterDelay()
 
         // Testing
         //renderHouseData(fakeHouseData)

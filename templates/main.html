@@ -1209,27 +1209,7 @@
                 const h3Element = event.target.closest('.house').querySelector('.house-info h3');
                 if (h3Element) {
                     const houseId = h3Element.classList[0];
-                    console.log(houseId)
-                    // Make an AJAX request to track click
-                    fetch('/track/click', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            house_id: houseId,
-                        })
-                    })
-                    .then(response => {
-                        if (response.status !== 200) {
-                            throw new Error('Failed to track click');
-                        }
-                        // Optionally handle successful response here
-                        console.log('Click tracked successfully');
-                    })
-                    .catch(error => {
-                        console.error('Error tracking click:', error);
-                    });
+                    
                     
                     window.location.href = '/user/house_detail/' + houseId;
                 }

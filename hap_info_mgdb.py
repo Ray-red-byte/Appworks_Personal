@@ -7,7 +7,7 @@ import re
 import logging
 import boto3
 from botocore.exceptions import NoCredentialsError
-from user_model.house_data_process import transform_one_house, transform_all_house, match_ten_house, get_value_from_dict
+from user_model.house_data_process import transform_one_house, transform_all_house, get_value_from_house_dict, one_hot_gender
 
 
 dotenv_path = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/.env'
@@ -143,7 +143,7 @@ def main():
     download_from_s3(aws_bucket, s3_hap_info_path, local_hap_info_file)
 
     # get all urls from mongoDB
-    all_h_url = get_all_mgdb_info(collection)
+    all_h_url = get_all_mgdb_info()
     all_h_url = [doc["url"] for doc in all_h_url]
     print(len(all_h_url))
 

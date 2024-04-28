@@ -24,7 +24,7 @@ house_collection = db["house"]
 transform_house_collection = db["transform_all_house"]
 
 # logging
-log_file_path = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/log/log_file_hap_info_insert.log'
+log_file_path = os.getenv("LOG_FILE_HAP_INSERT_PATH")
 logger = logging.getLogger(__name__)
 
 logging.basicConfig(filename=log_file_path, level=logging.INFO)

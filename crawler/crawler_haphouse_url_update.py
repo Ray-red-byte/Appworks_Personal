@@ -28,13 +28,13 @@ ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 aws_secret_access_key = os.getenv("S3_SECRET_ACCESS_KEY")
 aws_access_key_id = os.getenv("S3_ACCESS_KEY")
 aws_bucket = os.getenv("S3_BUCKET_NAME")
-s3_path = 'personal_project/urls/happy_urls/rent_hap_url.json'
-local_happy_url_file = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_hap_url.json'
+s3_path = os.getenv("S3_HAP_URL_PATH")
+local_happy_url_file = os.getenv("LOCAL_HAP_URL_FILE")
 
 
 # logger setting
-log_filename = 'log_file.log'
-log_file_path = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/log/log_file_hap_url.log'
+log_filename = os.getenv("LOG_FILE_NAME")
+log_file_path = os.getenv("LOG_FILE_PATH")
 logger = logging.getLogger(__name__)
 
 logging.basicConfig(filename=log_file_path, level=logging.INFO)
@@ -64,6 +64,7 @@ def simulate_human_interaction(driver):
     # Introduce another random delay
     time.sleep(random.uniform(1, 2))
 
+
 def upload_to_s3(local_file, bucket_name, s3_path):
     s3 = boto3.client('s3', aws_access_key_id=aws_access_key_id,
                       aws_secret_access_key=aws_secret_access_key)
@@ -80,6 +81,7 @@ def upload_to_s3(local_file, bucket_name, s3_path):
     except NoCredentialsError:
         print("Credentials not available")
         return False
+
 
 def download_from_s3(bucket_name, s3_path, local_file):
     s3 = boto3.client('s3', aws_access_key_id=aws_access_key_id,
@@ -103,7 +105,6 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-
 def load_urls_from_json(json_file):
     try:
         with open(json_file, 'r') as f:
@@ -121,7 +122,6 @@ def store_url(urls, json_file):
 
 
 def crawl_and_store_data(website_url, driver, first, urls, begin, page):
-
     '''
         1. Get in 樂屋網 website
         2. Get total pages to limit the loop
@@ -136,17 +136,18 @@ def crawl_and_store_data(website_url, driver, first, urls, begin, page):
 
         time.sleep(random.uniform(1, 5))
         driver.get(website_url)
-        time.sleep(random.uniform(1, 5))  # Adjust sleep time as needed for the page to load
+        # Adjust sleep time as needed for the page to load
+        time.sleep(random.uniform(1, 5))
         simulate_human_interaction(driver)
 
         count = 1
         next_page = 1
         total = 0
-        
+
         new_urls = {}
 
         while True:
-            
+
             # Next page
             if first:
                 if count > 11:
@@ -155,16 +156,18 @@ def crawl_and_store_data(website_url, driver, first, urls, begin, page):
                 if count > 12:
                     break
 
-            try:        
-                try:     
+            try:
+                try:
                     xpath = f'/html/body/div[8]/div/div[1]/div[4]/div[2]/div[{count}]/div[2]/div/h6/a'
-                    rent_href = driver.find_element(By.XPATH, xpath).get_attribute('href')
+                    rent_href = driver.find_element(
+                        By.XPATH, xpath).get_attribute('href')
                     rent_title = driver.find_element(By.XPATH, xpath).text
                 except:
                     xpath = f"/html/body/div[8]/div/div[1]/div[4]/div/div[{count}]/div[2]/div/h6/a"
-                    rent_href = driver.find_element(By.XPATH, xpath).get_attribute('href')
+                    rent_href = driver.find_element(
+                        By.XPATH, xpath).get_attribute('href')
                     rent_title = driver.find_element(By.XPATH, xpath).text
-                
+
                 count += 1
                 total += 1
 
@@ -188,16 +191,18 @@ def crawl_and_store_data(website_url, driver, first, urls, begin, page):
             urls = {**new_urls, **urls}
 
         logger.info(f"Next page : {page}")
-        store_url(urls, "/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_hap_url.json")
+        store_url(
+            urls, "/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_hap_url.json")
         return True, urls
 
     except Exception as e:
         print(f"Error retrieving data: {type(e).__name__} - {e}")
         return True, urls
-    
+
     finally:
         # Close the Chrome driver
         driver.quit()
+
 
 def get_total_page(driver, url):
 
@@ -205,7 +210,8 @@ def get_total_page(driver, url):
     driver.get(url)
     time.sleep(1)
 
-    total_page = driver.find_element(By.XPATH,f" /html/body/div[8]/div/div[1]/nav/p").text
+    total_page = driver.find_element(
+        By.XPATH, f" /html/body/div[8]/div/div[1]/nav/p").text
     match = re.search(r'(\d+) 頁', total_page)
 
     if match:
@@ -227,19 +233,18 @@ def main():
     except Exception as e:
         print("No file on S3")
 
-    urls = load_urls_from_json("/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_hap_url.json")
+    urls = load_urls_from_json(
+        "/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_hap_url.json")
 
     region_url = ["https://www.rakuya.com.tw/search/rent_search/index?display=list&con=eJyrVkrOLKlUsopWMlCK1VFKySwuyEkE8pVyMotLlHSU8pOyMvNSQPJBIPni1MSi5AwQF6wNKFJanJqcn5IKEjIHqrcAYksgNgQaVwsAQwcbJg&tab=def&sort=21&ds=&",
                   "https://www.rakuya.com.tw/search/rent_search/index?display=list&con=eJyrVkrOLKlUsopWMlKK1VFKySwuyEkE8pVyMotLlHSU8pOyMvNSQPJBIPni1MSi5AwQF6wNKFJanJqcn5IKEjIHqrcAYksgNjRQiq0FAEOtGyg&tab=def&sort=21&ds=&"]
-    
 
     logger.info(f"Previous number : {len(urls)}")
     timestamp_start = datetime.datetime.now()
     timestamp_start_stf = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    logger.info(f"-------------Start Crawler {timestamp_start_stf}-------------")
+    logger.info(
+        f"-------------Start Crawler {timestamp_start_stf}-------------")
 
-    
-    
     for region in region_url:
         driver = webdriver.Chrome(options=options)
         page_number = get_total_page(driver, region_url[0] + "page=1")
@@ -250,24 +255,24 @@ def main():
 
             first = i == 1
 
-            stop, urls = crawl_and_store_data(rent_url, driver, first, urls, begin, i)
+            stop, urls = crawl_and_store_data(
+                rent_url, driver, first, urls, begin, i)
             driver.quit()
 
             if stop:
                 print("Stop crawling")
                 break
 
-
     logger.info(f"Total number : {len(urls)}")
     timestamp_end = datetime.datetime.now()
     timestamp_end_stf = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    logger.info(f"-------------Time consume {timestamp_end - timestamp_start}-------------")
+    logger.info(
+        f"-------------Time consume {timestamp_end - timestamp_start}-------------")
     logger.info(f"-------------End Crawler {timestamp_end_stf}-------------")
-    
-
 
     # Upload the updated file to S3
     upload_to_s3(local_happy_url_file, aws_bucket, s3_path)
+
 
 if __name__ == "__main__":
     main()

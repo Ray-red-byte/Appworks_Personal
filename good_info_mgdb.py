@@ -15,8 +15,8 @@ from user_model.house_data_process import transform_one_house, transform_all_hou
 dotenv_path = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/.env'
 load_dotenv(dotenv_path)
 
-log_filename = 'log_file.log'
-log_file_path = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/log/log_file_good_info_insert.log'
+log_filename = os.getenv("LOG_FILE_NAME")
+log_file_path = os.getenv("LOG_FILE_GOOD_INSERT_PATH")
 logger = logging.getLogger(__name__)
 
 logging.basicConfig(filename=log_file_path, level=logging.INFO)
@@ -36,13 +36,13 @@ ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 aws_secret_access_key = os.getenv("S3_SECRET_ACCESS_KEY")
 aws_access_key_id = os.getenv("S3_ACCESS_KEY")
 aws_bucket = os.getenv("S3_BUCKET_NAME")
-s3_good_info_path = 'personal_project/house_detail/good_details/rent_good_info.json'
+s3_good_info_path = os.getenv("S3_GOOD_INFO_PATH")
 # s3_good_url_path = 'personal_project/urls/good_urls/rent_good_url.json'
-local_good_info_file = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_good_info.json'
+local_good_info_file = os.getenv("LOCAL_GOOD_INFO_FILE")
 # local_good_url_file = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_good_url.json'
 
 
-good_json_file_path = "/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_good_info.json"
+local_good_info_file = os.getenv("LOCAL_GOOD_INFO_FILE")
 
 
 def load_from_json(json_file):

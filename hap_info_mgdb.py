@@ -35,13 +35,12 @@ ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 aws_secret_access_key = os.getenv("S3_SECRET_ACCESS_KEY")
 aws_access_key_id = os.getenv("S3_ACCESS_KEY")
 aws_bucket = os.getenv("S3_BUCKET_NAME")
-s3_hap_info_path = 'personal_project/house_detail/good_details/rent_hap_info.json'
-s3_hap_url_path = 'personal_project/urls/good_urls/rent_good_url.json'
-local_hap_info_file = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_hap_info.json'
-local_hap_url_file = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_hap_url.json'
+s3_hap_info_path = os.getenv("S3_HAP_INFO_PATH")
+s3_hap_url_path = os.getenv("S3_HAP_URL_PATH")
+local_hap_info_file = os.getenv("LOCAL_HAP_INFO_FILE")
+local_hap_url_file = os.getenv("LOCAL_HAP_URL_FILE")
 
-
-hap_json_file_path = "/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_hap_info.json"
+local_hap_info_file = os.getenv("LOCAL_HAP_INFO_FILE")
 
 
 def load_from_json(json_file):

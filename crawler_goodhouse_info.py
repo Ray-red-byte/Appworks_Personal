@@ -43,17 +43,17 @@ ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 aws_secret_access_key = os.getenv("S3_SECRET_ACCESS_KEY")
 aws_access_key_id = os.getenv("S3_ACCESS_KEY")
 aws_bucket = os.getenv("S3_BUCKET_NAME")
-s3_good_info_path = 'personal_project/house_detail/good_details/rent_good_info.json'
-s3_good_url_path = 'personal_project/urls/good_urls/rent_good_url.json'
-s3_uncrawler_url_path = 'personal_project/urls/uncrawler_urls/rent_good_uncrawler_url.json'
-local_good_info_file = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_good_info.json'
-local_good_url_file = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_good_url.json'
+s3_good_info_path = os.getenv("S3_GOOD_INFO_PATH")
+s3_good_url_path = os.getenv("LOCAL_HAP_URL_FILE")
+s3_uncrawler_url_path = os.getenv("S3_GOOD_UNCRAWLER_URL_PATH")
 
-local_uncrawler_good_url_file = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_good_uncrawler_url.json'
+local_good_info_file = os.getenv("LOCAL_GOOD_INFO_FILE")
+local_good_url_file = os.getenv("LOCAL_GOOD_URL_FILE")
+local_uncrawler_good_url_file = os.getenv("LOCAL_GOOD_UNCRAWLER_HAP_URL_FILE")
 
 
-log_filename = 'log_file.log'
-log_file_path = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/log/log_file_good_info.log'
+log_filename = os.getenv("LOG_FILE_NAME")
+log_file_path = os.getenv("LOG_FILE_GOOD_PATH")
 logger = logging.getLogger(__name__)
 
 logging.basicConfig(filename=log_file_path, level=logging.INFO)

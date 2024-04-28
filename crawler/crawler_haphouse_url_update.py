@@ -192,7 +192,7 @@ def crawl_and_store_data(website_url, driver, first, urls, begin, page):
 
         logger.info(f"Next page : {page}")
         store_url(
-            urls, "/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_hap_url.json")
+            urls, local_happy_url_file)
         return True, urls
 
     except Exception as e:

@@ -19,56 +19,63 @@
 
         .header {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            background-color: #a18ba1;
             width: 100%;
+            background-color: #a18ba1;
         }
 
         .header h1 {
-            margin: 30px;
+            margin-left: 1000px; /* Remove default margin */
+            color: #f0eff0;
+            font-size: 110px;
+            margin-bottom: 100px;
+        }
 
-            margin-bottom: 30px;
-            font-size: 50px; /* Adjust font size */
-            color: #800080; /* Set text color */
+        
+        .logout-text {
+            color: #f0eff0;
+            margin-left: 800px;
+            margin-right: 200px;
+            margin-top:100px;
+            cursor:pointer;
+            font-size: 40px;
+            z-index: 10001;
+            text-decoration: underline;
         }
 
         .previous-page {
-            margin-top: 25px;
-            margin-left: 850px;
-
+            color: #f0eff0;
+            margin-left: 100px;
+            margin-top:100px;
+            font-size: 40px;
+            cursor:pointer;
+            z-index: 10001;
         }
 
-        .previous-page img {
-            width: 50px; /* Adjust size as needed */
-            height: 50px; /* Adjust size as needed */
-            
-        }
-
-        .logout-icon {
-            margin-top: 25px;
-            margin-left: 40px;
-
-        }
-        
-        .logout-icon img {
-            width: 50px; /* Adjust size as needed */
-            height: 50px; /* Adjust size as needed */
-            
+        .image {
+            width: 300px;
+            height: 10px;
         }
 
         .house-details {
             background-color: #fff;
-            margin: 20px;
+            margin: 50px;
             padding: 20px;
             border: 1px solid #ccc;
             border-radius: 30px;
-            width: 1000px;
+            width: 1500px;
+            font-size: 35px; 
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .house-details h3 {
+            font-size: 45px;
         }
 
         .house-details h2 {
             color: #333;
-            font-size: 24px;
+            font-size: 45px;
             margin-bottom: 20px;
         }
 
@@ -100,42 +107,147 @@
         .left-right-sections {
             display: flex;
             margin-left: 20px;
-            flex-direction: row;
+            flex-direction: column;
+        }
+
+        .upper-section {
+            display: flex; /* Use flexbox layout */
         }
 
         .left-section {
             flex: 1;
             padding-right: 20px; /* Adjust spacing between left and right sections */
+            height: 600px;
+            margin-top: 100px;
+            margin-left: 40px;
         }
 
         .right-section {
             flex: 1;
             padding-left: 20px; /* Adjust spacing between left and right sections */
-            margin-left: 20px;
+            margin-left: -180px;
             margin-right: 30px;
-            margin-top: 84px;
+            margin-top: 100px;
             padding: 10px 30px 30px 30px;
-            background-color: #dbd5d9;
+            background-color: #dfd9dd;
             border-radius: 30px;
             height: 100%;
         }
 
         .bottom-section {
-            margin-top: 100px; 
-            margin-left: 30px;
-            width: 100%;
-            color: #933939;
-            background-color: #390c0c;/* Adjust spacing between top and bottom sections */
+            display: flex;
+            margin-top: 30px; 
         }
+
+        .bottom-left-section {
+            flex: 1;
+            margin-bottom: 50px;
+            margin-left: 50px;
+            width: 100%;
+        }
+
+        .bottom-right-section {
+            flex: 1;
+            display: flex;
+            margin-left: -400px;
+            margin-top: 5px;
+            width: 100%;
+            background-color: rgb(227, 227, 227);
+        }
+
+        
+        /* Style for the fancy table */
+        .fancy-table {
+            width: 100%;
+            border-collapse: collapse; /* Collapse borders */
+        }
+
+        .fancy-table th,
+        .fancy-table td {
+            padding: 8px;
+            border: 1px solid #767676; /* Add border */
+        }
+
+        .fancy-table th {
+            background-color: #f2f2f2; /* Light gray background for header */
+            text-align: left;
+        }
+
+        /* Alternate row background color */
+        .fancy-table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        /* Hover effect */
+        .fancy-table tbody tr:hover {
+            background-color: #f2f2f2;
+        }
+
+
+        .recommend-house-container {
+            display: flex; /* Use flexbox layout */
+            justify-content: space-between; 
+            margin: 300px; 
+            margin-left: -1100px;
+            flex-direction: row;
+            
+        }
+
+        .house {
+            flex: 0 0 calc(50% - 10px); 
+            height: 1000px;
+            font-size: 30px;
+            
+            margin: 10px; /* Add margin between houses */
+            border: 1px solid #ccc; /* Add border for each house */
+            padding: 10px; /* Add padding */
+            box-sizing: border-box; /* Include padding and border in the element's total width and height */
+        }
+
+        .upper-section {
+            display: flex; /* Use flexbox layout */
+            flex-direction: row;
+        }
+
+        .recommend-left {
+            flex: 1;
+            padding-right: 20px; 
+            margin-left: 15px;
+        }
+
+        .recommend-right {
+            margin-top: 120px;
+            margin-right: 60px;
+        }
+
+        .save-house-btn {
+            flex: 0 0 100%; /* Each save-house button occupies 100% of the container width */
+            margin-left: -250px;
+            color:#ffffff;
+            margin-top: 920px;
+            width: 200px;
+            height: 50px;
+            font-size: 35px;
+            border-radius: 10px;
+            border: 2px solid #191919;
+            background-color: #909090;
+            text-align: center; /* Center-align the button */
+        }
+        .save-house-btn:hover {
+            background-color: #5f4c6b;
+            color: #fff;
+            cursor: pointer;
+        }
+
 
     </style>
 </head>
 <body>
     
     <div class="header">
-        <h1 class="greeting">House Details</h1>
-        <a href="/house_type" class="previous-page"><img src="/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/icons/arrow-circle.png" /></a>
-        <a href="/logout" class="logout-icon"><img src="/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/icons/7124045_logout_icon.png" /></a>       
+        <a href="/main" class="previous-page">HOME</a>
+        <h1 class="greeting">House Detail</h1>
+        <a href="/logout" class="logout-text">LOGOUT</a>       
     </div>
     <div class="house-details">
         <div class="house-info"></div>
@@ -148,7 +260,8 @@
     </div>
     <script>
 
-        const fakeHouseData = {
+        const fakeHouseData = [
+        {
             id: "6620b9a1adc00e3cd8cf3a77",
             title: "台大農業昆蟲館旁，近台大、台科大(房屋編號：CC831601)",
             price: 22000,
@@ -167,7 +280,47 @@
             cook: true,
             equip: ["Internet", "TV", "Washing Machine", "Dryer", "Water Dispenser"],
             furniture: ["Wardrobe", "Dining Table", "Dining Chair", "Cabinet", "Single Bed"]
-        };
+        },
+        {
+            id: "6620b9a1adc00e3cd8cf3a77",
+            title: "台大農業昆蟲館旁，近台大、台科大(房屋編號：CC831601)",
+            price: 22000,
+            address: "台北市大安區基隆路三段\n租金行情",
+            type: "無電梯公寓",
+            age: 50,
+            size: 25,
+            move_date: "隨時",
+            layout: "3房(室)1廳2衛",
+            floor: "1 / 1 樓",
+            img_url: "https://static.rakuya.com.tw/r2/n773/0d/a9/25944773_1_b.jpeg?1713234618",
+            identy: "Identified feature",
+            pet: "Pets allowed",
+            short_stay: "Short stay available",
+            stay_landlord: "yes",
+            cook: true,
+            equip: ["Internet", "TV", "Washing Machine", "Dryer", "Water Dispenser"],
+            furniture: ["Wardrobe", "Dining Table", "Dining Chair", "Cabinet", "Single Bed"]
+        },
+        {
+            id: "6620b9a1adc00e3cd8cf3a77",
+            title: "台大農業昆蟲館旁，近台大、台科大(房屋編號：CC831601)",
+            price: 22000,
+            address: "台北市大安區基隆路三段\n租金行情",
+            type: "無電梯公寓",
+            age: 50,
+            size: 25,
+            move_date: "隨時",
+            layout: "3房(室)1廳2衛",
+            floor: "1 / 1 樓",
+            img_url: "https://static.rakuya.com.tw/r2/n773/0d/a9/25944773_1_b.jpeg?1713234618",
+            identy: "Identified feature",
+            pet: "Pets allowed",
+            short_stay: "Short stay available",
+            stay_landlord: "yes",
+            cook: true,
+            equip: ["Internet", "TV", "Washing Machine", "Dryer", "Water Dispenser"],
+            furniture: ["Wardrobe", "Dining Table", "Dining Chair", "Cabinet", "Single Bed"]
+        }];
 
 
         function getHouseData() {
@@ -210,16 +363,21 @@
                 recommendHouseContainer.innerHTML += `
                     <div class="house">
                         <h2>Recommend House</h2>
-                        <div class="recommend-left">
-                            <h3 class="${houseData["house_id"]}"><a href="${houseData['house_id']}" target="_blank">${houseData['title']}</a></h3>
-                            <img src="${houseData['img_url']}" alt="${houseData['title']}">
+                        <div class="title">
+                            <h3><a href="${houseData['id']}" target="_blank">${houseData['title']}</a></h3>
                         </div>
-                        <div class="recommend-right">
-                            <h2>House Info</h2>
-                            <p>租金: ${houseData['price']} 月</p>
-                            <p>地址: ${houseData['address']}</p>
-                            <p>屋齡: ${houseData['age']} years</p>
-                            <p>坪數: ${houseData['size']} 坪</p>
+                        <div class="upper-section">
+                            <div class="recommend-left">
+                                
+                                <img src="${houseData['img_url']}" alt="${houseData['title']}" class="image">
+                            </div>
+                            <div class="recommend-right">
+                                <h2>House Info</h2>
+                                <p>租金: ${houseData['price']} 月</p>
+                                <p>地址: ${houseData['address']}</p>
+                                <p>屋齡: ${houseData['age']} years</p>
+                                <p>坪數: ${houseData['size']} 坪</p>
+                            </div>
                         </div>
                     </div>
                     <div class="save-house" style="z-index:10002;">
@@ -231,33 +389,6 @@
 
         // Event listener to handle house card click
         document.querySelector('.recommend-house-container').addEventListener('click', function(event) {
-            if (event.target.closest('.house')) {
-                const h3Element = event.target.closest('.house').querySelector('.recommend-left h3');
-                if (h3Element) {
-                    const houseId = h3Element.classList[0];
-                    console.log(houseId)
-                    // Make an AJAX request to track click
-                    fetch('/track/hot/click', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            house_id: houseId,
-                        })
-                    })
-                    .then(response => {
-                        if (response.status !== 200) {
-                            throw new Error('Failed to track click');
-                        }
-                        // Optionally handle successful response here
-                        console.log('Click tracked successfully');
-                    })
-                    .catch(error => {
-                        console.error('Error tracking click:', error);
-                    });
-                }
-            }
 
             if (event.target.closest('.save-house')){
                 const houseId = event.target.closest('.save-house').querySelector('.save-house-btn').id;
@@ -291,41 +422,56 @@
             const houseInfoContainer = document.querySelector('.house-info');
             houseInfoContainer.innerHTML = `
                 <div class="left-right-sections">
-                    <div class="left-section">
+                    <div class="title">
                         <h3><a href="${houseData['id']}" target="_blank">${houseData['title']}</a></h3>
-                        <img src="${houseData['img_url']}" alt="${houseData['title']}">
                     </div>
-                    <div class="right-section">
-                        <h2>House Info</h2>
-                        <p>租金: ${houseData['price']} 月</p>
-                        <p>地址: ${houseData['address']}</p>
-                        <p>型態: ${houseData['type']}</p>
-                        <p>屋齡: ${houseData['age']} years</p>
-                        <p>坪數: ${houseData['size']} 坪</p>
-                        <p>遷入日期: ${houseData['move_date']}</p>
+                    
+                    <div class="upper-section">
+                        <div class="left-section">
+                            
+                            <img src="${houseData['img_url']}" alt="${houseData['title']}">
+                        </div>
+                        <div class="right-section">
+                            <h2>房屋資訊</h2>
+                            <p>租金: ${houseData['price']} 月</p>
+                            <p>地址: ${houseData['address']}</p>
+                            <p>型態: ${houseData['type']}</p>
+                            <p>屋齡: ${houseData['age']} years</p>
+                            <p>坪數: ${houseData['size']} 坪</p>
+                            <p>遷入日期: ${houseData['move_date']}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bottom-section">
+                    <div class="bottom-left-section">
+                        <h2>房屋特色</h2>
+                        <p>身份要求: ${houseData['identy']}</p>
+                        <p>房東同住: ${houseData['stay_landlord']}</p>
+                        <p>寵物: ${houseData['pet']}</p>
+                        <p>最短租期: ${houseData['short_stay']}</p>
+                        <p>廚房: ${houseData['cook']}</p>
                         <p>格局: ${houseData['layout']}</p>
                         <p>樓層: ${houseData['floor']}</p>
                     </div>
-                </div>
-                <div class="bottom-seciton">
-                    <h2>House Features</h2>
-                    <p>身份要求: ${houseData['identy']}</p>
-                    <p>房東同住: ${houseData['stay_landlord']}</p>
-                    <p>寵物: ${houseData['pet']}</p>
-                    <p>最短租期: ${houseData['short_stay']}</p>
-                    <p>廚房: ${houseData['cook']}</p>
-
-
-                    <p>設備:</p>
-                    <ul>
-                        ${houseData['equip'].map(equipment => `<li>${equipment}</li>`).join('')}
-                    </ul>
-
-
-                    <p>家俱:</p>
-                    <ul>
-                        ${houseData['furniture'].map(furniture => `<li>${furniture}</li>`).join('')}
-                    </ul>
+                    <div class="bottom-right-section">
+                        <table class="fancy-table">
+                            <thead>
+                                <tr>
+                                    <th>設備</th>
+                                    <th>家具</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Loop through each equipment and furniture item -->
+                                ${houseData['equip'].map((equipment, index) => `
+                                    <tr>
+                                        <td>${equipment}</td>
+                                        <td>${houseData['furniture'][index]}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
                 
             `;
@@ -364,12 +510,13 @@
 
 
         // Fetch house data and render it
-        getHouseData()
-        getRecommendHouseData()
-        trackClickAfterDelay()
+        // getHouseData()
+        //getRecommendHouseData()
+        //trackClickAfterDelay()
 
         // Testing
-        //renderHouseData(fakeHouseData)
+        renderHouseData(fakeHouseData[0])
+        renderRecommendHouseData(fakeHouseData) 
 
         
     </script>

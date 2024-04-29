@@ -183,7 +183,7 @@ def user_information():
 
     if isinstance(user_id, int):
         username = get_user_name(user_id)
-        return render_template('user_information.html', username=username)
+        return render_template('user_information.html', username=username, user_id=user_id)
 
     return redirect(url_for('login'))
 
@@ -654,7 +654,7 @@ def get_user_recommend_house(house_id):
             transform_select_house_data_dicts)
 
         nearest_neighbors_id_list = match_house(transform_house_id_list, transform_house_value_list,
-                                                cur_transform_house["value"], 5)
+                                                cur_transform_house["value"], 3)
         try:
             match_houses = house_collection.find(
                 {"id": {"$in": nearest_neighbors_id_list}})

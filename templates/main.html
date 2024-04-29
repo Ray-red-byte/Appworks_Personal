@@ -101,7 +101,7 @@
             margin-left: -200px;
             padding: 20px;
             width: 1800px;
-            background-color: #eae6e6;
+            background-color: #e3e3e3f3;
             border-radius: 10px;
             border: 2px solid #7d7777;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
@@ -169,6 +169,29 @@
             cursor: pointer;
         }
 
+        .search-ai {
+            margin-top: 20px;
+            background-color: #a18ba1;
+        }
+        #ai-recommend {
+            background-color: #909090;
+            color: #fff;
+            border: none;
+            width: 180px;
+            height: 90px;
+            padding: 10px 20px;
+            margin-left: -1030px;
+            border-radius: 10px;
+            border: 1px solid #191919;
+            
+            font-size: 35px;
+            transition: background-color 0.3s;
+        }
+        #ai-recommend:hover {
+            background-color: #5f4c6b;
+            cursor: pointer;
+        }
+
         .houses-container {
             display: flex;
             flex-wrap: wrap;
@@ -182,11 +205,11 @@
         .house {
             display: flex;
             flex-direction: row;
-            width: calc(100% - 10px);
+            width: 90%;
             border: 1px solid #ccc;
             border-radius: 10px;
             padding: 20px;
-            background-color: #fff;
+            background-color: #ffffff;
             margin: 10px auto;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
@@ -220,6 +243,21 @@
             color: #333;
             font-size: 30px;
             line-height: 1.5;
+        }
+
+        .save-house-btn {
+            margin-top: 330px;
+            margin-left: -200px;
+            color:#ffffff;
+            font-size: 25px;
+            border-radius: 10px;
+            background-color: #909090;
+            width: 100px;
+            height: 50px;
+            cursor: pointer;
+        }
+        .save-house-btn:hover {
+            background-color: #5f4c6b;
         }
 
         .right-section {
@@ -727,13 +765,12 @@
     </div>
 
     <div class="right-main-section">
+        <h2 style="font-size: 55px; margin-top: 150px;">Hello {{ username }} !</h2>
+        <div class="search-ai">
+            <button id="ai-recommend" type="submit">AI Go !</button>
+        </div>
         <div class="inside-container">
             <h1 class="cur-userId" style="display: none;">{{ user_id }}</h1>
-            <h2 style="font-size: 50px;">Hello {{ username }}</h2>
-            <div class="search-ai">
-                <h2 style="font-size: 40px;">AI Recommendation</h2>
-                <button id="ai-recommend" type="submit">Go !</button>
-            </div>
 
             <div class="houses-container">
                 <!-- House cards will be displayed here -->
@@ -750,22 +787,22 @@
                     </div>
                     <div class="save-house" style="z-index:10002;">
                         <button class="save-house-btn" id="1">Save</button>
-                </div>
-            
-                <div class="house">
-                    <div class="house-details">
-                        <img src="cottage.jpg" alt="Cozy Cottage">
                     </div>
-                    <div class="house-info">
-                        <h3 class="2" style="cursor:pointer">Cozy Cottage</h3>
-                        <p>租金: 1500 元/月</p>
-                        <p>屋齡: 10 年</p>
-                        <p>地址: 456 Elm Street</p>
+                
+                    <div class="house">
+                        <div class="house-details">
+                            <img src="cottage.jpg" alt="Cozy Cottage">
+                        </div>
+                        <div class="house-info">
+                            <h3 class="2" style="cursor:pointer">Cozy Cottage</h3>
+                            <p>租金: 1500 元/月</p>
+                            <p>屋齡: 10 年</p>
+                            <p>地址: 456 Elm Street</p>
+                        </div>
                     </div>
-                </div>
-                <div class="save-house" style="z-index:10002;">
-                    <button class="save-house-btn" id="2">Save</button>
-                </div>
+                    <div class="save-house" style="z-index:10002;">
+                        <button class="save-house-btn" id="2">Save</button>
+                    </div>
 
             </div>
         </div>
@@ -977,6 +1014,7 @@
 
             if (matches.length === 0) {
                 matchList.innerHTML += '<p>Check out profile to get matches!</p>';
+                matchList.style = "margin-top: 10px; margin-left: 100px;"
                 return;
             }
 

@@ -11,7 +11,7 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #dbdada;
+            background-color: #f9f7f7;
             zoom: 100%; 
         }
 
@@ -29,17 +29,26 @@
             color: #f0eff0;
         }
 
+        .line-text {
+            color: #f0eff0;
+            margin-left: 700px;
+            margin-top:100px;
+            font-size: 40px;
+            z-index: 10001;
+        }
+        
         .logout-text {
             color: #f0eff0;
-            margin-left: 1000px;
+            margin-left: 0px;
             margin-top:100px;
+            cursor:pointer;
             font-size: 40px;
             z-index: 10001;
         }
 
         .user-info {
             color: #f0eff0;
-            margin-right: 100px;
+            margin-right: 300px;
             margin-top:100px;
             font-size: 40px;
             cursor:pointer;
@@ -47,7 +56,7 @@
         }
 
         .container {
-            background-color: #dbdada; /* Purple to orange gradient */
+            background-color: #fffcfc; /* Purple to orange gradient */
             border-radius: 10px;
             padding: 20px;
             width: 1000px; /* Increased width */
@@ -67,7 +76,7 @@
             padding: 20px;
             margin-top: -20px;
             margin-left: 60px;
-            background-color: #eae6e6;
+            background-color: #fffcfc;
             border-radius: 10px;
             border: 2px solid #7d7777;
             z-index: 9999;
@@ -87,10 +96,11 @@
         }
 
         .inside-container {
-            max-width: 1500px;
-            margin: 50px auto;
+            max-width: 2000px;
+            margin-top: 50px;
+            margin-left: -200px;
             padding: 20px;
-            width: 1500px;
+            width: 1800px;
             background-color: #eae6e6;
             border-radius: 10px;
             border: 2px solid #7d7777;
@@ -198,7 +208,7 @@
 
         .house h3 {
             color: #800080;
-            font-size: 20px;
+            font-size: 40px;
             margin-bottom: 10px;
         }
 
@@ -208,7 +218,7 @@
 
         .house p {
             color: #333;
-            font-size: 16px;
+            font-size: 30px;
             line-height: 1.5;
         }
 
@@ -218,61 +228,77 @@
             flex-direction: column;
             align-items: flex-end;
             top: 100px; /* Adjust as needed */
-            right: 20px; /* Adjust as needed */
+            right: 100px; /* Adjust as needed */
             width: 1000px;
             height: calc(100% - 100px); 
         }
 
         .select-match-type {
             position: fixed;
-            width: 700px;
+            width: 900px;
             font-size: 30px;
-            background-color: #c89ec8;
+            background-color: #a18ba1;
             border: 2px solid #7d7777;
             border-radius: 10px;
-            margin-top: 165px;
-            margin-right: 110px;
+            margin-top: 180px;
+            margin-right: 30px;
             padding: 20px;
             z-index: 9999;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+
+        #match-type{
+            margin-top: 15px;
+            margin-left:55px;
+            font-size: 30px;
+            width: 800px;
+            border-radius: 10px;
+        }
+
+        #matchType{
+            width: 800px;
+            height: 50px;
+            margin-left:55px;
+            border-radius: 10px;
+            font-size: 30px;
+        }
+        
         .matchlist-history{
             position: fixed;
             display: flex;
             flex-direction: row;
-
-            margin-top: 410px; 
+            margin-top: 480px; 
             margin-right: 105px;
-            width: 750px;
+            width: 800px;
             height:800px; /* Ensure the right-section takes up the full height */
         }
 
         .chat-user-history {
             position: fixed;
-            width: 400px;
+            width: 420px;
             font-size: 30px;
             background-color: #d3c7d3;
             border: 2px solid #7d7777;
-            margin-left: 320px;
+            margin-left: 424px;
             margin-top: 0px;
             padding: 12.5px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         .match-list {
             position: fixed;
-            width: 270px;
+            width: 450px;
             font-size: 30px;
             background-color: #d3c7d3;
             border: 2px solid #7d7777;
             padding: 20px;
-            margin-left: 0px;
+            margin-left: -68px;
             margin-bottom: 100px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         
 
         .chat-user-history h2 {
-            color: #800080;
+            color: #ffffff;
             font-size: 30px;
             margin-bottom: 15px;
         }
@@ -297,7 +323,7 @@
 
 
         .match-list h2 {
-            color: #800080;
+            color: #ffffff;
             font-size: 30px;
             margin-bottom: 15px;
         }
@@ -379,9 +405,10 @@
             background-color: #c7bbc2;
         }
         input[type="checkbox"] {
-            
+            width:30px;
             vertical-align: middle; /* Align checkboxes vertically */
             margin-right: 10px;
+            margin-left: 50px;
         }
         input[type="checkbox"] + label {
             display: inline-block;
@@ -389,7 +416,7 @@
         }
 
         input[type="submit"] {
-            background-color: #8a2be2; /* Purple color */
+            background-color: #584a58; /* Purple color */
             color: white;
             border: none;
             padding: 10px 20px;
@@ -488,8 +515,6 @@
             font-size: 40px;
         }
 
-
-
         .chat-room-btn {
             padding: 10px 20px;
             background-color: #a552dc;
@@ -516,13 +541,27 @@
             padding-left: 20px;
         }
 
+        #stayWithLandlord{
+            height: 55px;
+            border-radius: 10px;
+            font-size: 30px;
+        }
+
+        #park{
+            height: 55px;
+            border-radius: 10px;
+            font-size: 30px;
+        }
+
+
     </style>
 </head>
 <body>
     <div class="header">
         <h1 style="font-size: 100px;">Rent Right</h1>
-        <a href="/logout" class="logout-text" style="cursor:pointer" onclick="handleLogout()">logout</a>
-        <a href="/user/information" class="user-info">user info</a>
+        <a  href="/line_register" style="cursor:pointer" class="line-text">LINE</a>
+        <a class="logout-text" onclick="handleLogout()">LOGOUT</a>
+        <a href="/user/information" class="user-info">PROFILE</a>
     </div>
 
     <div class="container">
@@ -533,21 +572,21 @@
                     <div style="margin-bottom: 50px;">
                         <h3 style="font-size: 30px;">Price:</h3>
                         <input type="range" id="price" class="price" name="price" min="0" max="200000" step="1" value="50">
-                        <span id="priceValue">50
+                        <span style="font-size: 30px; margin-left: 450px;" id="priceValue">50
                     </div>
 
                     <div style="margin-bottom: 80px;">
                         <h3 style="font-size: 30px;">House Age:</h3>
                         <input type="range" id="houseAge" class="houseAge" name="houseAge" min="0" max="100" step="1" value="25">
-                        <span id="houseAgeValue">25</span>
+                        <span style="font-size: 30px; margin-left: 450px;" id="houseAgeValue">25</span>
                     </div>
                     
                     <div style="margin-bottom: 80px;">
-                        <h3 style="font-size: 30px;">Taipei</h3>
+                        <h3 style="font-size: 40px;">Taipei</h3>
                         <div class="taipei">
                             
                             <input type="checkbox" id="Zhongzheng" name="zone" value="中正區">
-                            <label for="Zhongzheng">中正區</label>
+                            <label for="Zhongzheng" >中正區</label>
      
                             <input type="checkbox" id="Datong" name="zone" value="大同區">
                             <label for="Datong">大同區</label>
@@ -584,7 +623,7 @@
                             <br>
                         </div>
 
-                        <h3 style="font-size: 30px;">New Taipei</h3>
+                        <h3 style="font-size: 40px; margin-top: 100px;">New Taipei</h3>
                         <div class="new-taipei">
                             <input type="checkbox" id="Banqiao" name="zone" value="板橋區">
                             <label for="Banqiao">板橋區</label>
@@ -663,15 +702,15 @@
                     
 
                     <div style="margin-bottom: 80px;">
-                        <h3 style="font-size: 30px;">Stay with Landlord:</h3>
-                        <select id="stayWithLandlord" name="stayWithLandlord">
-                            <option value="yes">Yes</option>
-                            <option value="no">No</option>
+                        <h3 style="font-size: 40px;">Stay with Landlord:</h3>
+                        <select id="stayWithLandlord" name="stayWithLandlord" >
+                            <option value="yes" style="font-size: 20px;">Yes</option>
+                            <option value="no" style="font-size: 50px;">No</option>
                         </select>
                     </div>
                     
                     <div style="margin-bottom: 80px;">
-                        <h3 style="font-size: 30px;">Park Nearby:</h3>
+                        <h3 style="font-size: 40px;">Park Nearby:</h3>
                         <select id="park" name="park">
                             <option value="yes">Yes</option>
                             <option value="no">No</option>
@@ -680,8 +719,9 @@
                 </div>
 
                 
-                <input id="search-input" type="submit" value="search">
+                <input id="search-input" type="submit" value="search" style="font-size: 40px;">
             </form>
+            
 
         </div>
     </div>
@@ -692,11 +732,40 @@
             <h2 style="font-size: 50px;">Hello {{ username }}</h2>
             <div class="search-ai">
                 <h2 style="font-size: 40px;">AI Recommendation</h2>
-                <button id="ai-recommend" type="submit">Recommend</button>
+                <button id="ai-recommend" type="submit">Go !</button>
             </div>
 
             <div class="houses-container">
                 <!-- House cards will be displayed here -->
+                    <div class="house">
+                        <div class="house-details">
+                            <img src="house1.jpg" alt="Beautiful House 1">
+                        </div>
+                        <div class="house-info">
+                            <h3 class="1" style="cursor:pointer">Beautiful House 1</h3>
+                            <p>租金: 2000 元/月</p>
+                            <p>屋齡: 5 年</p>
+                            <p>地址: 123 Main Street</p>
+                        </div>
+                    </div>
+                    <div class="save-house" style="z-index:10002;">
+                        <button class="save-house-btn" id="1">Save</button>
+                </div>
+            
+                <div class="house">
+                    <div class="house-details">
+                        <img src="cottage.jpg" alt="Cozy Cottage">
+                    </div>
+                    <div class="house-info">
+                        <h3 class="2" style="cursor:pointer">Cozy Cottage</h3>
+                        <p>租金: 1500 元/月</p>
+                        <p>屋齡: 10 年</p>
+                        <p>地址: 456 Elm Street</p>
+                    </div>
+                </div>
+                <div class="save-house" style="z-index:10002;">
+                    <button class="save-house-btn" id="2">Save</button>
+                </div>
 
             </div>
         </div>
@@ -705,7 +774,7 @@
 
     <div class="right-section">
         <div class="select-match-type">
-            <h2 style="font-size: 40px;">Select Match Type</h2>
+            <h2 style="font-size: 50px; color:#f0eff0;">Select Match Type</h2>
             <select id="matchType" name="matchType">
                 <option value="zone">Similar Zone</option>
                 <option value="identity">Similar identity</option>
@@ -719,9 +788,10 @@
                 <!-- Match User -->
             </div>
             
+            
             <div class="chat-user-history" id="chat-user-history">
                 <h2>Chat History</h2>
-                <!-- Match User -->
+                <!-- Existing content will be here -->
             </div>
         </div>
 
@@ -733,7 +803,7 @@
             <h2 class="uid" style="display: none;"></h2>
             <h2 class="cuid" style="display: none;"></h2>
             <h2 class="room_id" style="display: none;"></h2>
-            <h2 id="chat-username"></h2>
+            <h2 id="chat-username">Ray</h2>
 
             <button class="chat-room-btn" id="leave-btn" type="submit">leave</button>
             <div id="chatForm">
@@ -761,6 +831,7 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+    
     <script>
 
         const socket = io();
@@ -770,6 +841,26 @@
         let curUserName = '';
         let chatUserName = '';
         let roomId = '';
+        
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const dropdownButton = document.getElementById("dropdownButton");
+            const dropdownMenu = document.getElementById("dropdownMenu");
+
+            dropdownButton.addEventListener("click", function() {
+                const isExpanded = dropdownButton.getAttribute("aria-expanded") === "true";
+                if (isExpanded) {
+                dropdownButton.setAttribute("aria-expanded", "false");
+                dropdownMenu.style.display = "none";
+                } else {
+                dropdownButton.setAttribute("aria-expanded", "true");
+                dropdownMenu.style.display = "block";
+                }
+            });
+
+
+        });
+
 
         // AI Recommendation
         const aiRecommend = document.getElementById('ai-recommend');
@@ -782,7 +873,8 @@
 
         // use socketIO Show I am offline if trigger logout button
         function handleLogout() {
-            socket.emit('offline', { user_id: userId1 }); // Replace <user_id> with the actual user ID
+            socket.emit('offline', { user_id: userId1 }); 
+            window.location.href = '/logout';
         }
 
         // use socketIO Show I am online Initially
@@ -835,7 +927,7 @@
 
 
             if (matches.length === 0) {
-                matchList.innerHTML += '<p>Check out profile to get matches!</p>';
+                matchList.innerHTML += '<p>Check out profile!</p>';
                 return;
             }
 
@@ -1189,6 +1281,7 @@
 
         priceInput.addEventListener('input', function() {
             priceValue.textContent = this.value;
+            priceValue.style.fontSize = '30px';
         });
 
         // House Age range input
@@ -1197,6 +1290,7 @@
 
         houseAgeInput.addEventListener('input', function() {
             houseAgeValue.textContent = this.value;
+            houseAgeValue.style.fontSize = '30px';
         });
 
 

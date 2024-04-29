@@ -14,58 +14,67 @@
             flex-direction: column;
             align-items: center;
             height: 100vh;
-            zoom: 67%; 
+            zoom: 100%; 
         }
 
         .header {
             display: flex;
-            
+            justify-content: space-between;
             align-items: center;
+            width: 100%;
+            background-color: #a18ba1;
         }
 
         .header h1 {
-            margin-left: 690px;
-            margin-top: 80px;
-            margin-bottom: 30px;
-            font-size: 60px; /* Adjust font size */
-            color: #800080; /* Set text color */
+            margin-left: 1100px; /* Remove default margin */
+            color: #f0eff0;
+            font-size: 110px;
+            margin-bottom: 100px;
         }
 
-        .logout-icon {
-            margin-top: 60px;
-            margin-left: 450px;
+        
+        .logout-text {
+            color: #f0eff0;
+            margin-left: 800px;
+            margin-right: 200px;
+            margin-top:100px;
+            cursor:pointer;
+            font-size: 40px;
+            z-index: 10001;
+            text-decoration: underline;
+        }
 
+        .change-user-info{
+            color: #f0eff0;
+            margin-left: 100px;
+            margin-top:100px;
+            font-size: 40px;
+            cursor:pointer;
+            z-index: 10001;
         }
         
-        .logout-icon img {
-            width: 50px; /* Adjust size as needed */
-            height: 50px; /* Adjust size as needed */
-            
-        }
-
         .container {
             background-color: #d8d8d8; /* Purple to orange gradient */
             border-radius: 30px;
             padding: 20px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            width: 800px; 
-            height: 1600px;
-            margin: 20px;
+            width: 1500px; 
+            height: 1500px;
+            margin:150px;
             display: flex;
             flex-direction: column; /* Arrange children vertically */
             align-items: stretch;
         }
-
         h1 {
             color: #555; 
             text-align: center;
-            margin-bottom: 20px;
-            font-size: 45px;
-        }
+            margin-bottom: 60px;
+            font-size: 80px;
+        }        
         form {
             display: grid;
             grid-template-columns: 1fr 1fr; /* Two equal columns */
-            gap: 20px;
+            gap: 80px;
         }
         label {
             display: flex;
@@ -73,7 +82,7 @@
             margin-top: 30px;
             color: #555; /* White color */
             font-weight: bold;
-            font-size: 25px;
+            font-size: 50px;
         }
         input[type="text"],
         input[type="number"],
@@ -81,8 +90,9 @@
         select {
             width: 100%;
             padding: 10px;
-            margin-bottom: 20px;
-            font-size: 20px;
+            margin-bottom: 30px;
+            font-size: 40px;
+            height: 80px;
             border: none;
             border-radius: 5px;
             box-sizing: border-box;
@@ -98,17 +108,18 @@
         }
 
         textarea::placeholder {
-            font-size: 20px; /* Adjust the font size as needed */
+            font-size: 40px; /* Adjust the font size as needed */
             color: #999; /* Optionally adjust the color */
         }
         input[type="submit"] {
             background-color: #8a2be2; /* Purple color */
             color: white;
             border: none;
+            height: 75px;
             padding: 10px 20px;
-            margin-top: 10px; /* Center the button */
+            margin-top: 40px; /* Center the button */
             cursor: pointer;
-            font-size: 25px;
+            font-size: 45px;
             border-radius: 20px;
             transition: background-color 0.3s;
             justify-self: end; /* Align to the end of the grid cell */
@@ -120,10 +131,9 @@
 </head>
 <body>
     <div class="header">
+        <a href="/user/information" class="change-user-info">PREVIOUS</a>
         <h1 class="greeting">Hello, {{ username }}</h1>
-        <a href="/logout" class="logout-icon"><img src="/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/icons/7124045_logout_icon.png" /></a>
-        <a href="/house_type" class="change-routine">next page</a>
-        <a href="/user/information" class="change-user_info">previous page</a>
+        <a class="logout-text" onclick="handleLogout()">LOGOUT</a>
     </div>
     <div class="container">
         <h1>Daily Routine</h1>

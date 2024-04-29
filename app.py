@@ -164,7 +164,7 @@ def user_information():
 
     if isinstance(user_id, int):
         username = get_user_name(user_id)
-        return render_template('user_information.html', username=username)
+        return render_template('user_information.html', username=username, user_id=user_id)
 
     return redirect(url_for('login'))
 

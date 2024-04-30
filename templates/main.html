@@ -32,16 +32,16 @@
 
         .line-text {
             color: #f0eff0;
-            margin-left: 1100px;
-            margin-top:100px;
+            margin-left: 100px;
+            margin-top: 100px;
             font-size: 40px;
             z-index: 10001;
         }
         
         .logout-text {
             color: #f0eff0;
-            margin-left: 0px;
             margin-top:100px;
+            margin-left: -600px;
             cursor:pointer;
             font-size: 40px;
             z-index: 10001;
@@ -50,16 +50,17 @@
 
         .user-info {
             color: #f0eff0;
-            margin-right: 300px;
             margin-top:100px;
+            margin-left: -600px;
             font-size: 40px;
             cursor:pointer;
             z-index: 10001;
         }
 
-        .save-house {
+        .save-house-text {
             color: #f0eff0;
-            margin-right: 300px;
+            margin-right: 100px;
+            margin-left: -600px;
             margin-top:100px;
             font-size: 40px;
             cursor:pointer;
@@ -260,14 +261,19 @@
             line-height: 1.5;
         }
 
+        .save-house {
+            margin-top: -100px;
+            margin-left: 1950px;
+            width: 1000px;
+        }
+
         .save-house-btn {
-            margin-top: 330px;
-            margin-left: -200px;
+            
             color:#ffffff;
             font-size: 25px;
             border-radius: 10px;
             background-color: #909090;
-            width: 100px;
+            width: 150px;
             height: 50px;
             cursor: pointer;
         }
@@ -295,7 +301,7 @@
             position: fixed;
             flex-direction: column;
             align-items: flex-end;
-            top: 100px; /* Adjust as needed */
+            top: 150px; /* Adjust as needed */
             right: 40px; /* Adjust as needed */
             width: 1000px;
             height: calc(100% - 100px); 
@@ -308,7 +314,7 @@
             background-color: #a18ba1;
             border: 2px solid #7d7777;
             border-radius: 10px;
-            margin-top: 200px;
+            margin-top: 300px;
             margin-right: 180px;
             padding: 20px;
             z-index: 9999;
@@ -335,7 +341,7 @@
             position: fixed;
             display: flex;
             flex-direction: row;
-            margin-top: 500px; 
+            margin-top: 600px; 
             margin-right: 255px;
             width: 800px;
             height:800px; /* Ensure the right-section takes up the full height */
@@ -645,7 +651,7 @@
         <a  href="/line_register" style="cursor:pointer" class="line-text">LINE</a>
         <a class="logout-text" onclick="handleLogout()">LOGOUT</a>
         <a href="/user/information" class="user-info">PROFILE</a>
-        <a href="/user/save_house" class="save-house">SAVE</a>
+        <a href="/user/save_house" class="save-house-text">SAVE</a>
     </div>
 
     <div class="container">

@@ -851,7 +851,7 @@ def house_type_page():
 
 
 @ app.route('/user/house_detail/<int:houseId>')
-def house_detail(houseId):
+def house_detail_page(houseId):
     token = request.cookies.get('token')
 
     # Call the authentication function to verify the token
@@ -898,6 +898,18 @@ def user_profile(chat_user_id):
     user_id = authentication(token, jwt_secret_key)
     if isinstance(user_id, int):
         return render_template('user_profile.html', chat_user_id=chat_user_id)
+
+    return redirect(url_for('login'))
+
+
+@app.route('/user/save_house', methods=['GET', 'POST'])
+def save_house_page():
+    token = request.cookies.get('token')
+
+    # Call the authentication function to verify the token
+    user_id = authentication(token, jwt_secret_key)
+    if isinstance(user_id, int):
+        return render_template('save_house.html', user_id=user_id)
 
     return redirect(url_for('login'))
 # ------------------------------------- Render template-------------------------------------
@@ -1009,6 +1021,54 @@ def get_messages():
         return jsonify({'messages': messages, 'last_updated_by': last_updated_user_id}), 200
 
     return jsonify({'error': 'Room not found'}), 404
+
+# ------------------------User Save House------------------------
+
+
+@app.route('/remove_house', methods=['POST'])
+def remove_house():
+    token = request.cookies.get('token')
+    user_id = authentication(token, jwt_secret_key)
+
+    if isinstance(user_id, int):
+        remove_house_id = request.json.get('remove_house')
+        user_collection = client['personal_project']['user']
+
+        print(remove_house_id)
+
+        cur_user = user_collection.find_one({"user_id": user_id})
+        cur_user_save_house_ls = cur_user.get('saved_house', [])
+
+        if int(remove_house_id) in cur_user_save_house_ls:
+            print("remove", remove_house_id)
+            cur_user_save_house_ls.remove(int(remove_house_id))
+
+            # Update the saved house list
+            user_collection.update_one(
+                {'user_id': user_id},
+                {'$set': {'saved_house': cur_user_save_house_ls}},
+                upsert=True
+            )
+
+    return redirect(url_for('login'))
+
+
+@app.route('/user/house/', methods=['GET'])
+def get_user_save_house():
+    token = request.cookies.get('token')
+    user_id = authentication(token, jwt_secret_key)
+
+    house_collection = client['personal_project']['house']
+    user_collection = client['personal_project']['user']
+    cur_user_save_house_list = user_collection.find_one({"user_id": user_id})[
+        'saved_house']
+
+    houses = house_collection.find({"id": {"$in": cur_user_save_house_list}})
+    houses_json = [
+        {**house, '_id': str(house['_id'])}
+        for house in houses
+    ]
+    return jsonify(houses_json), 200
 
 
 # ------------------------Show online users------------------------

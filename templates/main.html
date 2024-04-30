@@ -1001,7 +1001,6 @@
                 return;
             }
 
-            console.log(matches)
             matches.forEach(userList => {
 
                 const row = document.createElement('div');
@@ -1011,6 +1010,7 @@
                     if (match["user_id"] !== userId.toString()) {
                         const listItem = document.createElement('li');
                         listItem.style.display = 'flex';
+                        
                         
                         // Creating an icon element
                         const icon = document.createElement('i');
@@ -1078,7 +1078,6 @@
                         const listItem = document.createElement('li');
                         listItem.style.display = 'flex';
                         listItem.style.alignItems = 'center';
-                        listItem.style = "padding-bottom: 10px;"
                         listItem.style = "cursor: pointer;"
 
                         // Creating an icon element
@@ -1113,7 +1112,7 @@
                         allocateButton.textContent = 'Chat';
                         allocateButton.className = 'allocate-button';
                         allocateButton.addEventListener('click', (event) => {
-                            event.stopPropagation(); // Prevent the click event from bubbling to the list item
+                            event.stopPropagation(); 
                             allocateChatRoom(match["user_id"]);
                         });
 
@@ -1336,38 +1335,6 @@
             }
         });
 
-        // Save house event listener
-        /*
-        const saveButtons = document.querySelectorAll('.save-house-btn');
-        saveButtons.forEach(button => {
-                button.addEventListener('click', function(event) { // Extract house ID from the button's id attribute    
-
-                    const houseId = button.id;
-                    console.log(houseId);
-                    fetch('/save_house', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ save_house: houseId })
-                    })
-                    .then(response => {
-                        if (response.status === 200) {
-                            return response.json();
-                        }
-                        throw new Error('Failed to save house');
-                    })
-                    .then(data => {
-                        // Handle successful response
-                        console.log('House saved successfully:', data);
-                    })
-                    .catch(error => {
-                        // Handle error
-                        console.error('Error saving house:', error);
-                    });
-                });
-            });
-        */
 
         // Price range input
         const priceInput = document.getElementById('price');
@@ -1428,8 +1395,9 @@
         });
 
         // Default match list
-        fetchUserMatches("default");
-        //renderMatchList(matches);
+        //fetchUserMatches("default");
+        renderMatchList(matches);
+        renderChatHistoryList(matches);
 
 
 

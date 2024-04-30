@@ -663,7 +663,6 @@ def get_user_recommend_house(house_id):
 
             matches_houses_data = [{'house_id': match_house['id'], 'title': match_house['title'], 'price': match_house['price'], 'address': match_house['address'], 'age': match_house['age'], 'size': match_house['size'], 'img_url': match_house['img_url']}
                                    for match_house in match_houses if int(match_house['id']) != int(house_id)]
-                                   for match_house in match_houses if int(match_house['id']) != int(house_id)]
 
         except Exception as e:
             print(e)
@@ -698,7 +697,7 @@ def get_matches(match_type):
     transform_all_user_collection.update_one(
         {"user_id": int(user_id)},
         {"$set": transform_cur_user_dat_dict},
-        upsert = True)
+        upsert=True)
 
     # Get all users from the user collection and share one or more zones with the current user
     transform_cur_user_data = transform_all_user_collection.find_one(

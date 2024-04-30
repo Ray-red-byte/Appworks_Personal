@@ -727,7 +727,31 @@ def get_matches(match_type):
         nearest_neighbors_id_list = match_user(transform_id_list, transform_value_lis,
                                                transform_cur_user_data["value"], 10)
 
-    else:
+    elif match_type == 'same_gender':
+        users_share_gender = user_collection.find(
+            {"basic_info.gender": cur_user["basic_info"]["gender"]})
+
+        print('users_share_gender', users_share_gender)
+
+        # Find users who share the same zone with the current user in the transform_all_user_collection
+        transform_select_user_data_dicts = []
+
+        for user in users_share_gender:
+            user_id = user["user_id"]
+            transform_user_data = transform_all_user_collection.find_one(
+                {"user_id": int(user_id)})
+            if transform_user_data:
+                transform_select_user_data_dicts.append(transform_user_data)
+
+        print("Selected same gender users", len(
+            transform_select_user_data_dicts))
+        transform_id_list, transform_value_lis = get_value_from_dict(
+            transform_select_user_data_dicts)
+
+        nearest_neighbors_id_list = match_user(transform_id_list, transform_value_lis,
+                                               transform_cur_user_data["value"], 10)
+
+    elif match_type == 'All':
         transform_all_user_dict = transform_all_user_collection.find()
 
         transform_id_list, transform_value_list = get_value_from_user_dict(
@@ -740,7 +764,7 @@ def get_matches(match_type):
         match_users = user_collection.find(
             {"user_id": {"$in": nearest_neighbors_id_list}})
         matches_data = [[{'user_id': user['user_id'], 'username': user['username']}]
-                        for user in match_users if user['user_id'] != user_id]
+                        for user in match_users if user['user_id'] != user_id if int(user['user_id']) != int(user_id)]
 
     except Exception as e:
         print(e)

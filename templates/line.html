@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LINE house preference</title>
     <style>
-                 body {
+        body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
@@ -19,11 +19,11 @@
             justify-content: space-between;
             align-items: center;
             width: 100%;
-            background-color: #a18ba1;
+            background-color: #58c989;
         }
 
         .header h1 {
-            margin-left: 1400px; /* Remove default margin */
+            margin: 100px auto; /* Remove default margin */
             color: #f0eff0;
         }
 
@@ -34,23 +34,7 @@
             font-size: 40px;
             z-index: 10001;
         }
-        
-        .logout-text {
-            color: #f0eff0;
-            margin-left: 0px;
-            margin-top:100px;
-            font-size: 40px;
-            z-index: 10001;
-        }
 
-        .user-info {
-            color: #f0eff0;
-            margin-right: 300px;
-            margin-top:100px;
-            font-size: 40px;
-            cursor:pointer;
-            z-index: 10001;
-        }
 
         .container {
             background-color: #fffcfc; /* Purple to orange gradient */
@@ -58,51 +42,15 @@
             padding: 20px;
             width: 1000px; /* Increased width */
             height: 100%;
-            margin: 20px;
+            margin: 20px auto;
             display: flex;
             flex-direction: column; /* Arrange children vertically */
             align-items: stretch;
         }
 
-        .left-main-section {
-            flex-direction: column;
-            position: fixed;
-            font-size: large;
-            width: 15%;
-            height: 1600px;
-            padding: 20px;
-            margin-top: -20px;
-            margin-left: 60px;
-            background-color: #fffcfc;
-            border-radius: 10px;
-            border: 2px solid #7d7777;
-            z-index: 9999;
-            overflow-y: auto;
-        }
-
-        .right-main-section {
-            display: flex;
-            
-            flex-direction: column;
-            margin-left: 300px;
-            width: 80%;
-            padding: 10px;
-            margin-top: -120px;
-            background-attachment: fixed;
-            align-items: center;
-        }
-
-        .inside-container {
-            max-width: 2000px;
-            margin-top: 50px;
-            margin-left: -200px;
-            padding: 20px;
-            width: 1800px;
-            background-color: #eae6e6;
-            border-radius: 10px;
-            border: 2px solid #7d7777;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-            align-items: center;
+        #housePreferenceForm {
+            width: 30%;
+            margin: 60px auto;
         }
 
         h2 {
@@ -116,7 +64,7 @@
 
         .filter label {
             display: block;
-            color: #800080;
+            color: #58c989;
             margin-bottom: 5px;
         }
 
@@ -126,7 +74,7 @@
             border: none;
             border-radius: 20px;
             background-color: #d3d3e6;
-            color: #800080;
+            color: #58c989;
             font-size: 16px;
             outline: none;
             margin-bottom: 10px;
@@ -166,192 +114,6 @@
             cursor: pointer;
         }
 
-        .houses-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-
-        .houses-container p {
-            font-size: 30px; /* Adjust the font size as desired */
-        }
-
-        .house {
-            display: flex;
-            flex-direction: row;
-            width: calc(100% - 10px);
-            border: 1px solid #ccc;
-            border-radius: 10px;
-            padding: 20px;
-            background-color: #fff;
-            margin: 10px auto;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .house-details {
-            flex: 1; /* Allow it to grow to fill available space */
-            margin-right: 10px; /* Add some space between the two divs */
-        }
-
-        .house-info {
-            flex: 1; /* Allow it to grow to fill available space */
-        }
-
-        .house img {
-            width: 100%;
-            border-radius: 10px;
-            margin-bottom: 15px;
-        }
-
-        .house h3 {
-            color: #800080;
-            font-size: 40px;
-            margin-bottom: 10px;
-        }
-
-        .house h3:hover {
-            color: red; /* Change color to red when hovered */
-        }
-
-        .house p {
-            color: #333;
-            font-size: 30px;
-            line-height: 1.5;
-        }
-
-        .right-section {
-            display: flex;
-            position: fixed;
-            flex-direction: column;
-            align-items: flex-end;
-            top: 100px; /* Adjust as needed */
-            right: 100px; /* Adjust as needed */
-            width: 1000px;
-            height: calc(100% - 100px); 
-        }
-
-        .select-match-type {
-            position: fixed;
-            width: 700px;
-            font-size: 30px;
-            background-color: #c89ec8;
-            border: 2px solid #7d7777;
-            border-radius: 10px;
-            margin-top: 165px;
-            margin-right: 110px;
-            padding: 20px;
-            z-index: 9999;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        
-        .matchlist-history{
-            position: fixed;
-            display: flex;
-            flex-direction: row;
-            margin-top: 410px; 
-            margin-right: 105px;
-            width: 750px;
-            height:800px; /* Ensure the right-section takes up the full height */
-        }
-
-        .chat-user-history {
-            position: fixed;
-            width: 400px;
-            font-size: 30px;
-            background-color: #d3c7d3;
-            border: 2px solid #7d7777;
-            margin-left: 320px;
-            margin-top: 0px;
-            padding: 12.5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        .match-list {
-            position: fixed;
-            width: 270px;
-            font-size: 30px;
-            background-color: #d3c7d3;
-            border: 2px solid #7d7777;
-            padding: 20px;
-            margin-left: 0px;
-            margin-bottom: 100px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        
-
-        .chat-user-history h2 {
-            color: #800080;
-            font-size: 30px;
-            margin-bottom: 15px;
-        }
-
-        .chat-room-container {
-            position: fixed;
-            flex: 1;
-            flex-shrink: 0;
-            flex-grow: 1;
-            bottom: 0;
-            right: 20px;
-            width: 1000px;
-            font-size: 30px;
-            background-color: #fdfdfd;
-            border: 2px solid #7d7777;
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 600px;
-
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-
-        .match-list h2 {
-            color: #800080;
-            font-size: 30px;
-            margin-bottom: 15px;
-        }
-
-
-        .match {
-            margin-bottom: 15px;
-        }
-
-        .match p {
-            color: #333;
-            font-size: 25px;
-            line-height: 1.5;
-            cursor: pointer;
-        }
-
-        .message-status {
-            font-size: 18px; /* Adjust font size */
-             /* Set background color */
-            color: white; /* Set text color */
-            padding: 3px 8px; /* Add padding */
-            margin-left: 70px;
-            margin-top: -40px;
-            border-radius: 8px; /* Add border radius for rounded corners */
-        }
-
-
-        .match-username {
-            padding-bottom: 10px;
-            margin-left: 20px;
-            cursor: pointer;
-        }
-        .match-username:hover{
-            color: gray;
-        }
-
-        /* Online icon style */
-        .fa-circle.text-success {
-            color: green; /* Change the color as needed */
-            margin-right: 2px;
-        }
-
-        /* Offline icon style */
-        .fa-circle.text-danger {
-            color: red; /* Change the color as needed */
-            margin-right: 2px;
-        }
 
         .section {
             display: flex;
@@ -377,7 +139,7 @@
         select,
         input[type="checkbox"] {
             width: calc(100% - 22px); /* Adjust width */
-            height: 30px;
+            height: 40px;
             margin-bottom: 10px;
             border: none;
             border-radius: 5px;
@@ -386,9 +148,10 @@
             background-color: #c7bbc2;
         }
         input[type="checkbox"] {
-            
+            width:30px;
             vertical-align: middle; /* Align checkboxes vertically */
             margin-right: 10px;
+            margin-left: 50px;
         }
         input[type="checkbox"] + label {
             display: inline-block;
@@ -406,8 +169,9 @@
             transition: background-color 0.3s;
         }
         input[type="submit"]:hover {
-            background-color: #a971ce;
+            background-color: #198d4b;
         }
+
 
         .price, .houseAge{
             -webkit-appearance: none;
@@ -427,8 +191,20 @@
             appearance: none;
             width: 35px;
             height: 35px;
-            background: #a971ce;
+            background: #198d4b;
             cursor: pointer; 
+        }
+
+        #stayWithLandlord{
+            height: 55px;
+            border-radius: 10px;
+            font-size: 30px;
+        }
+
+        #park{
+            height: 55px;
+            border-radius: 10px;
+            font-size: 30px;
         }
 
     </style>
@@ -441,15 +217,15 @@
     <form id="housePreferenceForm" method="POST">
         <div class="left-section">
             <div style="margin-bottom: 50px;">
-                <h3 style="font-size: 30px;">Price:</h3>
+                <h3 style="font-size: 40px;">Price:</h3>
                 <input type="range" id="price" class="price" name="price" min="0" max="200000" step="1" value="50">
-                <span style="font-size: 30px; margin-left: 450px;" id="priceValue">50
+                <span style="font-size: 40px; margin-left: 1200px;" id="priceValue">50
             </div>
 
             <div style="margin-bottom: 80px;">
-                <h3 style="font-size: 30px;">House Age:</h3>
+                <h3 style="font-size: 40px;">House Age:</h3>
                 <input type="range" id="houseAge" class="houseAge" name="houseAge" min="0" max="100" step="1" value="25">
-                <span style="font-size: 30px; margin-left: 450px;" id="houseAgeValue">25</span>
+                <span style="font-size: 40px; margin-left: 1200px;" id="houseAgeValue">25</span>
             </div>
             
             <div style="margin-bottom: 80px;">
@@ -575,7 +351,7 @@
             <div style="margin-bottom: 80px;">
                 <h3 style="font-size: 40px;">Stay with Landlord:</h3>
                 <select id="stayWithLandlord" name="stayWithLandlord" >
-                    <option value="yes" style="font-size: 20px;">Yes</option>
+                    <option value="yes" style="font-size: 50px;">Yes</option>
                     <option value="no" style="font-size: 50px;">No</option>
                 </select>
             </div>
@@ -590,7 +366,7 @@
         </div>
 
         
-        <input id="search-input" type="submit" value="Save and Continue choose house" style="font-size: 40px;">
+        <input id="search-input" type="submit" value="SAVE" style="font-size: 40px;">
     </form>
 
     <script>

@@ -12,17 +12,17 @@
             background-color: #f0f0f0;
         }
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            background-color: #816e81;
+        .banner {
+            text-align: center;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 500px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
         
         .container {
             max-width: 2000px;
-            margin: 800px auto;
+            margin: 300px auto;
             background-color: #fff;
             padding: 20px;
             border-radius: 8px;
@@ -47,14 +47,15 @@
             
         }
         .btn:hover {
-            background-color: #8694a3;
+            background-color: #48b934;
             cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1 style="color: #fff; margin-left: 20px;">User Registration and House Preference Update</h1>
+    <div class="banner">
+        <h1 style="font-size: 200px; color:#48b934;">Welcome {{ username }}</h1>
+        <h2 style="font-size: 100px; color:#48b934;">LINE WILL HELP YOU !</h2>
     </div>
     <div class="container">
         <a href="https://notify-bot.line.me/oauth/authorize?response_type=code&client_id=bvtTFwMkqG5LiWFJIq3aXb&redirect_uri=http://18.178.32.143:80&scope=notify&state=NO_STATE" class="btn" style="font-size: 60px;">Register !</a>

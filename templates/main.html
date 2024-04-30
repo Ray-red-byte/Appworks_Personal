@@ -431,6 +431,21 @@
             margin-right: 2px;
         }
 
+        .allocate-button {
+            margin-left: auto;
+            margin-top: 5px;
+            display: block;
+            width: 100px;
+            height: 25px;
+            font-size: 18px;
+            color:#f6f7f9;
+            background-color:#a2a2a2;
+        }
+        .allocate-button:hover{
+            cursor: pointer; 
+            background-color: #a971ce;
+        }
+
         .section {
             display: flex;
             justify-content: space-between;
@@ -844,6 +859,7 @@
             <div class="match-list" id="match-list">
                 <h2>Match List</h2>
                 <!-- Match User -->
+                
             </div>
             
             
@@ -863,7 +879,7 @@
             <h2 class="room_id" style="display: none;"></h2>
             <h2 id="chat-username">Ray</h2>
 
-            <button class="chat-room-btn" id="leave-btn" type="submit">leave</button>
+            <button class="chat-room-btn" id="leave-btn" type="submit">X</button>
             <div id="chatForm">
 
                 <!-- Messages show here -->
@@ -901,23 +917,6 @@
         let roomId = '';
         
 
-        document.addEventListener("DOMContentLoaded", function() {
-            const dropdownButton = document.getElementById("dropdownButton");
-            const dropdownMenu = document.getElementById("dropdownMenu");
-
-            dropdownButton.addEventListener("click", function() {
-                const isExpanded = dropdownButton.getAttribute("aria-expanded") === "true";
-                if (isExpanded) {
-                dropdownButton.setAttribute("aria-expanded", "false");
-                dropdownMenu.style.display = "none";
-                } else {
-                dropdownButton.setAttribute("aria-expanded", "true");
-                dropdownMenu.style.display = "block";
-                }
-            });
-
-
-        });
 
 
         // AI Recommendation
@@ -976,6 +975,19 @@
             });
         });
 
+        const matches = [
+            [
+                { user_id: "1", username: "Alice" },
+                { user_id: "2", username: "Bob" },
+                { user_id: "3", username: "Charlie" }
+            ],
+            [
+                { user_id: "4", username: "David" },
+                { user_id: "5", username: "Eve" },
+                { user_id: "6", username: "Frank" }
+            ]
+        ];
+
         // Function to render match list
         function renderMatchList(matches) {
 
@@ -998,7 +1010,8 @@
                 userList.forEach(match => {
                     if (match["user_id"] !== userId.toString()) {
                         const listItem = document.createElement('li');
-
+                        listItem.style.display = 'flex';
+                        
                         // Creating an icon element
                         const icon = document.createElement('i');
 
@@ -1010,11 +1023,24 @@
                         const usernameSpan = document.createElement('span');
                         usernameSpan.className = 'match-username';
                         usernameSpan.textContent = match["username"];
+                        usernameSpan.addEventListener('click', () => {
+                            window.location.href = `/user/profile/${match["user_id"]}`;
+                        });
 
                         listItem.appendChild(icon);
                         listItem.appendChild(usernameSpan);
 
-                        listItem.addEventListener('click', () => allocateChatRoom(match["user_id"]));
+                        const allocateButton = document.createElement('button');
+                        allocateButton.textContent = 'Chat';
+                        allocateButton.className = 'allocate-button';
+                        allocateButton.addEventListener('click', (event) => {
+                            event.stopPropagation(); // Prevent the click event from bubbling to the list item
+                            allocateChatRoom(match["user_id"]);
+                        });
+
+                        listItem.appendChild(allocateButton);
+
+                        //listItem.addEventListener('click', () => allocateChatRoom(match["user_id"]));
 
                         matchList.appendChild(listItem);
 
@@ -1066,12 +1092,12 @@
                         const usernameSpan = document.createElement('span');
                         usernameSpan.className = 'match-username';
                         usernameSpan.textContent = match["username"];
+                        usernameSpan.addEventListener('click', () => {
+                            window.location.href = `/user/profile/${match["user_id"]}`;
+                        });
 
                         listItem.appendChild(icon);
                         listItem.appendChild(usernameSpan);
-                        
-
-                        listItem.addEventListener('click', () => allocateChatRoom(match["user_id"]));
 
                         const messageStatusSpan = document.createElement('span');
                         messageStatusSpan.className = 'message-status';
@@ -1083,7 +1109,16 @@
                             messageStatusSpan.style = "background-color: #00FF00;"
                         }
 
+                        const allocateButton = document.createElement('button');
+                        allocateButton.textContent = 'Chat';
+                        allocateButton.className = 'allocate-button';
+                        allocateButton.addEventListener('click', (event) => {
+                            event.stopPropagation(); // Prevent the click event from bubbling to the list item
+                            allocateChatRoom(match["user_id"]);
+                        });
+
                         listItem.appendChild(messageStatusSpan);
+                        listItem.appendChild(allocateButton);
                         matchList.appendChild(listItem);
 
                         row.appendChild(listItem);
@@ -1394,6 +1429,7 @@
 
         // Default match list
         fetchUserMatches("default");
+        //renderMatchList(matches);
 
 
 

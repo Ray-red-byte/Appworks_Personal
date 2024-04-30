@@ -188,25 +188,28 @@
             display: flex; /* Use flexbox layout */
             justify-content: space-between; 
             margin: 300px; 
-            margin-left: -1100px;
-            flex-direction: row;
-            
+            margin-left: 450px;
+            width: 50%;
+            flex-direction: column;
+           
         }
 
         .house {
-            flex: 0 0 calc(50% - 10px); 
-            height: 1000px;
+            flex: 0 0 ; 
             font-size: 30px;
-            
-            margin: 10px; /* Add margin between houses */
-            border: 1px solid #ccc; /* Add border for each house */
-            padding: 10px; /* Add padding */
+            margin: 40px; /* Add margin between houses */
+            border: 2px solid #0e0e0e; /* Add border for each house */
+            border-radius: 50px;
+            background-color: #fff;
+            padding: 10px;
             box-sizing: border-box; /* Include padding and border in the element's total width and height */
         }
 
         .upper-section {
             display: flex; /* Use flexbox layout */
             flex-direction: row;
+            align-items: center;
+            margin-left: 100px;
         }
 
         .recommend-left {
@@ -214,17 +217,29 @@
             padding-right: 20px; 
             margin-left: 15px;
         }
+        img {
+            /* Set maximum width and height */
+            max-width: 100%; /* Limits the image width to the width of its container */
+            max-height: 100%; /* Limits the image height to the height of its container */
+        }
 
         .recommend-right {
-            margin-top: 120px;
-            margin-right: 60px;
+            margin-top: 70px;
+            margin-right: 200px;
+            padding: -10px;
+            font-size: 40px;
+        }
+
+        .save-house {
+            margin-bottom: 100px;
+            margin-top: -150px;
+            z-index: 10002;
         }
 
         .save-house-btn {
-            flex: 0 0 100%; /* Each save-house button occupies 100% of the container width */
-            margin-left: -250px;
+            flex: 0; /* Each save-house button occupies 100% of the container width */
+            margin-left: 1900px;
             color:#ffffff;
-            margin-top: 920px;
             width: 200px;
             height: 50px;
             font-size: 35px;
@@ -233,6 +248,7 @@
             background-color: #909090;
             text-align: center; /* Center-align the button */
         }
+
         .save-house-btn:hover {
             background-color: #5f4c6b;
             color: #fff;
@@ -256,6 +272,7 @@
     <h2 class="houseId" style="display: none;">{{ houseId }}</h2>
 
     <div class="recommend-house-container">
+        <h2 style="font-size: 80px;">Recommend Searching ...</h2>
 
     </div>
     <script>
@@ -272,7 +289,7 @@
             move_date: "隨時",
             layout: "3房(室)1廳2衛",
             floor: "1 / 1 樓",
-            img_url: "https://static.rakuya.com.tw/r2/n773/0d/a9/25944773_1_b.jpeg?1713234618",
+            img_url: "https://pic.hfcdn.com/res/DrawImage/ShowPic/400/300/HFRENT05/1834182/1?t=0922",
             identy: "Identified feature",
             pet: "Pets allowed",
             short_stay: "Short stay available",
@@ -292,7 +309,7 @@
             move_date: "隨時",
             layout: "3房(室)1廳2衛",
             floor: "1 / 1 樓",
-            img_url: "https://static.rakuya.com.tw/r2/n773/0d/a9/25944773_1_b.jpeg?1713234618",
+            img_url: "https://pic.hfcdn.com/res/DrawImage/ShowPic/400/300/HFRENT07/Z999/dca6a049-1716-4742-8275-a4cdb3d97a8a/Z999A00120240000404094455e56a9.jpg?t=0950",
             identy: "Identified feature",
             pet: "Pets allowed",
             short_stay: "Short stay available",
@@ -359,17 +376,18 @@
         // Function to render recommend house data
         function renderRecommendHouseData(houseDatas) {
             const recommendHouseContainer = document.querySelector('.recommend-house-container');
+            recommendHouseContainer.innerHTML = '';
+            recommendHouseContainer.innerHTML = `<h2 style="font-size: 80px;">Recommend Houses</h2>`;
             houseDatas.forEach(houseData => {
                 recommendHouseContainer.innerHTML += `
                     <div class="house">
-                        <h2>Recommend House</h2>
                         <div class="title">
-                            <h3><a href="${houseData['id']}" target="_blank">${houseData['title']}</a></h3>
+                            <h3 style="margin-left: 100px; font-size: 50px;"><a href="/user/house_detail/${houseData['id']}">${houseData['title']}</a></h3>
                         </div>
                         <div class="upper-section">
                             <div class="recommend-left">
                                 
-                                <img src="${houseData['img_url']}" alt="${houseData['title']}" class="image">
+                                <img src="${houseData['img_url']}" alt="${houseData['title']}">
                             </div>
                             <div class="recommend-right">
                                 <h2>House Info</h2>
@@ -466,7 +484,7 @@
                                 ${houseData['equip'].map((equipment, index) => `
                                     <tr>
                                         <td>${equipment}</td>
-                                        <td>${houseData['furniture'][index]}</td>
+                                        <td>${houseData['furniture'][index] || '--'}</td>
                                     </tr>
                                 `).join('')}
                             </tbody>
@@ -510,13 +528,14 @@
 
 
         // Fetch house data and render it
-        // getHouseData()
-        //getRecommendHouseData()
-        //trackClickAfterDelay()
+        getHouseData()
+        getRecommendHouseData()
+
+        trackClickAfterDelay()
 
         // Testing
-        renderHouseData(fakeHouseData[0])
-        renderRecommendHouseData(fakeHouseData) 
+        //renderHouseData(fakeHouseData[0])
+        //renderRecommendHouseData(fakeHouseData) 
 
         
     </script>

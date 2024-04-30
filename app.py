@@ -726,6 +726,16 @@ def house_detail(houseId):
 # ------------------------------------- Render template-------------------------------------
 
 
+@app.route('/cancel', methods=['GET'])
+def cancel():
+    cancel_room_id = request.json.get('room_id')
+    cancel_chat_user_id = request.json.get('chat_user_id')
+
+    room_collection = client['personal_project']['room']
+    room_collection.delete_one({"room_id": cancel_room_id})
+    return "Cancel", 200
+
+
 @ app.route('/chat_history', methods=['GET', 'POST'])
 def chat_history():
     token = request.cookies.get('token')

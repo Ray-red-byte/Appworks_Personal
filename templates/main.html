@@ -503,8 +503,15 @@
         }
 
         #leave-btn {
-            margin-bottom:50px;
+            margin-top: -150px;
             margin-left: -17px;
+            border-radius: 15px;
+            z-index: 10000;
+        }
+        #cancel-btn {
+            margin-bottom:5px;
+            margin-left: 880px;
+            border-radius: 15px;
         }
 
         .chat-room-btn:hover {
@@ -728,10 +735,12 @@
             <h2 class="uid" style="display: none;"></h2>
             <h2 class="cuid" style="display: none;"></h2>
             <h2 class="room_id" style="display: none;"></h2>
-            <h2 id="chat-username"></h2>
+            <h2 id="chat-username">Ray</h2>
 
             <button class="chat-room-btn" id="leave-btn" type="submit">leave</button>
+            <button class="chat-room-btn" id="cancel-btn" type="submit">report</button>
             <div id="chatForm">
+                
 
                 <!-- Messages show here -->
                 <!-- Example message 1 -->
@@ -767,7 +776,7 @@
         let roomId = '';
 
         // Initially hide chat room
-        hideChatRoom();
+        //hideChatRoom();
 
         // use socketIO Show I am offline if trigger logout button
         function handleLogout() {
@@ -1341,6 +1350,32 @@
             socket.emit('leave', {'roomId': roomId, 'userId1': userId1}, function() {
                 hideChatRoom(); 
                 fetchChatHistory();
+            });
+        });
+
+        const reportBtn = document.getElementById('cancel-btn');
+        reportBtn.addEventListener('click', function() {
+            fetch('/cancel', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ "room_id": roomId, "chat_user_id": userId2 })
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    socket.emit('leave', {'roomId': roomId, 'userId1': userId1}, function() {
+                        hideChatRoom(); 
+                        fetchChatHistory();
+                    });
+                }
+                throw new Error('Failed to report user');
+            })
+            .then(data => {
+                console.log('User reported:', data);
+            })
+            .catch(error => {
+                console.error('Error reporting user:', error);
             });
         });
 

@@ -352,7 +352,7 @@ def user_filter_insert():
 
 
 @app.route('/save_house', methods=["GET", "POST"])
-def save_hosue():
+def save_house():
     token = request.cookies.get('token')
     user_id = authentication(token, jwt_secret_key)
 
@@ -662,7 +662,7 @@ def get_user_recommend_house(house_id):
             print(nearest_neighbors_id_list)
 
             matches_houses_data = [{'house_id': match_house['id'], 'title': match_house['title'], 'price': match_house['price'], 'address': match_house['address'], 'age': match_house['age'], 'size': match_house['size'], 'img_url': match_house['img_url']}
-                                   for match_house in match_houses if match_house['id'] != house_id]
+                                   for match_house in match_houses if int(match_house['id']) != int(house_id)]
 
         except Exception as e:
             print(e)

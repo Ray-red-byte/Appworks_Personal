@@ -1256,7 +1256,16 @@
             return constants;
         }
 
+        function imageExists(url, callback) {
+            var img = new Image();
+            img.onload = function() { callback(true); };
+            img.onerror = function() { callback(false); };
+            img.src = url;
+        }
+
+
         // Function to render house cards
+        
         function renderHouses(api) {
             // fetch houses from the Flask API
             fetch(api)
@@ -1270,24 +1279,31 @@
             .then(housesData => {
                 const housesContainer = document.querySelector('.houses-container');
                 housesContainer.innerHTML = '';
+
+                
                 housesData.forEach(house => {
-                    const houseCard = `
-                        <div class="house">
-                            <div class="house-details">
-                                <img src="${house["img_url"]}" alt="${house["title"]}" >
-                            </div>
-                            <div class="house-info">
-                                <h3 class="${house["id"]}" style="cursor:pointer">${house["title"]}</h3>
-                                <p>租金: ${house["price"]} 元/月</p>
-                                <p>屋齡: ${house["age"]} 年</p>
-                                <p>地址: ${house["address"]}</p>
-                            </div>
-                        </div>
-                        <div class="save-house" style="z-index:10002;">
-                                <button class="save-house-btn" id="${house["id"]}">Save</button>
-                        </div>
-                    `;
-                    housesContainer.innerHTML += houseCard;
+                    const imageUrl = house["img_url"];
+                    imageExists(imageUrl, function(exists) {
+                        if (exists) {
+                            const houseCard = `
+                                <div class="house">
+                                    <div class="house-details">
+                                        <img src="${house["img_url"]}" alt="${house["title"]}" >
+                                    </div>
+                                    <div class="house-info">
+                                        <h3 class="${house["id"]}" style="cursor:pointer">${house["title"]}</h3>
+                                        <p>租金: ${house["price"]} 元/月</p>
+                                        <p>屋齡: ${house["age"]} 年</p>
+                                        <p>地址: ${house["address"]}</p>
+                                    </div>
+                                </div>
+                                <div class="save-house" style="z-index:10002;">
+                                        <button class="save-house-btn" id="${house["id"]}">Save</button>
+                                </div>
+                            `;
+                            housesContainer.innerHTML += houseCard;
+                        }
+                    });
                 });
             })
             .catch(error => {

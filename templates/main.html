@@ -287,7 +287,7 @@
             width: 1000px;
             font-size: 30px;
             background-color: #fdfdfd;
-            border: 2px solid #7d7777;
+            border: 3px solid #656565;
             border-radius: 10px;
             padding: 20px;
             margin-top: 600px;
@@ -423,7 +423,14 @@
             background: #a971ce;
             cursor: pointer; 
         }
-        
+
+
+        .chatroom-top{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
 
 
         .chat-username, .cur-username, .uid, .cuid, .room_id {
@@ -447,8 +454,20 @@
             align-self: flex-start; /* Position messages received by the current user on the left side */
         }
 
+        .sent, .received {
+            max-width: 70%;
+            padding: 20px;
+            margin: 10px;
+            border-radius: 20px;
+            background-color: #ffffff;
+        }
+
         .middle {
             align-self: center; /* Position messages received by the current user on the left side */
+            margin-top: 10px;
+            margin-bottom: 10px;
+            margin-left: 15px;
+            font-family:'Times New Roman', Times, serif;
         }
 
 
@@ -461,14 +480,15 @@
             display: flex;
             flex-direction: column;
             width: 950px;
-            height: 900px;
+            height: 1000px;
             margin-left: 5px;
             margin-bottom: 40px;
-            border-radius: 10px;
+            border-radius: 20px;
+            border: 1px solid #000000;
             padding: 20px;
             overflow-y: auto;
             z-index: 10000;
-            background-color: #e5dada; /* Set background color */
+            background-color: #d1d0d3; /* Set background color */
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add box shadow for depth */
         }
 
@@ -480,15 +500,13 @@
 
         #chatInput {
             padding: 5px;
-            border: 1px solid #ccc;
+            border: 1px solid #6b6a6a;
             border-radius: 5px 0 0 5px;
             border-right: none;
             height: 70px;
             flex: 1; /* Takes up remaining space */
             font-size: 40px;
         }
-
-
 
         .chat-room-btn {
             padding: 10px 20px;
@@ -503,15 +521,19 @@
         }
 
         #leave-btn {
-            margin-top: -150px;
-            margin-left: -17px;
-            border-radius: 15px;
-            z-index: 10000;
+            margin-bottom: 85px;
+            margin-top: -15px;
+            margin-left: -570px;
+            width: 150px;
+            height: 60px;
+            background-color: #a552dc;
         }
         #cancel-btn {
-            margin-bottom:5px;
-            margin-left: 880px;
-            border-radius: 15px;
+            margin-bottom: -100px;
+            height: 60px;
+            margin-left: 800px;
+            margin-right: 7px;
+            background-color: #acaaaa;
         }
 
         .chat-room-btn:hover {
@@ -735,10 +757,13 @@
             <h2 class="uid" style="display: none;"></h2>
             <h2 class="cuid" style="display: none;"></h2>
             <h2 class="room_id" style="display: none;"></h2>
-            <h2 id="chat-username">Ray</h2>
 
-            <button class="chat-room-btn" id="leave-btn" type="submit">leave</button>
-            <button class="chat-room-btn" id="cancel-btn" type="submit">report</button>
+            <div class="chatroom-top">
+                <h2 style="margin-left: 470px;" id="chat-username">Ray</h2>
+
+                <button class="chat-room-btn" id="leave-btn" type="submit">X</button>
+                <button class="chat-room-btn" id="cancel-btn" type="submit">cancel</button>
+            </div>
             <div id="chatForm">
                 
 

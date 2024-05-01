@@ -454,7 +454,7 @@
         .allocate-button-hist {
             margin-left: 95px;
             margin-top: 5px;
-            display: inline-block;
+            display: block;
             width: 100px;
             height: 25px;
             font-size: 18px;
@@ -1469,7 +1469,9 @@
         });
 
         // Default match list
-        fetchUserMatches("All");
+        //fetchUserMatches("All");
+
+        renderChatHistoryList();
 
 
 

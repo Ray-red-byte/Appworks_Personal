@@ -295,13 +295,13 @@
 
         .select-match-type {
             position: fixed;
-            width: 900px;
+            width: 1000px;
             font-size: 30px;
             background-color: #a18ba1;
             border: 2px solid #7d7777;
             border-radius: 10px;
             margin-top: 300px;
-            margin-right: 180px;
+            margin-right: 100px;
             padding: 20px;
             z-index: 9999;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -335,23 +335,23 @@
 
         .chat-user-history {
             position: fixed;
-            width: 420px;
+            width: 560px;
             font-size: 30px;
             background-color: #d3c7d3;
             border: 2px solid #7d7777;
-            margin-left: 424px;
+            margin-left: 366px;
             margin-top: 0px;
             padding: 12.5px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         .match-list {
             position: fixed;
-            width: 450px;
+            width: 410px;
             font-size: 30px;
             background-color: #d3c7d3;
             border: 2px solid #7d7777;
             padding: 20px;
-            margin-left: -68px;
+            margin-left: -85px;
             margin-bottom: 100px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
@@ -432,6 +432,10 @@
             margin-right: 2px;
         }
 
+        li{
+            margin-top: 30px;
+        }
+
         .allocate-button {
             margin-left: auto;
             margin-top: 5px;
@@ -443,6 +447,21 @@
             background-color:#a2a2a2;
         }
         .allocate-button:hover{
+            cursor: pointer; 
+            background-color: #a971ce;
+        }
+
+        .allocate-button-hist {
+            margin-left: 95px;
+            margin-top: 5px;
+            display: inline-block;
+            width: 100px;
+            height: 25px;
+            font-size: 18px;
+            color:#f6f7f9;
+            background-color:#a2a2a2;
+        }
+        .allocate-button-hist:hover{
             cursor: pointer; 
             background-color: #a971ce;
         }
@@ -1015,11 +1034,9 @@
 
         const matches = [
             [
-                { user_id: "1", username: "Alice" },
+                { user_id: "1", username: "Aliceeeee" },
                 { user_id: "2", username: "Bob" },
-                { user_id: "3", username: "Charlie" }
-            ],
-            [
+                { user_id: "3", username: "Charlie" },
                 { user_id: "4", username: "David" },
                 { user_id: "5", username: "Eve" },
                 { user_id: "6", username: "Frank" }
@@ -1148,14 +1165,15 @@
 
                         const allocateButton = document.createElement('button');
                         allocateButton.textContent = 'Chat';
-                        allocateButton.className = 'allocate-button';
+                        allocateButton.className = 'allocate-button-hist';
                         allocateButton.addEventListener('click', (event) => {
                             event.stopPropagation(); 
                             allocateChatRoom(match["user_id"]);
                         });
 
-                        listItem.appendChild(messageStatusSpan);
                         listItem.appendChild(allocateButton);
+                        listItem.appendChild(messageStatusSpan);
+                        
                         matchList.appendChild(listItem);
 
                         row.appendChild(listItem);
@@ -1165,6 +1183,8 @@
                 matchList.appendChild(row);
             });
         }
+
+        
 
         // Get chatting history to show existing room
         function fetchChatHistory() {

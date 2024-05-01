@@ -511,9 +511,6 @@ def ai_recommend():
         highest_size = (highest_save_size * 2 + highest_click_size) / 3
 
         # Base on above information to search for house
-        '''
-            問題在這
-        '''
 
         # Search similar zone
         zones = []

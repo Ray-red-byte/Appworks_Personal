@@ -786,6 +786,26 @@ def allocate_chat_room():
     if isinstance(cur_user_id, int):
         cur_username = get_user_name(cur_user_id)
 
+        # Track user status
+        user_collection = client['personal_project']['user']
+        cur_user = user_collection.find_one({"user_id": cur_user_id})
+        cur_user_chat_count = cur_user.get('chat_user', 0)
+        cur_user_chat_count += 1
+        user_collection.update_one(
+            {'user_id': cur_user_id},
+            {'$set': {'chat_user': cur_user_chat_count}},
+            upsert=True
+        )
+
+        chat_user = user_collection.find_one({"user_id": chat_user_id})
+        chat_user_chat_count = chat_user.get('chat_user', 0)
+        chat_user_chat_count += 1
+        user_collection.update_one(
+            {'user_id': chat_user_id},
+            {'$set': {'be_chatted_user': chat_user_chat_count}},
+            upsert=True
+        )
+
         return jsonify({'cur_user_id': cur_user_id, 'cur_username': cur_username, 'chat_user_id': chat_user_id, 'chat_username': chat_user_name}), 200
     return redirect(url_for('login'))
 
@@ -938,12 +958,28 @@ def chat_user_data(chat_user_id):
 
 @app.route('/cancel', methods=['POST'])
 def cancel():
+    token = request.cookies.get('token')
+    user_id = authentication(token, jwt_secret_key)
+
     cancel_room_id = request.json.get('room_id')
     cancel_chat_user_id = request.json.get('chat_user_id')
 
     room_collection = client['personal_project']['room']
     room_collection.delete_one({"room_id": cancel_room_id})
     print("delete successfully")
+
+    # Track user status
+    user_collection = client['personal_project']['user']
+    cancel_user = user_collection.find_one({"user_id": cancel_chat_user_id})
+    cancel_user_cancel_ls = cancel_user.get('be_canceled', [])
+    cancel_user_cancel_ls.append(user_id)
+
+    user_collection.update_one(
+        {'user_id': cancel_chat_user_id},
+        {'$set': {'be_canceled': cancel_user_cancel_ls}},
+        upsert=True
+    )
+
     return "Cancel", 200
 
 

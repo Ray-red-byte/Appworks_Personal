@@ -196,7 +196,8 @@
         }
 
         .recommend-right {
-            margin-top: 70px;
+            margin-top: 50px;
+            margin-bottom: 50px;
             margin-right: 200px;
             padding: -10px;
             font-size: 40px;
@@ -208,12 +209,17 @@
             z-index: 10002;
         }
 
-        .save-house-btn {
+        .remove-house{
+            margin-top: -150px;
+            margin-bottom: 100px;
+        }
+
+        .remove-house-btn {
             flex: 0; /* Each save-house button occupies 100% of the container width */
             margin-left: 1900px;
             color:#ffffff;
             width: 200px;
-            height: 50px;
+            height: 70px;
             font-size: 35px;
             border-radius: 10px;
             border: 2px solid #191919;
@@ -221,7 +227,7 @@
             text-align: center; /* Center-align the button */
         }
 
-        .save-house-btn:hover {
+        .remove-house-btn:hover {
             background-color: #5f4c6b;
             color: #fff;
             cursor: pointer;
@@ -402,11 +408,10 @@
 
 
         // Fetch house data and render it
-        getSaveHouseData()
+        //getSaveHouseData()
 
         // Testing
-        //renderHouseData(fakeHouseData[0])
-        //renderRecommendHouseData(fakeHouseData) 
+        renderSaveHouseData(fakeHouseData)
 
         
     </script>

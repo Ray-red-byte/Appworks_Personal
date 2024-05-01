@@ -1043,8 +1043,18 @@ def monitor(user_id, access_token):
             print(last_house["title"])
             if float(last_house['price']) <= float(cur_user_house_preference['price']) and int(last_house['age']) <= int(cur_user_house_preference['house_age']) and re.search(regex_pattern, last_house['address']) and last_house['stay_landlord'] == (cur_user_house_preference['stay_with_landlord'] == "yes") and last_house['park'] == (cur_user_house_preference['park_nearby'] == "yes"):
                 house_title = last_house["title"]
+                house_price = last_house['price']
+                house_address = last_house['address']
+                house_age = last_house['age']
                 lineNotifyMessage(
-                    access_token, f"New house is available {house_title}")
+                    access_token, "New house ! ! !")
+                lineNotifyMessage(
+                    access_token,
+                    f"{house_title}\n\
+                      Price: {house_price}\n\
+                      Address: {house_address}\n\
+                      Age: {house_age}"
+                )
 
         lineNotifyMessage(
             access_token, f"No house is available .......")

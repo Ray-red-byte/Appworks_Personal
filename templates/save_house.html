@@ -235,7 +235,7 @@
     <div class="header">
         <a href="/main" class="previous-page">HOME</a>
         <h1 class="greeting">Save House</h1>
-        <a href="/logout" class="logout-text">LOGOUT</a>       
+        <a  class="logout-text" onclick="handleLogout()">LOGOUT</a>       
     </div>
     <h2 class="user-id" style="display: none;">{{ user_id }}</h2>
 
@@ -322,6 +322,11 @@
 
             })
             .catch(error => console.error('Error fetching house data:', error));
+        }
+
+        function handleLogout() {
+            socket.emit('offline', { user_id: userId1 }); 
+            window.location.href = '/logout';
         }
 
 

@@ -940,7 +940,6 @@ def chat_user_data(chat_user_id):
 def cancel():
     cancel_room_id = request.json.get('room_id')
     cancel_chat_user_id = request.json.get('chat_user_id')
-    print(cancel_room_id)
 
     room_collection = client['personal_project']['room']
     room_collection.delete_one({"room_id": cancel_room_id})

@@ -745,7 +745,7 @@ def get_matches(match_type):
 
         print("Selected same gender users", len(
             transform_select_user_data_dicts))
-        transform_id_list, transform_value_lis = get_value_from_dict(
+        transform_id_list, transform_value_lis = get_value_from_user_dict(
             transform_select_user_data_dicts)
 
         nearest_neighbors_id_list = match_user(transform_id_list, transform_value_lis,

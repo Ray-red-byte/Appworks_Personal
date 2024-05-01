@@ -143,7 +143,6 @@ def crawl_and_store_data(website_url, driver, first, urls, begin, page):
         count = 1
         next_page = 1
         total = 0
-
         new_urls = {}
 
         while True:
@@ -175,14 +174,24 @@ def crawl_and_store_data(website_url, driver, first, urls, begin, page):
                     new_urls.update({rent_href: rent_title})
                     print("Success", rent_href, rent_title)
                 else:
+                    if len(urls) == 0:
+                        urls = new_urls
+                    elif begin:
+                        urls = {**urls, **new_urls}
+                    else:
+                        urls = {**new_urls, **urls}
+
+                    store_url(urls, local_happy_url_file)
                     print("Already exists", rent_href, rent_title)
                     return True, urls
 
             except Exception as e:
+
                 print("No element found")
                 count += 1
                 continue
 
+        logger.info(f"Next page : {page}")
         if len(urls) == 0:
             urls = new_urls
         elif begin:
@@ -190,9 +199,7 @@ def crawl_and_store_data(website_url, driver, first, urls, begin, page):
         else:
             urls = {**new_urls, **urls}
 
-        logger.info(f"Next page : {page}")
-        store_url(
-            urls, local_happy_url_file)
+        store_url(urls, local_happy_url_file)
         return True, urls
 
     except Exception as e:
@@ -234,7 +241,7 @@ def main():
         print("No file on S3")
 
     urls = load_urls_from_json(
-        "/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/data/rent_hap_url.json")
+        local_happy_url_file)
 
     region_url = ["https://www.rakuya.com.tw/search/rent_search/index?display=list&con=eJyrVkrOLKlUsopWMlCK1VFKySwuyEkE8pVyMotLlHSU8pOyMvNSQPJBIPni1MSi5AwQF6wNKFJanJqcn5IKEjIHqrcAYksgNgQaVwsAQwcbJg&tab=def&sort=21&ds=&",
                   "https://www.rakuya.com.tw/search/rent_search/index?display=list&con=eJyrVkrOLKlUsopWMlKK1VFKySwuyEkE8pVyMotLlHSU8pOyMvNSQPJBIPni1MSi5AwQF6wNKFJanJqcn5IKEjIHqrcAYksgNjRQiq0FAEOtGyg&tab=def&sort=21&ds=&"]
@@ -257,6 +264,7 @@ def main():
 
             stop, urls = crawl_and_store_data(
                 rent_url, driver, first, urls, begin, i)
+
             driver.quit()
 
             if stop:

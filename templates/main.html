@@ -405,7 +405,9 @@
              /* Set background color */
             color: white; /* Set text color */
             padding: 3px 8px; /* Add padding */
-            margin-left: 70px;
+            display: block;
+            width: 65px;
+            margin-left: 300px;
             margin-top: -40px;
             border-radius: 8px; /* Add border radius for rounded corners */
         }
@@ -452,12 +454,13 @@
         }
 
         .allocate-button-hist {
-            margin-left: 95px;
-            margin-top: 5px;
-            display: block;
+            
+            display: inline-block;
             width: 100px;
             height: 25px;
             font-size: 18px;
+            margin-left: 450px;
+            margin-top: 0px;
             color:#f6f7f9;
             background-color:#a2a2a2;
         }
@@ -1171,8 +1174,10 @@
                             allocateChatRoom(match["user_id"]);
                         });
 
-                        listItem.appendChild(allocateButton);
+
                         listItem.appendChild(messageStatusSpan);
+                        listItem.appendChild(allocateButton);
+                        
                         
                         matchList.appendChild(listItem);
 

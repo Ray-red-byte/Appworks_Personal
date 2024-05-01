@@ -44,7 +44,7 @@ aws_secret_access_key = os.getenv("S3_SECRET_ACCESS_KEY")
 aws_access_key_id = os.getenv("S3_ACCESS_KEY")
 aws_bucket = os.getenv("S3_BUCKET_NAME")
 s3_good_info_path = os.getenv("S3_GOOD_INFO_PATH")
-s3_good_url_path = os.getenv("LOCAL_HAP_URL_FILE")
+s3_good_url_path = os.getenv("LOCAL_GOOD_URL_FILE")
 s3_uncrawler_url_path = os.getenv("S3_GOOD_UNCRAWLER_URL_PATH")
 
 local_good_info_file = os.getenv("LOCAL_GOOD_INFO_FILE")
@@ -275,8 +275,8 @@ def main():
     rent_uncrawler_urls = load_from_json(local_uncrawler_good_url_file)
 
     # Load from mongo
-    all_h_url = get_all_mgdb_good_info()
-    all_h_url = [doc["url"] for doc in all_h_url]
+    all_g_url = get_all_mgdb_good_info()
+    all_g_url = [doc["url"] for doc in all_g_url]
 
     logger.info(f"Previous number : {len(rent_good_info)}")
     timestamp_start = datetime.datetime.now()
@@ -293,8 +293,8 @@ def main():
             print("Server error more than 5 times, stop crawling. Sorry")
             break
 
-        if rent_good_url in all_h_url:
-            print("Already exists in DB. Skip.")
+        if rent_good_url in all_g_url:
+            print(f"Already exists {rent_good_url} in DB. Skip.")
             break
 
         driver = webdriver.Chrome(options=options)

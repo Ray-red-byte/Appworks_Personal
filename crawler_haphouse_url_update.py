@@ -34,7 +34,7 @@ local_happy_url_file = os.getenv("LOCAL_HAP_URL_FILE")
 
 # logger setting
 log_filename = os.getenv("LOG_FILE_NAME")
-log_file_path = os.getenv("LOG_FILE_PATH")
+log_file_path = os.getenv("LOG_FILE_HAP_PATH")
 logger = logging.getLogger(__name__)
 
 logging.basicConfig(filename=log_file_path, level=logging.INFO)

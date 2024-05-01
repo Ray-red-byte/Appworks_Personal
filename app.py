@@ -636,7 +636,7 @@ def get_user_recommend_house(house_id):
             transform_select_house_data_dicts)
 
         nearest_neighbors_id_list = match_house(transform_house_id_list, transform_house_value_list,
-                                                cur_transform_house["value"], 3)
+                                                cur_transform_house["value"], 5)
         try:
             match_houses = house_collection.find(
                 {"id": {"$in": nearest_neighbors_id_list}})
@@ -708,7 +708,7 @@ def get_matches(match_type):
             transform_select_user_data_dicts)
 
         nearest_neighbors_id_list = match_user(transform_id_list, transform_value_lis,
-                                               transform_cur_user_data["value"], 10)
+                                               transform_cur_user_data["value"], 11)
 
     else:
         transform_all_user_dict = transform_all_user_collection.find()
@@ -717,13 +717,13 @@ def get_matches(match_type):
             transform_all_user_dict)
 
         nearest_neighbors_id_list = match_user(transform_id_list, transform_value_list,
-                                               transform_cur_user_data["value"], 10)
+                                               transform_cur_user_data["value"], 11)
 
     try:
         match_users = user_collection.find(
             {"user_id": {"$in": nearest_neighbors_id_list}})
         matches_data = [[{'user_id': user['user_id'], 'username': user['username']}]
-                        for user in match_users if user['user_id'] != user_id]
+                        for user in match_users if int(user['user_id']) != int(user_id)]
 
     except Exception as e:
         print(e)

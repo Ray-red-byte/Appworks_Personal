@@ -749,7 +749,7 @@ def get_matches(match_type):
             transform_select_user_data_dicts)
 
         nearest_neighbors_id_list = match_user(transform_id_list, transform_value_lis,
-                                               transform_cur_user_data["value"], 10)
+                                               transform_cur_user_data["value"], 11)
 
     elif match_type == 'All':
         transform_all_user_dict = transform_all_user_collection.find()

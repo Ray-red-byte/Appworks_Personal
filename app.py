@@ -1130,7 +1130,7 @@ online_users = []
 @ socketio.on('online')
 def handle_online(data):
     user_id = data['user_id']
-    if user_id not in online_users:
+    if user_id not in online_users and user_id is not None:
         online_users.append(user_id)
     print("online", online_users)
     emit('show', online_users, broadcast=True)

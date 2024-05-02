@@ -990,7 +990,22 @@
 
 
         socket.on('show', function(online_users) {
+            online_users.forEach(user_id =>  {
+                const iconMatch = document.getElementById(`match-${user_id}`);     
+                if (iconMatch) {
+                    iconMatch.textContent = 'online  ';
+                    iconMatch.className = `fas fa-circle text-success`;
+                }
+
+                const iconHist = document.getElementById(`hist-${user_id}`);
+                if (iconHist) {
+                    iconHist.textContent = 'online  ';
+                    iconHist.className = `fas fa-circle text-success`;
+                }
+            });
+
             // Select all <i> elements with the class "fas fa-circle text-danger"
+                /*
             const icons = document.querySelectorAll('.fas.fa-circle.text-danger');
 
             // Iterate over each icon element
@@ -1008,6 +1023,7 @@
                     icon.className = 'fas fa-circle text-danger';
                 }
             });
+            */
         });
 
 
@@ -1016,12 +1032,18 @@
             // Find the corresponding list item and update its online status
             console.log(offline_user_id)
     
-            const icon = document.getElementById(offline_user_id);        
-            console.log(icon)   
-            if (icon) {
-                icon.textContent = 'offline  ';
-                icon.className = `fas fa-circle text-danger`;
+            const iconMatch = document.getElementById(`match-${offline_user_id}`);     
+            if (iconMatch) {
+                iconMatch.textContent = 'offline  ';
+                iconMatch.className = `fas fa-circle text-danger`;
             }
+
+            // Chat History
+            const iconHist = document.getElementById(`hist-${offline_user_id}`);
+            if (iconHist) {
+                iconHist.textContent = 'offline  ';
+                iconHist.className = `fas fa-circle text-danger`;
+            }   
         });
 
         const matches = [
@@ -1064,7 +1086,7 @@
 
                         // Initially, assuming user is offline
                         icon.className = `fas fa-circle text-danger`;
-                        icon.id = `${match["user_id"]}`;
+                        icon.id = `match-${match["user_id"]}`;
                         icon.textContent = 'offline';
 
                         const usernameSpan = document.createElement('span');
@@ -1132,7 +1154,7 @@
 
                         // Initially, assuming user is offline
                         icon.className = `fas fa-circle text-danger`;
-                        icon.id = `${match["user_id"]}`;
+                        icon.id = `hist-${match["user_id"]}`;
                         icon.textContent = 'offline';
 
                         const usernameSpan = document.createElement('span');

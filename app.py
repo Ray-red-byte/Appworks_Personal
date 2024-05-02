@@ -657,6 +657,12 @@ def get_user_recommend_house(house_id):
         })
         print("matching_zone_houses", matching_zone_houses)
 
+        house_ids = [matching_zone_house["id"]
+                     for matching_zone_house in matching_zone_houses]
+        transform_select_house_data_dicts = list(
+            transform_all_house_collection.find({"house_id": {"$in": house_ids}}))
+
+        '''
         transform_select_house_data_dicts = []
 
         for matching_zone_house in matching_zone_houses:
@@ -665,12 +671,13 @@ def get_user_recommend_house(house_id):
                 {"house_id": int(house_id)})
             if transform_house_data:
                 transform_select_house_data_dicts.append(transform_house_data)
+        '''
 
         transform_house_id_list, transform_house_value_list = get_value_from_house_dict(
             transform_select_house_data_dicts)
 
         nearest_neighbors_id_list = match_house(transform_house_id_list, transform_house_value_list,
-                                                cur_transform_house["value"], 5)
+                                                cur_transform_house["value"], 6)
         try:
             match_houses = house_collection.find(
                 {"id": {"$in": nearest_neighbors_id_list}})

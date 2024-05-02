@@ -12,7 +12,7 @@ import time
 import signal
 import subprocess
 from werkzeug.security import generate_password_hash, check_password_hash
-from Appworks_Personal.fake.function import get_user_id, check_exist_user, validate_email, create_token, authentication, get_user_password, get_user_name, calculate_active_status
+from function import get_user_id, check_exist_user, validate_email, create_token, authentication, get_user_password, get_user_name, calculate_active_status
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from user_model.user_data_process import transform_one_user, transform_all_user, match_user, get_value_from_user_dict
@@ -729,6 +729,7 @@ def get_matches(match_type):
 
         # Find users who share the same zone with the current user in the transform_all_user_collection
         transform_select_user_data_dicts = []
+        user_active_status_list = []
 
         for user in users_share_zone:
             user_id = user["user_id"]
@@ -736,11 +737,12 @@ def get_matches(match_type):
                 {"user_id": int(user_id)})
             if transform_user_data:
                 transform_select_user_data_dicts.append(transform_user_data)
+                user_active_status_list.append(user['active_status'])
 
         transform_id_list, transform_value_lis = get_value_from_user_dict(
             transform_select_user_data_dicts)
 
-        nearest_neighbors_id_list = match_user(transform_id_list, transform_value_lis,
+        nearest_neighbors_id_list = match_user(transform_id_list, user_active_status_list, transform_value_lis,
                                                transform_cur_user_data["value"], 11)
 
     elif match_type == 'same_gender':
@@ -751,6 +753,7 @@ def get_matches(match_type):
 
         # Find users who share the same zone with the current user in the transform_all_user_collection
         transform_select_user_data_dicts = []
+        user_active_status_list = []
 
         for user in users_share_gender:
             user_id = user["user_id"]
@@ -758,20 +761,34 @@ def get_matches(match_type):
                 {"user_id": int(user_id)})
             if transform_user_data:
                 transform_select_user_data_dicts.append(transform_user_data)
+                user_active_status_list.append(user['active_status'])
 
         print("Selected same gender users", len(
             transform_select_user_data_dicts))
         transform_id_list, transform_value_lis = get_value_from_user_dict(
             transform_select_user_data_dicts)
 
-        nearest_neighbors_id_list = match_user(transform_id_list, transform_value_lis,
+        nearest_neighbors_id_list = match_user(transform_id_list, user_active_status_list, transform_value_lis,
                                                transform_cur_user_data["value"], 11)
 
     elif match_type == 'All':
+        user_collection = client['personal_project']['user']
         transform_all_user_dict = transform_all_user_collection.find()
+
+        user_active_status_list = []
+        for transform_user_id in transform_id_list:
+            user = user_collection.find_one(
+                {"user_id": transform_user_id})
+            user_active_status_list.append(user['active_status'])
 
         transform_id_list, transform_value_list = get_value_from_user_dict(
             transform_all_user_dict)
+
+        user_active_status_list = []
+        for transform_user_id in transform_id_list:
+            user = user_collection.find_one(
+                {"user_id": transform_user_id})
+            user_active_status_list.append(user['active_status'])
 
         nearest_neighbors_id_list = match_user(transform_id_list, transform_value_list,
                                                transform_cur_user_data["value"], 11)
@@ -988,7 +1005,9 @@ def cancel():
     user_collection = client['personal_project']['user']
     cancel_user = user_collection.find_one({"user_id": cancel_chat_user_id})
     cancel_user_cancel_ls = cancel_user.get('be_canceled', [])
-    cancel_user_cancel_ls.append(user_id)
+
+    if user_id not in cancel_user_cancel_ls:
+        cancel_user_cancel_ls.append(user_id)
 
     user_collection.update_one(
         {'user_id': cancel_chat_user_id},

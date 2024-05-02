@@ -820,24 +820,27 @@ def allocate_chat_room():
         cur_username = get_user_name(cur_user_id)
 
         # Track user status
-        user_collection = client['personal_project']['user']
-        cur_user = user_collection.find_one({"user_id": cur_user_id})
-        cur_user_chat_count = cur_user.get('chat_user', 0)
-        cur_user_chat_count += 1
-        user_collection.update_one(
-            {'user_id': cur_user_id},
-            {'$set': {'chat_user': cur_user_chat_count}},
-            upsert=True
-        )
+        room_id = f"{cur_user_id}_{chat_user_id}"
+        room_collection = client['personal_project']['room']
+        if not room_collection.find_one({"room_id": room_id}):
+            user_collection = client['personal_project']['user']
+            cur_user = user_collection.find_one({"user_id": cur_user_id})
+            cur_user_chat_count = cur_user.get('chat_user', 0)
+            cur_user_chat_count += 1
+            user_collection.update_one(
+                {'user_id': cur_user_id},
+                {'$set': {'chat_user': cur_user_chat_count}},
+                upsert=True
+            )
 
-        chat_user = user_collection.find_one({"user_id": chat_user_id})
-        chat_user_chat_count = chat_user.get('chat_user', 0)
-        chat_user_chat_count += 1
-        user_collection.update_one(
-            {'user_id': chat_user_id},
-            {'$set': {'be_chatted_user': chat_user_chat_count}},
-            upsert=True
-        )
+            chat_user = user_collection.find_one({"user_id": chat_user_id})
+            chat_user_chat_count = chat_user.get('chat_user', 0)
+            chat_user_chat_count += 1
+            user_collection.update_one(
+                {'user_id': chat_user_id},
+                {'$set': {'be_chatted_user': chat_user_chat_count}},
+                upsert=True
+            )
 
         return jsonify({'cur_user_id': cur_user_id, 'cur_username': cur_username, 'chat_user_id': chat_user_id, 'chat_username': chat_user_name}), 200
     return redirect(url_for('login'))

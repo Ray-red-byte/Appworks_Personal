@@ -656,7 +656,7 @@
             margin-bottom: -100px;
             height: 60px;
             margin-left: 800px;
-            margin-right: 7px;
+            margin-right: 10px;
             background-color: #acaaaa;
         }
 
@@ -692,6 +692,8 @@
         <a href="/user/information" class="user-info">PROFILE</a>
         <a href="/user/save_house" class="save-house-text">SAVE</a>
     </div>
+
+    <div class="page-user-id">{{ user_id }}</div>
 
     <div class="container">
         <div class="left-main-section">
@@ -879,22 +881,6 @@
                     <div class="save-house" style="z-index:10002;">
                         <button class="save-house-btn" id="1">Save</button>
                     </div>
-                
-                    <div class="house">
-                        <div class="house-details">
-                            <img src="cottage.jpg" alt="Cozy Cottage">
-                        </div>
-                        <div class="house-info">
-                            <h3 class="2" style="cursor:pointer">Cozy Cottage</h3>
-                            <p>租金: 1500 元/月</p>
-                            <p>屋齡: 10 年</p>
-                            <p>地址: 456 Elm Street</p>
-                        </div>
-                    </div>
-                    <div class="save-house" style="z-index:10002;">
-                        <button class="save-house-btn" id="2">Save</button>
-                    </div>
-
             </div>
         </div>
     </div>
@@ -990,7 +976,9 @@
 
         // use socketIO Show I am offline if trigger logout button
         function handleLogout() {
-            socket.emit('offline', { user_id: userId1 }); 
+            const userId1Logout = document.querySelector('.page-user-id').innerHTML;
+            console.log(userId1Logout)
+            socket.emit('offline', { 'user_id': userId1Logout }); 
             window.location.href = '/logout';
         }
 
@@ -1002,7 +990,22 @@
 
 
         socket.on('show', function(online_users) {
+            online_users.forEach(user_id =>  {
+                const iconMatch = document.getElementById(`match-${user_id}`);     
+                if (iconMatch) {
+                    iconMatch.textContent = 'online  ';
+                    iconMatch.className = `fas fa-circle text-success`;
+                }
+
+                const iconHist = document.getElementById(`hist-${user_id}`);
+                if (iconHist) {
+                    iconHist.textContent = 'online  ';
+                    iconHist.className = `fas fa-circle text-success`;
+                }
+            });
+
             // Select all <i> elements with the class "fas fa-circle text-danger"
+                /*
             const icons = document.querySelectorAll('.fas.fa-circle.text-danger');
 
             // Iterate over each icon element
@@ -1020,19 +1023,27 @@
                     icon.className = 'fas fa-circle text-danger';
                 }
             });
+            */
         });
 
 
         // Socket.io event listener to handle offline status updates
-        socket.on('hide', function(offline_users) {
+        socket.on('hide', function(offline_user_id) {
             // Find the corresponding list item and update its online status
-            offline_users.forEach(user_id => {
-                const icon = document.getElementById(user_id);            
-                if (icon) {
-                    icon.textContent = 'offline  ';
-                    icon.className = `fas fa-circle text-danger`;
-                }
-            });
+            console.log(offline_user_id)
+    
+            const iconMatch = document.getElementById(`match-${offline_user_id}`);     
+            if (iconMatch) {
+                iconMatch.textContent = 'offline  ';
+                iconMatch.className = `fas fa-circle text-danger`;
+            }
+
+            // Chat History
+            const iconHist = document.getElementById(`hist-${offline_user_id}`);
+            if (iconHist) {
+                iconHist.textContent = 'offline  ';
+                iconHist.className = `fas fa-circle text-danger`;
+            }   
         });
 
         const matches = [
@@ -1075,7 +1086,7 @@
 
                         // Initially, assuming user is offline
                         icon.className = `fas fa-circle text-danger`;
-                        icon.id = `${match["user_id"]}`;
+                        icon.id = `match-${match["user_id"]}`;
                         icon.textContent = 'offline';
 
                         const usernameSpan = document.createElement('span');
@@ -1143,7 +1154,7 @@
 
                         // Initially, assuming user is offline
                         icon.className = `fas fa-circle text-danger`;
-                        icon.id = `${match["user_id"]}`;
+                        icon.id = `hist-${match["user_id"]}`;
                         icon.textContent = 'offline';
 
                         const usernameSpan = document.createElement('span');
@@ -1476,7 +1487,7 @@
         // Default match list
         fetchUserMatches("All");
 
-        //renderChatHistoryList();
+        //renderMatchList(matches);
 
 
 
@@ -1560,7 +1571,7 @@
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ "messages": chatMessages , "room_id": roomId, "user_id": userId1})
+                body: JSON.stringify({ "messages": chatMessages , "room_id": roomId, "user_id": userId1, 'chat_user_id':userId2})
             })
             .then(response => {
                 console.log(response);

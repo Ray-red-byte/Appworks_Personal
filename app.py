@@ -725,69 +725,86 @@ def get_matches(match_type):
         users_share_zone = user_collection.find(
             {"house_preference.zone": {"$in": user_prefer_zone}})
 
-        print('users_share_zone', users_share_zone)
+        users_share_zone_id_dict = [user["user_id"]
+                                    for user in users_share_zone]
 
-        # Find users who share the same zone with the current user in the transform_all_user_collection
-        transform_select_user_data_dicts = []
-        user_active_status_list = []
+        transform_users_share_zone_dict = transform_all_user_collection.find(
+            {"user_id": {"$in": users_share_zone_id_dict}})
 
-        for user in users_share_zone:
-            user_id = user["user_id"]
-            transform_user_data = transform_all_user_collection.find_one(
-                {"user_id": int(user_id)})
-            if transform_user_data:
-                transform_select_user_data_dicts.append(transform_user_data)
-                user_active_status_list.append(user['active_status'])
+        transform_id_list, transform_value_list = get_value_from_user_dict(
+            transform_users_share_zone_dict)
 
-        transform_id_list, transform_value_lis = get_value_from_user_dict(
-            transform_select_user_data_dicts)
+        user_active_statuses = user_collection.find(
+            {"user_id": {"$in": transform_id_list}},
+            # Projection to include only active_status field
+            {"active_status": 1, "user_id": 1}
+        )
 
-        nearest_neighbors_id_list = match_user(transform_id_list, user_active_status_list, transform_value_lis,
+        user_active_status_list = [[user["user_id"], user["active_status"]]
+                                   for user in user_active_statuses]
+        sorted_user_active_status_list = sorted(
+            user_active_status_list, key=lambda x: x[1], reverse=True)[:500]
+
+        sorted_user_ids = [user[0] for user in sorted_user_active_status_list]
+
+        transform_id_list, transform_value_list = get_value_from_user_dict(transform_all_user_collection.find(
+            {"user_id": {"$in": sorted_user_ids}}))
+
+        nearest_neighbors_id_list = match_user(transform_id_list, transform_value_list,
                                                transform_cur_user_data["value"], 11)
 
     elif match_type == 'same_gender':
-        users_share_gender = user_collection.find(
+        users_share_gender_dict = user_collection.find(
             {"basic_info.gender": cur_user["basic_info"]["gender"]})
 
-        print('users_share_gender', users_share_gender)
+        users_share_gender_id_dict = [user["user_id"]
+                                      for user in users_share_gender_dict]
+        transform_users_share_gender_dict = transform_all_user_collection.find(
+            {"user_id": {"$in": users_share_gender_id_dict}})
 
-        # Find users who share the same zone with the current user in the transform_all_user_collection
-        transform_select_user_data_dicts = []
-        user_active_status_list = []
+        transform_id_list, transform_value_list = get_value_from_user_dict(
+            transform_users_share_gender_dict)
 
-        for user in users_share_gender:
-            user_id = user["user_id"]
-            transform_user_data = transform_all_user_collection.find_one(
-                {"user_id": int(user_id)})
-            if transform_user_data:
-                transform_select_user_data_dicts.append(transform_user_data)
-                user_active_status_list.append(user['active_status'])
+        user_active_statuses = user_collection.find(
+            {"user_id": {"$in": transform_id_list}},
+            # Projection to include only active_status field
+            {"active_status": 1, "user_id": 1}
+        )
 
-        print("Selected same gender users",  transform_select_user_data_dicts)
-        transform_id_list, transform_value_lis = get_value_from_user_dict(
-            transform_select_user_data_dicts)
+        user_active_status_list = [[user["user_id"], user["active_status"]]
+                                   for user in user_active_statuses]
+        sorted_user_active_status_list = sorted(
+            user_active_status_list, key=lambda x: x[1], reverse=True)[:500]
 
-        nearest_neighbors_id_list = match_user(transform_id_list, user_active_status_list, transform_value_lis,
+        sorted_user_ids = [user[0] for user in sorted_user_active_status_list]
+
+        transform_id_list, transform_value_list = get_value_from_user_dict(transform_all_user_collection.find(
+            {"user_id": {"$in": sorted_user_ids}}))
+
+        nearest_neighbors_id_list = match_user(transform_id_list, transform_value_list,
                                                transform_cur_user_data["value"], 11)
 
     elif match_type == 'All':
         user_collection = client['personal_project']['user']
         transform_all_user_dict = transform_all_user_collection.find()
 
-        user_active_status_list = []
-        for transform_user_id in transform_id_list:
-            user = user_collection.find_one(
-                {"user_id": transform_user_id})
-            user_active_status_list.append(user['active_status'])
-
         transform_id_list, transform_value_list = get_value_from_user_dict(
             transform_all_user_dict)
 
-        user_active_status_list = []
-        for transform_user_id in transform_id_list:
-            user = user_collection.find_one(
-                {"user_id": transform_user_id})
-            user_active_status_list.append(user['active_status'])
+        user_active_statuses = user_collection.find(
+            {"user_id": {"$in": transform_id_list}},
+            # Projection to include only active_status field
+            {"active_status": 1, "user_id": 1}
+        )
+        user_active_status_list = [[user["user_id"], user["active_status"]]
+                                   for user in user_active_statuses]
+        sorted_user_active_status_list = sorted(
+            user_active_status_list, key=lambda x: x[1], reverse=True)[:500]
+
+        sorted_user_ids = [user[0] for user in sorted_user_active_status_list]
+
+        transform_id_list, transform_value_list = get_value_from_user_dict(transform_all_user_collection.find(
+            {"user_id": {"$in": sorted_user_ids}}))
 
         nearest_neighbors_id_list = match_user(transform_id_list, transform_value_list,
                                                transform_cur_user_data["value"], 11)
@@ -796,7 +813,7 @@ def get_matches(match_type):
         match_users = user_collection.find(
             {"user_id": {"$in": nearest_neighbors_id_list}})
         matches_data = [[{'user_id': user['user_id'], 'username': user['username']}]
-                        for user in match_users if user['user_id'] != user_id if int(user['user_id']) != int(user_id)]
+                        for user in match_users if int(user['user_id']) != int(user_id)]
 
     except Exception as e:
         print(e)
@@ -934,7 +951,7 @@ def user_profile(chat_user_id):
     return redirect(url_for('login'))
 
 
-@app.route('/user/save_house', methods=['GET', 'POST'])
+@ app.route('/user/save_house', methods=['GET', 'POST'])
 def save_house_page():
     token = request.cookies.get('token')
 
@@ -968,7 +985,7 @@ def chat_user_data(chat_user_id):
     return redirect(url_for('login'))
 
 
-@app.route('/cancel', methods=['POST'])
+@ app.route('/cancel', methods=['POST'])
 def cancel():
     token = request.cookies.get('token')
     user_id = authentication(token, jwt_secret_key)
@@ -1115,7 +1132,7 @@ def get_messages():
 # ------------------------User Save House------------------------
 
 
-@app.route('/remove_house', methods=['POST'])
+@ app.route('/remove_house', methods=['POST'])
 def remove_house():
     token = request.cookies.get('token')
     user_id = authentication(token, jwt_secret_key)
@@ -1143,7 +1160,7 @@ def remove_house():
     return redirect(url_for('login'))
 
 
-@app.route('/user/house/', methods=['GET'])
+@ app.route('/user/house/', methods=['GET'])
 def get_user_save_house():
     token = request.cookies.get('token')
     user_id = authentication(token, jwt_secret_key)

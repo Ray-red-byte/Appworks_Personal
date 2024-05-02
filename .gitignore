@@ -6,3 +6,4 @@ schedule/logs/
 schedule/plugins/
 schedule/.env
 schedule/config/
+fake/

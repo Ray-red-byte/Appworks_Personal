@@ -12,7 +12,7 @@ import time
 import signal
 import subprocess
 from werkzeug.security import generate_password_hash, check_password_hash
-from function import get_user_id, check_exist_user, validate_email, create_token, authentication, get_user_password, get_user_name
+from Appworks_Personal.fake.function import get_user_id, check_exist_user, validate_email, create_token, authentication, get_user_password, get_user_name, calculate_active_status
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from user_model.user_data_process import transform_one_user, transform_all_user, match_user, get_value_from_user_dict
@@ -57,6 +57,25 @@ def login():
 
 @app.route('/logout', methods=['GET'])
 def logout():
+    user_collection = client['personal_project']['user']
+    user_id = authentication(request.cookies.get('token'), jwt_secret_key)
+    user = user_collection.find_one({"user_id": user_id})
+
+    save_house_count = len(user.get('saved_house', []))
+    click_house_count = len(user.get('click_house', []))
+    be_cancel_count = len(user.get('be_cancel', []))
+    be_chatted_user_count = user.get('be_chatted_user', 0)
+    chat_user_count = user.get('chat_user', 0)
+
+    active_status_percent = calculate_active_status(be_cancel_count, be_chatted_user_count,
+                                                    chat_user_count, save_house_count, click_house_count)
+
+    user_collection.update_one(
+        {'user_id': user_id},
+        {'$set': {'active_status': active_status_percent}},
+        upsert=True
+    )
+
     response = make_response(redirect(url_for('login')))
     response.set_cookie('token', '', expires=0)
     return response
@@ -973,7 +992,7 @@ def cancel():
 
     user_collection.update_one(
         {'user_id': cancel_chat_user_id},
-        {'$set': {'be_canceled': cancel_user_cancel_ls}},
+        {'$set': {'be_cancel': cancel_user_cancel_ls}},
         upsert=True
     )
 

@@ -1018,7 +1018,7 @@ def save_messages():
         timestamp = datetime.now()
 
         # Track user status
-        if user_id < chat_user_id:
+        if int(user_id) < int(chat_user_id):
             room_id = f"{user_id}_{chat_user_id}"
         else:
             room_id = f"{chat_user_id}_{user_id}"
@@ -1130,8 +1130,9 @@ online_users = []
 @ socketio.on('online')
 def handle_online(data):
     user_id = data['user_id']
-    online_users.append(user_id)
-    print("online", user_id)
+    if user_id not in online_users:
+        online_users.append(user_id)
+    print("online", online_users)
     emit('show', online_users, broadcast=True)
 
 
@@ -1139,7 +1140,7 @@ def handle_online(data):
 def handle_offline(data):
     user_id = data['user_id']
     online_users.remove(user_id)
-    print("remove", user_id)
+    print("remove", online_users)
     emit('hide', user_id, broadcast=True)
 
 # ------------------------Show online users------------------------

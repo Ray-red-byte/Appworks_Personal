@@ -693,6 +693,8 @@
         <a href="/user/save_house" class="save-house-text">SAVE</a>
     </div>
 
+    <div class="page-user-id">{{ user_id }}</div>
+
     <div class="container">
         <div class="left-main-section">
             <h1 style="font-size:40px;">House Preference</h1>
@@ -974,7 +976,9 @@
 
         // use socketIO Show I am offline if trigger logout button
         function handleLogout() {
-            socket.emit('offline', { user_id: userId1 }); 
+            const userId1Logout = document.querySelector('.page-user-id').innerHTML;
+            console.log(userId1Logout)
+            socket.emit('offline', { 'user_id': userId1Logout }); 
             window.location.href = '/logout';
         }
 
@@ -1008,15 +1012,16 @@
 
 
         // Socket.io event listener to handle offline status updates
-        socket.on('hide', function(offline_users) {
+        socket.on('hide', function(offline_user_id) {
             // Find the corresponding list item and update its online status
-            offline_users.forEach(user_id => {
-                const icon = document.getElementById(user_id);            
-                if (icon) {
-                    icon.textContent = 'offline  ';
-                    icon.className = `fas fa-circle text-danger`;
-                }
-            });
+            console.log(offline_user_id)
+    
+            const icon = document.getElementById(offline_user_id);        
+            console.log(icon)   
+            if (icon) {
+                icon.textContent = 'offline  ';
+                icon.className = `fas fa-circle text-danger`;
+            }
         });
 
         const matches = [
@@ -1544,7 +1549,7 @@
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ "messages": chatMessages , "room_id": roomId, "user_id": userId1, })
+                body: JSON.stringify({ "messages": chatMessages , "room_id": roomId, "user_id": userId1, 'chat_user_id':userId2})
             })
             .then(response => {
                 console.log(response);

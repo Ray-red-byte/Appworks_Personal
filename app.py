@@ -740,8 +740,7 @@ def get_matches(match_type):
             if transform_user_data:
                 transform_select_user_data_dicts.append(transform_user_data)
 
-        print("Selected same gender users", len(
-            transform_select_user_data_dicts))
+        print("Selected same gender users",  transform_select_user_data_dicts)
         transform_id_list, transform_value_lis = get_value_from_user_dict(
             transform_select_user_data_dicts)
 
@@ -782,29 +781,6 @@ def allocate_chat_room():
     cur_user_id = authentication(token, jwt_secret_key)
     if isinstance(cur_user_id, int):
         cur_username = get_user_name(cur_user_id)
-
-        # Track user status
-        room_id = f"{cur_user_id}_{chat_user_id}"
-        room_collection = client['personal_project']['room']
-        if not room_collection.find_one({"room_id": room_id}):
-            user_collection = client['personal_project']['user']
-            cur_user = user_collection.find_one({"user_id": cur_user_id})
-            cur_user_chat_count = cur_user.get('chat_user', 0)
-            cur_user_chat_count += 1
-            user_collection.update_one(
-                {'user_id': cur_user_id},
-                {'$set': {'chat_user': cur_user_chat_count}},
-                upsert=True
-            )
-
-            chat_user = user_collection.find_one({"user_id": chat_user_id})
-            chat_user_chat_count = chat_user.get('chat_user', 0)
-            chat_user_chat_count += 1
-            user_collection.update_one(
-                {'user_id': chat_user_id},
-                {'$set': {'be_chatted_user': chat_user_chat_count}},
-                upsert=True
-            )
 
         return jsonify({'cur_user_id': cur_user_id, 'cur_username': cur_username, 'chat_user_id': chat_user_id, 'chat_username': chat_user_name}), 200
     return redirect(url_for('login'))
@@ -1033,12 +1009,41 @@ def save_messages():
     messages = request.json.get('messages')
     room_id = request.json.get('room_id')
     user_id = request.json.get('user_id')
+    chat_user_id = request.json.get('chat_user_id')
 
     print("only one user save messages", messages)
 
     # Insert messages into MongoDB
     try:
         timestamp = datetime.now()
+
+        # Track user status
+        if user_id < chat_user_id:
+            room_id = f"{user_id}_{chat_user_id}"
+        else:
+            room_id = f"{chat_user_id}_{user_id}"
+
+        room_collection = client['personal_project']['room']
+        if room_collection.find_one({"room_id": room_id}) is None:
+            user_collection = client['personal_project']['user']
+            cur_user = user_collection.find_one({"user_id": user_id})
+            cur_user_chat_count = cur_user.get('chat_user', 0)
+            cur_user_chat_count += 1
+            user_collection.update_one(
+                {'user_id': user_id},
+                {'$set': {'chat_user': cur_user_chat_count}},
+                upsert=True
+            )
+
+            chat_user = user_collection.find_one({"user_id": chat_user_id})
+            chat_user_chat_count = chat_user.get('chat_user', 0)
+            chat_user_chat_count += 1
+            user_collection.update_one(
+                {'user_id': chat_user_id},
+                {'$set': {'be_chatted_user': chat_user_chat_count}},
+                upsert=True
+            )
+
         room_collection.update_one(
             {'room_id': room_id},
             {'$set': {'last_updated_by': user_id,

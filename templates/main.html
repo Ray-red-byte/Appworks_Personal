@@ -656,7 +656,7 @@
             margin-bottom: -100px;
             height: 60px;
             margin-left: 800px;
-            margin-right: 7px;
+            margin-right: 10px;
             background-color: #acaaaa;
         }
 
@@ -879,22 +879,6 @@
                     <div class="save-house" style="z-index:10002;">
                         <button class="save-house-btn" id="1">Save</button>
                     </div>
-                
-                    <div class="house">
-                        <div class="house-details">
-                            <img src="cottage.jpg" alt="Cozy Cottage">
-                        </div>
-                        <div class="house-info">
-                            <h3 class="2" style="cursor:pointer">Cozy Cottage</h3>
-                            <p>租金: 1500 元/月</p>
-                            <p>屋齡: 10 年</p>
-                            <p>地址: 456 Elm Street</p>
-                        </div>
-                    </div>
-                    <div class="save-house" style="z-index:10002;">
-                        <button class="save-house-btn" id="2">Save</button>
-                    </div>
-
             </div>
         </div>
     </div>
@@ -1476,7 +1460,7 @@
         // Default match list
         fetchUserMatches("All");
 
-        //renderChatHistoryList();
+        //renderMatchList(matches);
 
 
 
@@ -1560,7 +1544,7 @@
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ "messages": chatMessages , "room_id": roomId, "user_id": userId1})
+                body: JSON.stringify({ "messages": chatMessages , "room_id": roomId, "user_id": userId1, })
             })
             .then(response => {
                 console.log(response);

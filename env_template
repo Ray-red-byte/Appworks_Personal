@@ -9,6 +9,10 @@ DB_NAME=your_database
 # API key for external service
 API_KEY=your_api_key
 
+# dotenv path
+DOT_ENV_PATH= your_dotenv_path
+
+
 # Environment Variables
 DEBUG = TRUE/FALSE
 HOST = your_host
@@ -19,8 +23,34 @@ S3_SECRET_ACCESS_KEY= your s3 secret key
 S3_ACCESS_KEY= your s3 access key
 S3_BUCKET_NAME= your s3 bucket name
 
+S3_HAP_INFO_PATH= your hap_info s3 path
+S3_HAP_URL_PATH= your hap url s3 path
+S3_HAP_UNCRAWLER_URL_PATH= your hap uncrawler url s3 path
+
+S3_GOOD_INFO_PATH= your good info s3 path
+S3_GOOD_URL_PATH= your good url s3 path
+S3_GOOD_UNCRAWLER_URL_PATH= your good uncrawler url s3 path
+
+
+# Local path
+LOCAL_HAP_INFO_FILE= your hap_info local path
+LOCAL_HAP_URL_FILE= your hap url local path
+LOCAL_UNCRAWLER_HAP_URL_FILE= your uncrawler hap url local path
+
+LOCAL_GOOD_INFO_FILE= your good_info local path
+LOCAL_GOOD_URL_FILE= your good url local path
+LOCAL_GOOD_UNCRAWLER_HAP_URL_FILE= your uncrawler good url local path
+
+
 # JWT secret key
 JWT_SECRET_KEY= youur jwt secret key
+
+
+# Line
+LINE_SUBSCRIBE_URL= your line subscribe url
+LINE_CLIENT_ID= your line client id
+LINE_CLIENT_SECRET= your line client secret
+
 
 # Mongo Atlas
 MONGO_ATLAS_USER= your mongo db URI

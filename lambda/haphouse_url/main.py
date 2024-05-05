@@ -17,20 +17,17 @@ import os
 import re
 
 
-dotenv_path = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/.env'
+dotenv_path = './.env'
 
 # Load environment variables from the specified .env file
 load_dotenv(dotenv_path)
 
 
 # S3 setting
-ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 aws_secret_access_key = os.getenv("S3_SECRET_ACCESS_KEY")
 aws_access_key_id = os.getenv("S3_ACCESS_KEY")
 aws_bucket = os.getenv("S3_BUCKET_NAME")
 s3_path = os.getenv("S3_HAP_URL_PATH")
-local_happy_url_file = os.getenv("LOCAL_HAP_URL_FILE")
-
 
 # logger setting
 log_filename = os.getenv("LOG_FILE_NAME")
@@ -45,11 +42,17 @@ begin = False
 
 # Chromedriver setting
 options = Options()
-options.add_argument('--headless')  # run in headless mode.
-options.add_argument('--disable-gpu')
-options.add_argument('start-maximized')
-options.add_argument('disable-infobars')
-options.add_argument('--disable-extensions')
+service = webdriver.ChromeService("/opt/chromedriver")
+
+options.binary_location = '/opt/chrome/chrome'
+options.add_argument("--headless=new")
+options.add_argument('--no-sandbox')
+options.add_argument("--disable-gpu")
+options.add_argument("--single-process")
+options.add_argument("--disable-dev-shm-usage")
+options.add_argument("--disable-dev-tools")
+options.add_argument("--no-zygote")
+options.add_argument("--remote-debugging-port=9222")
 
 
 def simulate_human_interaction(driver):
@@ -65,60 +68,36 @@ def simulate_human_interaction(driver):
     time.sleep(random.uniform(1, 2))
 
 
-def upload_to_s3(local_file, bucket_name, s3_path):
-    s3 = boto3.client('s3', aws_access_key_id=aws_access_key_id,
-                      aws_secret_access_key=aws_secret_access_key)
+def upload_to_s3(data, bucket_name, s3_path):
+    s3 = boto3.client('s3')
     try:
-        s3.upload_file(local_file, bucket_name, s3_path)
+        json_data = json.dumps(data, ensure_ascii=False)
+        s3.put_object(Body=json_data,
+                      Bucket=bucket_name, Key=s3_path)
         print("Upload Successful")
-
         return True
-
-    except FileNotFoundError:
-        print("The file was not found")
-        return False
-
     except NoCredentialsError:
         print("Credentials not available")
         return False
-
-
-def download_from_s3(bucket_name, s3_path, local_file):
-    s3 = boto3.client('s3', aws_access_key_id=aws_access_key_id,
-                      aws_secret_access_key=aws_secret_access_key)
-    try:
-        s3.download_file(bucket_name, s3_path, local_file)
-        print("Download Successful")
-        return True
-
-    except FileNotFoundError:
-        print("The file was not found")
-        return False
-
-    except NoCredentialsError:
-        print("Credentials not available")
-        return False
-
-
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-
-def load_urls_from_json(json_file):
-    try:
-        with open(json_file, 'r') as f:
-            return json.load(f)
     except Exception as e:
-        print(e)
-        return {}
+        print(f"Error uploading file to S3: {e}")
+        return False
 
 
-def store_url(urls, json_file):
-
-    with open(json_file, 'w') as f:
-        json.dump(urls, f, ensure_ascii=False)
-    print(f"URL stored successfully.")
+def download_from_s3(bucket_name, s3_path):
+    s3 = boto3.client('s3')
+    try:
+        response = s3.get_object(Bucket=bucket_name, Key=s3_path)
+        data = response['Body'].read()
+        print("Download Successful")
+        downloaded_dict = json.loads(data.decode('utf-8'))
+        return downloaded_dict
+    except NoCredentialsError:
+        print("Credentials not available")
+        return None
+    except Exception as e:
+        print(f"Error downloading file from S3: {e}")
+        return None
 
 
 def crawl_and_store_data(website_url, driver, first, urls, begin, page):
@@ -181,7 +160,6 @@ def crawl_and_store_data(website_url, driver, first, urls, begin, page):
                     else:
                         urls = {**new_urls, **urls}
 
-                    store_url(urls, local_happy_url_file)
                     print("Already exists", rent_href, rent_title)
                     return True, urls
 
@@ -199,7 +177,6 @@ def crawl_and_store_data(website_url, driver, first, urls, begin, page):
         else:
             urls = {**new_urls, **urls}
 
-        store_url(urls, local_happy_url_file)
         return True, urls
 
     except Exception as e:
@@ -231,39 +208,38 @@ def get_total_page(driver, url):
     return page_number
 
 
-def main():
+def handler(event=None, context=None):
 
     # 樂屋網
     # First download the file from S3
     try:
-        download_from_s3(aws_bucket, s3_path, local_happy_url_file)
+        rent_hap_urls = download_from_s3(aws_bucket, s3_path)
+        print(rent_hap_urls)
     except Exception as e:
+        print(e)
         print("No file on S3")
-
-    urls = load_urls_from_json(
-        local_happy_url_file)
 
     region_url = ["https://www.rakuya.com.tw/search/rent_search/index?display=list&con=eJyrVkrOLKlUsopWMlCK1VFKySwuyEkE8pVyMotLlHSU8pOyMvNSQPJBIPni1MSi5AwQF6wNKFJanJqcn5IKEjIHqrcAYksgNgQaVwsAQwcbJg&tab=def&sort=21&ds=&",
                   "https://www.rakuya.com.tw/search/rent_search/index?display=list&con=eJyrVkrOLKlUsopWMlKK1VFKySwuyEkE8pVyMotLlHSU8pOyMvNSQPJBIPni1MSi5AwQF6wNKFJanJqcn5IKEjIHqrcAYksgNjRQiq0FAEOtGyg&tab=def&sort=21&ds=&"]
 
-    logger.info(f"Previous number : {len(urls)}")
+    logger.info(f"Previous number : {len(rent_hap_urls)}")
     timestamp_start = datetime.datetime.now()
     timestamp_start_stf = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     logger.info(
         f"-------------Start Crawler {timestamp_start_stf}-------------")
 
     for region in region_url:
-        driver = webdriver.Chrome(options=options)
+        driver = webdriver.Chrome(options=options, service=service)
         page_number = get_total_page(driver, region_url[0] + "page=1")
 
         for i in range(1, page_number+1):
-            driver = webdriver.Chrome(options=options)
+            driver = webdriver.Chrome(options=options, service=service)
             rent_url = region + f"page={i}"
 
             first = i == 1
 
-            stop, urls = crawl_and_store_data(
-                rent_url, driver, first, urls, begin, i)
+            stop, rent_hap_urls = crawl_and_store_data(
+                rent_url, driver, first, rent_hap_urls, begin, i)
 
             driver.quit()
 
@@ -271,7 +247,7 @@ def main():
                 print("Stop crawling")
                 break
 
-    logger.info(f"Total number : {len(urls)}")
+    logger.info(f"Total number : {len(rent_hap_urls)}")
     timestamp_end = datetime.datetime.now()
     timestamp_end_stf = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     logger.info(
@@ -279,8 +255,6 @@ def main():
     logger.info(f"-------------End Crawler {timestamp_end_stf}-------------")
 
     # Upload the updated file to S3
-    upload_to_s3(local_happy_url_file, aws_bucket, s3_path)
+    upload_to_s3(rent_hap_urls, aws_bucket, s3_path)
 
-
-if __name__ == "__main__":
-    main()
+    return {"statusCode": 200, "body": "Success"}

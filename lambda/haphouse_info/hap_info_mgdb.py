@@ -7,10 +7,10 @@ import re
 import logging
 import boto3
 from botocore.exceptions import NoCredentialsError
-from user_model.house_data_process import transform_one_house, transform_all_house, get_value_from_house_dict, one_hot_gender
+from house_data_process import transform_one_house, transform_all_house, get_value_from_house_dict, one_hot_gender
 
 
-dotenv_path = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/.env'
+dotenv_path = './.env'
 load_dotenv(dotenv_path)
 
 # Mongo atlas
@@ -31,25 +31,11 @@ logging.basicConfig(filename=log_file_path, level=logging.INFO)
 
 
 # S3 setting
-ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 aws_secret_access_key = os.getenv("S3_SECRET_ACCESS_KEY")
 aws_access_key_id = os.getenv("S3_ACCESS_KEY")
 aws_bucket = os.getenv("S3_BUCKET_NAME")
 s3_hap_info_path = os.getenv("S3_HAP_INFO_PATH")
 s3_hap_url_path = os.getenv("S3_HAP_URL_PATH")
-local_hap_info_file = os.getenv("LOCAL_HAP_INFO_FILE")
-local_hap_url_file = os.getenv("LOCAL_HAP_URL_FILE")
-
-local_hap_info_file = os.getenv("LOCAL_HAP_INFO_FILE")
-
-
-def load_from_json(json_file):
-    try:
-        with open(json_file, 'r') as f:
-            return json.load(f)
-    except Exception as e:
-        print(e)
-        return {}
 
 
 def download_from_s3(bucket_name, s3_path, local_file):
@@ -84,7 +70,9 @@ def get_next_house_id():
 
 
 def insert_hap_info_to_mgdb(good_info_url, info):
-
+    db = client["personal_project"]
+    house_collection = db["house"]
+    transform_house_collection = db["transform_all_house"]
     try:
 
         house_id = get_next_house_id()
@@ -128,8 +116,8 @@ def insert_hap_info_to_mgdb(good_info_url, info):
         transform_house_collection.insert_one(house_dict)
 
         # Close the connection
-        client.close()
-        print("Data inserted successfully.")
+
+        print("New Data inserted successfully.")
 
     except Exception as e:
         # Rollback in case of any error

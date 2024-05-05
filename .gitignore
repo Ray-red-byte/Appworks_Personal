@@ -2,6 +2,7 @@ data/
 log/
 .env
 fake_data/
+crawler/
 schedule/logs/
 schedule/plugins/
 schedule/.env

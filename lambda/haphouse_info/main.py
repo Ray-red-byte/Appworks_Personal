@@ -4,17 +4,12 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
-from concurrent.futures import ThreadPoolExecutor
 from dotenv import load_dotenv
 import datetime
-import base64
 import time
 import json
 import random
-import requests
-import threading
 import logging
-from bs4 import BeautifulSoup
 import boto3
 from botocore.exceptions import NoCredentialsError
 import os
@@ -22,9 +17,7 @@ import pymongo
 from hap_info_mgdb import get_all_mgdb_info, get_next_house_id, insert_hap_info_to_mgdb
 
 
-dotenv_path = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/.env'
-
-# Load environment variables from the specified .env file
+dotenv_path = './.env'
 load_dotenv(dotenv_path)
 
 # Mongo Setting
@@ -37,7 +30,6 @@ db = client["personal_project"]
 collection = db["house"]
 
 # S3 setting
-ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 aws_secret_access_key = os.getenv("S3_SECRET_ACCESS_KEY")
 aws_access_key_id = os.getenv("S3_ACCESS_KEY")
 aws_bucket = os.getenv("S3_BUCKET_NAME")
@@ -45,23 +37,25 @@ s3_hap_info_path = os.getenv("S3_HAP_INFO_PATH")
 s3_hap_url_path = os.getenv("S3_HAP_URL_PATH")
 s3_uncrawler_url_path = os.getenv("S3_HAP_UNCRAWLER_URL_PATH")
 
-local_hap_info_file = os.getenv("LOCAL_HAP_INFO_FILE")
-local_hap_url_file = os.getenv("LOCAL_HAP_URL_FILE")
-local_uncrawler_hap_url_file = os.getenv("LOCAL_UNCRAWLER_HAP_URL_FILE")
-
-
 log_filename = os.getenv("LOG_FILE_NAME")
 log_file_path = os.getenv("LOG_FILE_HAP_PATH")
 logger = logging.getLogger(__name__)
 
 logging.basicConfig(filename=log_file_path, level=logging.INFO)
 
+
 options = Options()
-options.add_argument('--headless')  # run in headless mode.
-options.add_argument('--disable-gpu')
-options.add_argument('start-maximized')
-options.add_argument('disable-infobars')
-options.add_argument('--disable-extensions')
+service = webdriver.ChromeService("/opt/chromedriver")
+
+options.binary_location = '/opt/chrome/chrome'
+options.add_argument("--headless=new")
+options.add_argument('--no-sandbox')
+options.add_argument("--disable-gpu")
+options.add_argument("--single-process")
+options.add_argument("--disable-dev-shm-usage")
+options.add_argument("--disable-dev-tools")
+options.add_argument("--no-zygote")
+options.add_argument("--remote-debugging-port=9222")
 
 
 def simulate_human_interaction(driver):
@@ -77,69 +71,39 @@ def simulate_human_interaction(driver):
     time.sleep(random.uniform(1, 5))
 
 
-def upload_to_s3(local_file, bucket_name, s3_path):
-    s3 = boto3.client('s3', aws_access_key_id=aws_access_key_id,
-                      aws_secret_access_key=aws_secret_access_key)
+def upload_to_s3(data, bucket_name, s3_path):
+    s3 = boto3.client('s3')
     try:
-        s3.upload_file(local_file, bucket_name, s3_path)
+        json_data = json.dumps(data, ensure_ascii=False)
+        s3.put_object(Body=json_data,
+                      Bucket=bucket_name, Key=s3_path)
         print("Upload Successful")
         return True
-
-    except FileNotFoundError:
-        print("The file was not found")
-        return False
-
     except NoCredentialsError:
         print("Credentials not available")
         return False
-
-
-def download_from_s3(bucket_name, s3_path, local_file):
-    s3 = boto3.client('s3', aws_access_key_id=aws_access_key_id,
-                      aws_secret_access_key=aws_secret_access_key)
-    try:
-        s3.download_file(bucket_name, s3_path, local_file)
-        print("Download Successful")
-        return True
-
-    except FileNotFoundError:
-        print("The file was not found")
-        return False
-
-    except NoCredentialsError:
-        print("Credentials not available")
-        return False
-
-
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-
-def load_from_json(json_file):
-    try:
-        with open(json_file, 'r') as f:
-            return json.load(f)
     except Exception as e:
-        print(e)
-        return {}
+        print(f"Error uploading file to S3: {e}")
+        return False
 
 
-def store_url(infos, json_file):
+def download_from_s3(bucket_name, s3_path):
+    s3 = boto3.client('s3')
+    try:
+        response = s3.get_object(Bucket=bucket_name, Key=s3_path)
+        data = response['Body'].read()
+        print("Download Successful")
+        downloaded_dict = json.loads(data.decode('utf-8'))
+        return downloaded_dict
+    except NoCredentialsError:
+        print("Credentials not available")
+        return None
+    except Exception as e:
+        print(f"Error downloading file from S3: {e}")
+        return None
 
-    with open(json_file, 'w') as f:
-        json.dump(infos, f, ensure_ascii=False)
-    print(f"URL stored successfully.")
 
-
-def store_uncrawler_url(urls, json_file):
-    with open(json_file, 'a') as f:
-        json.dump(urls, f, ensure_ascii=False)
-    print(f"Un crawler URL stored.")
-    time.sleep(2)
-
-
-def crawl_each_url(website_url, rent_info, driver, local_uncrawler_url_file):
+def crawl_each_url(website_url, title, rent_info, driver, uncrawler_hap_url_dict):
 
     try:
 
@@ -219,56 +183,62 @@ def crawl_each_url(website_url, rent_info, driver, local_uncrawler_url_file):
             insert_hap_info_to_mgdb(website_url, info_dict)
         except Exception as e:
             print("Cannot insert to mongoDB", website_url)
-            return False, rent_info, "cannot insert"
+            return False, rent_info, uncrawler_hap_url_dict, "cannot insert"
 
         new_rent_info.update(rent_info)
         rent_info = new_rent_info
 
         print("--------------------------------------------------------------------------")
-        return False, rent_info, "success"
+        return False, rent_info, uncrawler_hap_url_dict, "success"
 
     except Exception as e:
         print("Cannot crawl the website", website_url)
-        store_uncrawler_url(website_url, local_uncrawler_url_file)
-        return False, rent_info, "cannot crawl"
+        uncrawler_hap_url_dict.update({website_url: title})
+        return False, rent_info, uncrawler_hap_url_dict, "cannot crawl"
 
 
-def main():
+def handler(event=None, context=None):
 
     # ----------------------------------------------------------------樂屋網----------------------------------------------------------------
-    # download hap_url from S3
+    print("Received event:", json.dumps(event))
+
+    bucket_name = event['Records'][0]['s3']['bucket']['name']
+    object_key = event['Records'][0]['s3']['object']['key']
+
+    print(bucket_name, object_key)
+
+    if object_key != s3_hap_url_path:
+        return {
+            'statusCode': 200,
+            'body': json.dumps('Not a hap_url file')
+        }
+
     try:
-        download_from_s3(aws_bucket, s3_hap_url_path, local_hap_url_file)
+        rent_hap_urls = download_from_s3(
+            aws_bucket, s3_hap_url_path)
     except Exception as e:
         print(e)
         print("No url file on S3")
-        exit()
 
-    # download hap_info from S3
     try:
-        download_from_s3(aws_bucket, s3_hap_info_path, local_hap_info_file)
+        rent_hap_info = download_from_s3(aws_bucket, s3_hap_info_path)
     except Exception as e:
         print(e)
         print("No info file on S3")
 
-        local_uncrawler_hap_url_file
     try:
-        download_from_s3(aws_bucket, s3_uncrawler_url_path,
-                         local_uncrawler_hap_url_file)
+        uncrawler_hap_url_dict = download_from_s3(
+            aws_bucket, s3_uncrawler_url_path)
     except Exception as e:
+        uncrawler_hap_url_dict = {}
         print("No info file on S3")
-
-    # Download the url and info file
-    rent_hap_urls = load_from_json(local_hap_url_file)
-    rent_hap_info = load_from_json(local_hap_info_file)
-    rent_uncrawler_urls = load_from_json(local_uncrawler_hap_url_file)
 
     # Load from mongo
     all_h_url = get_all_mgdb_info()
     all_h_url = [doc["url"] for doc in all_h_url]
 
     # Log start time
-    logger.info(f"Previous number : {len(rent_hap_info)}")
+    logger.info(f"Previous number : {len(all_h_url)}")
     timestamp_start = datetime.datetime.now()
     timestamp_start_stf = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     logger.info(
@@ -286,9 +256,9 @@ def main():
             print("Already exists in DB. Skip.")
             break
 
-        driver = webdriver.Chrome(options=options)
-        stop, rent_info, response = crawl_each_url(
-            rent_hap_url, rent_hap_info, driver, local_uncrawler_hap_url_file)
+        driver = webdriver.Chrome(service=service, options=options)
+        stop, rent_hap_info, uncrawler_hap_url_dict, response = crawl_each_url(
+            rent_hap_url, title, rent_hap_info, driver, uncrawler_hap_url_dict)
         driver.quit()
 
         if stop:
@@ -299,8 +269,6 @@ def main():
             server_error += 1
             continue
 
-        store_url(rent_info, local_hap_info_file)
-
     # Log end time
     logger.info(f"Total number : {len(rent_hap_info)}")
     timestamp_end = datetime.datetime.now()
@@ -310,12 +278,7 @@ def main():
     logger.info(f"-------------End Crawler {timestamp_end_stf}-------------")
 
     # Upload the updated file to S3
-    upload_to_s3(local_hap_info_file, aws_bucket, s3_hap_info_path)
-    upload_to_s3(local_uncrawler_hap_url_file,
-                 aws_bucket, s3_uncrawler_url_path)
+    upload_to_s3(rent_hap_info, aws_bucket, s3_hap_info_path)
+    upload_to_s3(uncrawler_hap_url_dict, aws_bucket, s3_uncrawler_url_path)
 
-    upload_to_s3(local_hap_url_file, aws_bucket, s3_hap_url_path)
-
-
-if __name__ == "__main__":
-    main()
+    return {"status": "success"}

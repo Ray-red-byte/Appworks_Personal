@@ -1,5 +1,4 @@
 import json
-import pymysql
 import pymongo
 import logging
 import datetime
@@ -9,10 +8,10 @@ import os
 import boto3
 import re
 from botocore.exceptions import NoCredentialsError
-from user_model.house_data_process import transform_one_house, transform_all_house, get_value_from_house_dict, one_hot_gender
+from house_data_process import transform_one_house, transform_all_house, get_value_from_house_dict, one_hot_gender
 
 
-dotenv_path = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/.env'
+dotenv_path = './.env'
 load_dotenv(dotenv_path)
 
 log_filename = os.getenv("LOG_FILE_NAME")
@@ -86,6 +85,9 @@ def get_next_house_id():
 
 
 def insert_good_info_to_mgdb(good_info_url, info):
+    db = client["personal_project"]
+    house_collection = db["house"]
+    transform_house_collection = db["transform_all_house"]
 
     try:
         house_id = get_next_house_id()
@@ -131,8 +133,7 @@ def insert_good_info_to_mgdb(good_info_url, info):
         transform_house_collection.insert_one(house_dict)
 
         # Close the connection
-        client.close()
-        print("Data inserted successfully.")
+        print("New Data inserted successfully.")
 
     except Exception as e:
         # Rollback in case of any error

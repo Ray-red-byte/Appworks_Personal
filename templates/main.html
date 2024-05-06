@@ -644,19 +644,28 @@
         }
 
         #leave-btn {
+            position: absolute;
+            left: 0;
+            top: 0;
             margin-bottom: 85px;
-            margin-top: -18px;
-            margin-left: -575px;
-            width: 250px;
+            font-size: 35px;
+            width: 100px;
+            color: #fff;
             height: 60px;
             background-color: #a552dc;
+            z-index: 20000;
+            cursor: pointer;
         }
         #cancel-btn {
-            margin-bottom: -100px;
+            position: absolute;
+            right: 20px;
+            top: 100px;
             height: 60px;
-            margin-left: 800px;
-            margin-right: 10px;
+            font-size: 30px;
+            color: #fff;
             background-color: #acaaaa;
+            z-index: 20000;
+            cursor: pointer;
         }
 
         .chat-room-btn:hover {
@@ -949,8 +958,8 @@
             <div class="chatroom-top">
                 <h2 style="margin-left: 470px;" id="chat-username">Ray</h2>
 
-                <button class="chat-room-btn" id="leave-btn" type="submit">X</button>
-                <button class="chat-room-btn" id="cancel-btn" type="submit">cancel</button>
+                <button id="leave-btn" type="submit">X</button>
+                <button id="cancel-btn" type="submit">cancel</button>
             </div>
             <div id="chatForm">
                 
@@ -1031,26 +1040,7 @@
                 }
             });
 
-            // Select all <i> elements with the class "fas fa-circle text-danger"
-                /*
-            const icons = document.querySelectorAll('.fas.fa-circle.text-danger');
-
-            // Iterate over each icon element
-            icons.forEach(icon => {
-                const userId = icon.getAttribute('id');
-
-                // Check if the current user is online
-                if (online_users.includes(userId)) {
-                    // Update the icon to indicate online status
-                    icon.textContent = 'online';
-                    icon.className = 'fas fa-circle text-success';
-                } else {
-                    // Update the icon to indicate offline status
-                    icon.textContent = 'offline';
-                    icon.className = 'fas fa-circle text-danger';
-                }
-            });
-            */
+   
         });
 
 

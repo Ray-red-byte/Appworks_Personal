@@ -1,0 +1,29 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  deploy:
+    runs-on: centos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Stop existing celery and gunicorn processes
+        run: |
+          pkill -f 'celery -A app.celery'
+          pkill -f 'gunicorn -b localhost:5000 --worker-class gevent app:app'
+
+      - name: Restart Nginx
+        run: sudo systemctl restart nginx
+
+      - name: Deploy code to EC2
+        run: |
+          cd /path/to/your/application
+          git pull origin main
+          gunicorn -b localhost:5000 --worker-class gevent app:app &
+          celery -A app.celery worker --loglevel=info --concurrency=4 &

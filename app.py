@@ -953,7 +953,8 @@ def user_profile(chat_user_id):
     # Call the authentication function to verify the token
     user_id = authentication(token, jwt_secret_key)
     if isinstance(user_id, int):
-        return render_template('user_profile.html', chat_user_id=chat_user_id)
+        username = get_user_name(user_id)
+        return render_template('user_profile.html', chat_user_id=chat_user_id, username=username)
 
     return redirect(url_for('login'))
 

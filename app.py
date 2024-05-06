@@ -210,7 +210,7 @@ def user_information():
 def user_info_insert():
 
     if request.method == 'POST':
-        # Retrieve the parameters from the query string
+
         token = request.cookies.get('token')
 
         # Call the authentication function to verify the token

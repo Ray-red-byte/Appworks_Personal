@@ -13,10 +13,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup SSH
-        run: |
-          chmod 600 ~/.ssh/id_rsa
-
       - name: Deploy to Server 1
         uses: easingthemes/ssh-deploy@main
         

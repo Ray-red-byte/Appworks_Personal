@@ -167,7 +167,6 @@
         }
 
         .house {
-            flex: 0 0 ; 
             font-size: 30px;
             margin: 40px; /* Add margin between houses */
             border: 2px solid #0e0e0e; /* Add border for each house */
@@ -193,6 +192,7 @@
             /* Set maximum width and height */
             max-width: 100%; /* Limits the image width to the width of its container */
             max-height: 100%; /* Limits the image height to the height of its container */
+            width: 60%; /* Ensures the image does not exceed its original width */
         }
 
         .recommend-right {
@@ -348,7 +348,6 @@
         function renderSaveHouseData(houseDatas) {
             const recommendHouseContainer = document.querySelector('.save-house-container');
             recommendHouseContainer.innerHTML = '';
-            recommendHouseContainer.innerHTML = `<h2 style="font-size: 80px;">Save Houses</h2>`;
             houseDatas.forEach(houseData => {
                 const imageUrl = houseData["img_url"];
                 imageExists(imageUrl, function(exists) {
@@ -413,10 +412,10 @@
 
 
         // Fetch house data and render it
-        getSaveHouseData()
+        //getSaveHouseData()
 
         // Testing
-        //renderSaveHouseData(fakeHouseData)
+        renderSaveHouseData(fakeHouseData)
 
         
     </script>

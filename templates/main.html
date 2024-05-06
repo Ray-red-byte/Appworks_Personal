@@ -296,7 +296,7 @@
         .select-match-type {
             position: fixed;
             width: 1000px;
-            font-size: 40px;
+            font-size: 45px;
             background-color: #a18ba1;
             border: 2px solid #7d7777;
             border-radius: 10px;
@@ -310,7 +310,7 @@
         #match-type{
             margin-top: 15px;
             margin-left:55px;
-            font-size: 30px;
+            font-size: 40px;
             width: 800px;
             border-radius: 10px;
         }
@@ -327,7 +327,7 @@
             position: fixed;
             display: flex;
             flex-direction: row;
-            margin-top: 600px; 
+            margin-top: 650px; 
             margin-right: 255px;
             width: 800px;
             height:800px; /* Ensure the right-section takes up the full height */
@@ -336,7 +336,7 @@
         .chat-user-history {
             position: fixed;
             width: 560px;
-            font-size: 30px;
+            font-size: 50px;
             background-color: #d3c7d3;
             border: 2px solid #7d7777;
             margin-left: 366px;
@@ -384,7 +384,7 @@
 
         .match-list h2 {
             color: #ffffff;
-            font-size: 30px;
+            font-size: 45px;
             margin-bottom: 15px;
         }
 
@@ -395,7 +395,7 @@
 
         .match p {
             color: #333;
-            font-size: 25px;
+            font-size: 30px;
             line-height: 1.5;
             cursor: pointer;
         }
@@ -916,7 +916,7 @@
 
     <div class="right-section">
         <div class="select-match-type">
-            <h2 style="font-size: 50px; color:#f0eff0;">Select Match Type</h2>
+            <h2 style="font-size: 65px; color:#f0eff0;">Select Match Type</h2>
             <select id="matchType" name="matchType">
                 <option value="zone">Similar Zone</option>
                 <option value="same_gender">Same Gender</option>
@@ -933,7 +933,7 @@
             
             
             <div class="chat-user-history" id="chat-user-history">
-                <h2>Chat History</h2>
+                <h2 style="font-size: 45px;">Chat History</h2>
                 <!-- Existing content will be here -->
             </div>
         </div>
@@ -1158,7 +1158,7 @@
 
             if (matches.length === 0) {
                 matchList.innerHTML += '<p>Check out profile to get matches!</p>';
-                matchList.style = "margin-top: 10px; margin-left: 100px;"
+                matchList.style = "margin-top: 10px; margin-left: 170px;"
                 return;
             }
 

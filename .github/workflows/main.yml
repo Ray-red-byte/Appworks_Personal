@@ -14,18 +14,18 @@ jobs:
         uses: actions/checkout@v2
 
       - name: SSH into EC2 instance
-          uses: appleboy/ssh-action@master
-          with:
-            host: ${{ secrets.EC2_HOST }}
-            username: ${{ secrets.EC2_USERNAME }}
-            key: ${{ secrets.SSH_PRIVATE_KEY }}
-            port: ${{ secrets.EC2_SSH_PORT }}
-            script: |
-              cd /home/ec2-user/Appworks_Personal
-              git pull origin main
-              pkill -f 'celery -A app.celery'
-              pkill -f 'gunicorn -b localhost:5000 --worker-class gevent app:app' || true
-              sleep 5 
-              sudo systemctl restart nginx
-              gunicorn -b localhost:5000 --worker-class gevent app:app &
-              celery -A app.celery worker --loglevel=info --concurrency=4 &
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.EC2_SSH_PORT }}
+          script: |
+            cd /home/ec2-user/Appworks_Personal
+            git pull origin main
+            pkill -f 'celery -A app.celery'
+            pkill -f 'gunicorn -b localhost:5000 --worker-class gevent app:app' || true
+            sleep 5 
+            sudo systemctl restart nginx
+            gunicorn -b localhost:5000 --worker-class gevent app:app &
+            celery -A app.celery worker --loglevel=info --concurrency=4 &

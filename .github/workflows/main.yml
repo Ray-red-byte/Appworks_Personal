@@ -21,6 +21,9 @@ jobs:
           REMOTE_HOST: ${{ secrets.HOST_DNS }}
           REMOTE_USER: ${{ secrets.USERNAME }}
           TARGET: ${{ secrets.TARGET_DIR }}
+      - name: Permission
+        run: |
+          chmod 600 ~/.ssh/id_rsa
 
       - name: SSH into EC2 instance
         uses: appleboy/ssh-action@master

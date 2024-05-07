@@ -8,6 +8,7 @@ from celery import Celery
 import pymongo
 import numpy as np
 import time
+import logging
 import signal
 import subprocess
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -16,6 +17,13 @@ from flask_cors import CORS
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from user_model.user_data_process import transform_one_user, transform_all_user, match_user, get_value_from_user_dict
 from user_model.house_data_process import transform_one_house, transform_all_house, match_house, get_value_from_house_dict, one_hot_gender
+
+
+log_filename = os.getenv("APP_LOG_FILE_NAME")
+log_file_path = os.getenv("APP_LOG_FILE_PATH")
+logger = logging.getLogger(__name__)
+
+logging.basicConfig(filename=log_file_path, level=logging.INFO)
 
 
 app = Flask(__name__)
@@ -29,9 +37,10 @@ celery.conf.update(app.config)
 
 CORS(app)
 
-socketio = SocketIO(app)
+socketio = SocketIO(app, cors_allowed_origins="*")
 
-dotenv_path = '/home/ec2-user/Appworks_Personal/.env'
+dotenv_path = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/.env'
+
 load_dotenv(dotenv_path)
 
 # JWT secret key
@@ -56,28 +65,32 @@ def login():
 
 @app.route('/logout', methods=['GET'])
 def logout():
-    user_collection = client['personal_project']['user']
-    user_id = authentication(request.cookies.get('token'), jwt_secret_key)
-    user = user_collection.find_one({"user_id": user_id})
+    try:
+        user_collection = client['personal_project']['user']
+        user_id = authentication(request.cookies.get('token'), jwt_secret_key)
+        user = user_collection.find_one({"user_id": user_id})
 
-    save_house_count = len(user.get('saved_house', []))
-    click_house_count = len(user.get('click_house', []))
-    be_cancel_count = len(user.get('be_cancel', []))
-    be_chatted_user_count = user.get('be_chatted_user', 0)
-    chat_user_count = user.get('chat_user', 0)
+        save_house_count = len(user.get('saved_house', []))
+        click_house_count = len(user.get('click_house', []))
+        be_cancel_count = len(user.get('be_cancel', []))
+        be_chatted_user_count = user.get('be_chatted_user', 0)
+        chat_user_count = user.get('chat_user', 0)
 
-    active_status_percent = calculate_active_status(be_cancel_count, be_chatted_user_count,
-                                                    chat_user_count, save_house_count, click_house_count)
+        active_status_percent = calculate_active_status(be_cancel_count, be_chatted_user_count,
+                                                        chat_user_count, save_house_count, click_house_count)
 
-    user_collection.update_one(
-        {'user_id': user_id},
-        {'$set': {'active_status': active_status_percent}},
-        upsert=True
-    )
+        user_collection.update_one(
+            {'user_id': user_id},
+            {'$set': {'active_status': active_status_percent}},
+            upsert=True
+        )
 
-    response = make_response(redirect(url_for('login')))
-    response.set_cookie('token', '', expires=0)
-    return response
+        response = make_response(redirect(url_for('login')))
+        response.set_cookie('token', '', expires=0)
+        return response
+
+    except Exception as e:
+        logger.error(f"Log out error : {e}")
 
 
 @app.route('/user/login_token', methods=['POST'])
@@ -120,7 +133,7 @@ def login_token():
         return response, 200
 
     else:
-
+        logger.error(f"Log out error : Invalid Content-Type")
         response_data = {"Error": "Invalid Content-Type"}
         return response_data, 400
 
@@ -194,7 +207,7 @@ def user_information():
     # Retrieve the parameters from the query string
     token = request.cookies.get('token')
 
-    print("-----------------User information page-----------------")
+    logger.info(f"-----------------User information page-----------------")
 
     # Call the authentication function to verify the token
     user_id = authentication(token, jwt_secret_key)
@@ -202,6 +215,8 @@ def user_information():
     if isinstance(user_id, int):
         username = get_user_name(user_id)
         return render_template('user_information.html', username=username, user_id=user_id)
+
+    logger.warning(f"Login timeout")
 
     return redirect(url_for('login'))
 
@@ -242,6 +257,8 @@ def user_info_insert():
 
             return redirect(url_for('routine_page'))
 
+        logger.warning(f"Login timeout")
+
         return redirect(url_for('login'))
 
 
@@ -256,7 +273,6 @@ def user_routine_insert():
         user_id = authentication(token, jwt_secret_key)
 
         if isinstance(user_id, int):
-            print(user_id)
 
             # Extract form data
             sleep_time = request.form['sleepTime']
@@ -282,7 +298,6 @@ def user_routine_insert():
                 'smokeOptions': smoke_options,
                 'additionalNotes': additional_notes
             }
-            print(routine_data)
 
             user_collection.update_one(
                 {'user_id': user_id},
@@ -290,6 +305,8 @@ def user_routine_insert():
             )
 
             return redirect(url_for('house_type_page'))
+
+        logger.warning(f"Login timeout")
 
         return redirect(url_for('login'))
 
@@ -318,9 +335,10 @@ def furniture_insert():
             {'user_id': user_id},
             {'$set': {'furniture_preference': furniture_preference}}
         )
-        print("house type saved successfully")
+        logger.info(f"house type saved successfully")
         return redirect(url_for('main_page'))
 
+    logger.warning(f"Login timeout")
     return redirect(url_for('login'))
 
 
@@ -378,7 +396,7 @@ def save_house():
         data = request.get_json()
         house_id = data.get('save_house')
 
-        print('house_id', house_id)
+        logger.info(f"{user_id} save house {house_id}")
 
         if house_id is None:
             return jsonify({'error': 'House ID not provided'}), 400
@@ -402,6 +420,8 @@ def save_house():
             print("-------------------------------", cur_user_save_house_ls)
             return "House saved successfully", 200
 
+        logger.warning(f"Login timeout")
+
 
 @app.route('/search/hot', methods=['GET'])
 def search_hot():
@@ -411,6 +431,7 @@ def search_hot():
     user_id = authentication(token, jwt_secret_key)
 
     if not user_id:
+        logger.warning(f"Login timeout")
         return redirect(url_for('login'))
 
     house_collection = client['personal_project']['house']
@@ -420,7 +441,7 @@ def search_hot():
         for house in top_houses
     ]
 
-    print(top_houses_json)
+    logger.info(f"Top houses: {len(top_houses_json)}")
 
     if top_houses_json:
         return jsonify(top_houses_json), 200
@@ -477,6 +498,9 @@ def search():
 
         return jsonify(search_houses_json), 200
 
+    logger.warning(f"Login timeout")
+    return redirect(url_for('login'))
+
 
 @app.route('/ai_recommend', methods=['GET'])
 def ai_recommend():
@@ -510,7 +534,8 @@ def ai_recommend():
             user_house_address_dict['address'].append(house_collection.find_one(
                 {"id": user_click_house_id})['address'])
 
-        print("------------------Start AI search-------------------------")
+        logger.info(
+            f"------------------Start AI search-------------------------")
 
         np_save, np_click = np.array(user_house_transform_dict['save']), np.array(
             user_house_transform_dict['click'])
@@ -537,14 +562,12 @@ def ai_recommend():
             district = district.split('區')[0] + '區'
             zones.append(district)
 
-        print(zones)
+        logger.info(f"{zones}")
 
         zone_pattern = '|'.join(zones)
         regex_pattern = re.compile(f'({zone_pattern})', re.IGNORECASE)
         zone_id_list = [house['id'] for house in house_collection.find(
             {"address": {"$regex": regex_pattern}})]
-
-        print(zone_id_list)
 
         transform_id_list = []
         for matching_house in transform_all_house_collection.find({"house_id": {"$in": zone_id_list}}):
@@ -553,8 +576,6 @@ def ai_recommend():
 
         nearest_neighbors_id_list = [
             transform_id for transform_id in transform_id_list if transform_id not in cur_user['saved_house'] and transform_id not in cur_user['click_house']][:10]
-
-        print(nearest_neighbors_id_list)
 
         try:
             match_houses = house_collection.find(
@@ -567,7 +588,7 @@ def ai_recommend():
             ]
 
         except Exception as e:
-            print(e)
+            logger.error("AI recommend error : ", e)
             return jsonify({'error': 'No match'}), 500
 
         return jsonify(search_houses_json), 200
@@ -585,9 +606,7 @@ def track_click():
     user_id = authentication(token, jwt_secret_key)
 
     # Save house click
-    print("click", house_id)
     house_collection = client['personal_project']['house']
-    print(type(house_id))
     house_collection.update_one(
         {'id': int(house_id)},
         {'$inc': {'click': 1}},
@@ -627,6 +646,8 @@ def get_user_house(house_id):
         # Convert ObjectId to string
         search_house_json = {**house, '_id': str(house['_id'])}
         return jsonify(search_house_json), 200
+
+    logger.warning(f"House not found")
     return jsonify({'error': 'House not found'}), 404
 
 
@@ -687,7 +708,7 @@ def get_user_recommend_house(house_id):
                                    for match_house in match_houses if int(match_house['id']) != int(house_id)]
 
         except Exception as e:
-            print(e)
+            logger.warning("Recommend house not found", e)
             return jsonify({'error': 'No match'}), 500
 
         return jsonify(matches_houses_data), 200
@@ -711,7 +732,7 @@ def get_matches(match_type):
         cur_user = user_collection.find_one({"user_id": int(user_id)})
         user_prefer_zone = cur_user["house_preference"]["zone"]
     except Exception as e:
-        print(e)
+        logger.warning(f"User not found", e)
         return jsonify({'error': 'No match'}), 500
 
     # No matter what transform first
@@ -725,7 +746,7 @@ def get_matches(match_type):
     transform_cur_user_data = transform_all_user_collection.find_one(
         {"user_id": int(user_id)})
 
-    print("-----------------Start Search-----------------")
+    logger.info(f"-----------------Start Search-----------------")
 
     if match_type == 'zone':
         users_share_zone = user_collection.find(
@@ -822,7 +843,7 @@ def get_matches(match_type):
                         for user in match_users if int(user['user_id']) != int(user_id)]
 
     except Exception as e:
-        print(e)
+        logger.warning("No match users", e)
         return jsonify({'error': 'No match'}), 500
 
     return jsonify(matches_data), 200
@@ -898,7 +919,6 @@ def house_type_page():
     user_id = authentication(token, jwt_secret_key)
 
     if isinstance(user_id, int):
-        print("house type page")
         username = get_user_name(user_id)
         return render_template('house_type.html', username=username)
 
@@ -911,7 +931,6 @@ def house_detail_page(houseId):
 
     # Call the authentication function to verify the token
     user_id = authentication(token, jwt_secret_key)
-    print("get house detail")
     if isinstance(user_id, int):
         username = get_user_name(user_id)
         return render_template('house_detail.html', username=username, houseId=houseId)
@@ -1002,7 +1021,6 @@ def cancel():
 
     room_collection = client['personal_project']['room']
     room_collection.delete_one({"room_id": cancel_room_id})
-    print("delete successfully")
 
     # Track user status
     user_collection = client['personal_project']['user']
@@ -1073,8 +1091,6 @@ def save_messages():
     user_id = request.json.get('user_id')
     chat_user_id = request.json.get('chat_user_id')
 
-    print("only one user save messages", messages)
-
     # Insert messages into MongoDB
     try:
         timestamp = datetime.now()
@@ -1113,10 +1129,9 @@ def save_messages():
             upsert=True  # Create a new document if no matching document is found
         )
 
-        print(room_id, "save messages successfully")
         return jsonify({'success': True, 'message': 'Messages saved successfully'}), 200
     except Exception as e:
-        print(e)
+        logger.error("Error insert :", e)
         return jsonify({'success': False, 'message': 'Failed to save messages'}), 500
 
 
@@ -1126,11 +1141,8 @@ def get_messages():
     room_collection = client['personal_project']['room']
     room = room_collection.find_one({"room_id": room_id})
 
-    print("Get messages from room", room_id)
-
     if room:
         messages = room['messages']
-        print("messages", messages)
         last_updated_user_id = room['last_updated_by']
         return jsonify({'messages': messages, 'last_updated_by': last_updated_user_id}), 200
 
@@ -1148,13 +1160,10 @@ def remove_house():
         remove_house_id = request.json.get('remove_house')
         user_collection = client['personal_project']['user']
 
-        print(remove_house_id)
-
         cur_user = user_collection.find_one({"user_id": user_id})
         cur_user_save_house_ls = cur_user.get('saved_house', [])
 
         if int(remove_house_id) in cur_user_save_house_ls:
-            print("remove", remove_house_id)
             cur_user_save_house_ls.remove(int(remove_house_id))
 
             # Update the saved house list
@@ -1194,7 +1203,7 @@ def handle_online(data):
     user_id = data['user_id']
     if user_id not in online_users and user_id is not None:
         online_users.append(user_id)
-    print("online", online_users)
+    logger.info(f"{online_users} is online")
     emit('show', online_users, broadcast=True)
 
 
@@ -1202,7 +1211,7 @@ def handle_online(data):
 def handle_offline(data):
     user_id = data['user_id']
     online_users.remove(user_id)
-    print("remove", online_users)
+    logger.info(f"{online_users} is remove")
     emit('hide', user_id, broadcast=True)
 
 # ------------------------Show online users------------------------
@@ -1215,13 +1224,13 @@ room_count = {}
 def on_join(data):
     user_id = data['user_id']
     username = get_user_name(int(user_id))
-    print("new user", username)
+    logger.info(f"new user join room {username}")
     room_id = data['room_id']
     join_room(room_id)
     room_count.setdefault(room_id, 0)
     room_count[room_id] += 1
 
-    print(f'{username} has join {room_id} the room.')
+    logger.info(f'{username} has join {room_id} the room.')
 
     emit('message', {'senderId': username,
                      "recipientId": "None",  "message": 'joined the room.', 'room_status': "join room"}, room=room_id)
@@ -1238,9 +1247,9 @@ def on_leave(data):
 
     # if the last one leave the room
 
-    print(f'{username} has left the {room_id} room.')
+    logger.info(f'{username} has left the {room_id} room.')
     if user_count == 0:
-        print("last user left the room.")
+        logger.info("last user left the room.")
 
     emit('message', {'senderId': username,
                      "recipientId": "None",  "message": 'leave  room.', 'room_status': "leave_room"}, room=room_id)
@@ -1253,7 +1262,8 @@ def handle_message(data):
     recipientId = data['recipientId']
     room_id = data['room']
     message = data['message']
-    print(senderId, ':', message)
+
+    logger.info(f"{senderId} : {message}")
 
     # Get all users from the room_id
     total_user = len(room_id.split("_"))
@@ -1330,7 +1340,6 @@ def line_house_preference():
             {"$set": {'line_preference': {'price': price, 'house_age': house_age, 'zone': zone,
                                           'stay_with_landlord': stay_with_landlord, 'park_nearby': park_nearby}}}
         )
-        print("save successfully")
     return jsonify("Line preference saved successfully"), 200
 
 
@@ -1345,7 +1354,7 @@ def send():
     cur_user = user_collection.find_one({"user_id": user_id})
     access_token = cur_user["access_token"]
 
-    print("start to send")
+    logger.info(f"start to use line notify : {user_id}")
 
     monitor.delay(user_id, access_token)
     return jsonify("Start to send"), 200
@@ -1353,7 +1362,6 @@ def send():
 
 @ celery.task
 def monitor(user_id, access_token):
-    print('hi monitor', access_token)
     db = client["personal_project"]
 
     last_update_at = ''
@@ -1384,7 +1392,7 @@ def monitor(user_id, access_token):
                     [("updated_at", -1)]).limit(1)[0]['updated_at']
 
             except Exception as e:
-                print(e)
+                logger.info(f"No house available {e}")
                 lineNotifyMessage(
                     access_token, f"No house is available")
                 time.sleep(30)
@@ -1392,7 +1400,6 @@ def monitor(user_id, access_token):
 
         # Check if last house match user's preference
         for last_house in last_house_list:
-            print(last_house["title"])
             if float(last_house['price']) <= float(cur_user_house_preference['price']) and int(last_house['age']) <= int(cur_user_house_preference['house_age']) and re.search(regex_pattern, last_house['address']) and last_house['stay_landlord'] == (cur_user_house_preference['stay_with_landlord'] == "yes") and last_house['park'] == (cur_user_house_preference['park_nearby'] == "yes"):
                 house_title = last_house["title"]
                 house_price = last_house['price']

@@ -7,11 +7,15 @@ from sklearn.neighbors import KDTree
 from sklearn.decomposition import PCA
 from dotenv import load_dotenv
 import pymongo
+import logging
 import os
-
 
 dotenv_path = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/.env'
 load_dotenv(dotenv_path)
+
+log_filename = os.getenv("APP_LOG_FILE_NAME")
+log_file_path = os.getenv("APP_LOG_FILE_PATH")
+logger = logging.getLogger(__name__)
 
 # Mongo atlas
 CONNECTION_STRING = os.getenv("MONGO_ATLAS_USER")
@@ -112,7 +116,7 @@ def transform_all_house(house_data):
 def match_house(id_list, transform_select_house_data, cur_house_data, match_num):
     transform_select_house_data = np.array(transform_select_house_data)
     kdtree = KDTree(transform_select_house_data)
-    print(cur_house_data)
+    logger.info(f"Match house : {cur_house_data}")
     distances, indices = kdtree.query([cur_house_data], k=match_num)
 
     # Optionally, you can retrieve the actual data points corresponding to the indices

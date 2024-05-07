@@ -132,29 +132,3 @@ def get_value_from_house_dict(transform_all_house_data_dicts):
         id_list.append(transform_all_hosue_data_dict['house_id'])
         value_list.append(transform_all_hosue_data_dict['value'])
     return id_list, value_list
-
-
-'''
-house_collection = db['house']
-transform_all_house_collection = db['transform_all_house']
-
-house_data = house_collection.find()
-transform_all_house_data_dict, transform_all_house_data = transform_all_house(
-    house_data)
-'''
-'''
-print(transform_all_house_data_dict)
-id_list, value_list = get_value_from_dict(transform_all_house_data_dict)
-'''
-'''
-cur_house_data = {'house_id': 1455, 'value': [
-    17000.0, 20, 15.0, 20, 1, 0, 0, -1, -1, -1]}
-
-
-print(transform_all_house_data)
-match_ten_house(id_list, transform_all_house_data, cur_house_data['value'])
-'''
-'''
-insert_transform_all_house_to_mongo(
-    transform_all_house_collection, transform_all_house_data_dict)
-'''

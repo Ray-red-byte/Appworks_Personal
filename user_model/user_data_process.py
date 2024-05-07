@@ -176,17 +176,3 @@ def get_value_from_user_dict(transform_all_user_data_dicts):
         id_list.append(transform_all_user_data_dict['user_id'])
         value_list.append(transform_all_user_data_dict['value'])
     return id_list, value_list
-
-
-user_collection = db['user']
-transform_all_user_collection = db['transform_all_user']
-
-user_data = user_collection.find()
-transform_all_user_data_dict, transform_all_user_data = transform_all_user(
-    user_data)
-
-
-'''
-insert_transform_all_user_to_mongo(
-    transform_all_user_collection, transform_all_user_data_dict)
-'''

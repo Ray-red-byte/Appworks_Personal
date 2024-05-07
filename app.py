@@ -1291,7 +1291,7 @@ def getNotifyToken(AuthorizeCode, user_id):
     body = {
         "grant_type": "authorization_code",
         "code": AuthorizeCode,
-        "redirect_uri": f'http://18.178.32.143:80',
+        "redirect_uri": f'https://rentright.info',
         "client_id": 'bvtTFwMkqG5LiWFJIq3aXb',
         "client_secret": 'saHb9IQBraM3Rm76iNMModraELZAjx7YJUiibpfEfUh'
     }
@@ -1347,7 +1347,7 @@ def send():
 
     print("start to send")
 
-    # monitor.delay(user_id, access_token)
+    monitor.delay(user_id, access_token)
     return jsonify("Start to send"), 200
 
 

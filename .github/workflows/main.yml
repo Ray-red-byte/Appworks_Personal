@@ -24,7 +24,7 @@ jobs:
 
       - name: Copy code to EC2
         run: |
-          scp -i ${{ secrets.EC2_SSH_KEY }} -r /Users/hojuicheng/Desktop/personal_project/Appworks_Personal/log /Users/hojuicheng/Desktop/personal_project/Appworks_Personal/templates /Users/hojuicheng/Desktop/personal_project/Appworks_Personal/user_model /Users/hojuicheng/Desktop/personal_project/Appworks_Personal/app.py /Users/hojuicheng/Desktop/personal_project/Appworks_Personal/function.py  ./ ec2-user@${{ secrets.HOST_DNS }}:/home/ec2-user/Appworks_Personal
+          scp -i ${{ secrets.EC2_SSH_KEY }} /Users/hojuicheng/Desktop/personal_project/Appworks_Personal/log /Users/hojuicheng/Desktop/personal_project/Appworks_Personal/templates /Users/hojuicheng/Desktop/personal_project/Appworks_Personal/user_model /Users/hojuicheng/Desktop/personal_project/Appworks_Personal/app.py /Users/hojuicheng/Desktop/personal_project/Appworks_Personal/function.py  ./ ec2-user@${{ secrets.HOST_DNS }}:/home/ec2-user/Appworks_Personal
 
 
       - name: SSH into EC2 instance

@@ -31,8 +31,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd /home/ec2-user/Appworks_Personal
-            pkill -f 'celery worker'
-            pkill -f gunicorn
+
             sleep 5 
             sudo systemctl restart nginx
             gunicorn -b localhost:5000 --worker-class gevent app:app &

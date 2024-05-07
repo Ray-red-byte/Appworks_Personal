@@ -23,7 +23,7 @@ jobs:
           TARGET: ${{ secrets.TARGET_DIR }}
 
       - name: Copy code to EC2
-        run: scp -i ${{ secrets.EC2_SSH_KEY }} -r --exclude=".env" ./ ec2-user@${{ secrets.HOST_DNS }}:/home/ec2-user/Appworks_Personal
+        run: scp -i ${{ secrets.EC2_SSH_KEY }} -r --exclude="/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/.env" ./ ec2-user@${{ secrets.HOST_DNS }}:/home/ec2-user/Appworks_Personal
 
 
       - name: SSH into EC2 instance

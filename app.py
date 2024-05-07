@@ -31,7 +31,7 @@ CORS(app)
 
 socketio = SocketIO(app)
 
-dotenv_path = '/home/ec2-user/Appworks_Personal/.env'
+dotenv_path = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/.env'
 load_dotenv(dotenv_path)
 
 # JWT secret key

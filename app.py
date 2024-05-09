@@ -18,8 +18,7 @@ from flask_socketio import SocketIO, emit, join_room, leave_room
 from user_model.user_data_process import transform_one_user, transform_all_user, match_user, get_value_from_user_dict
 from user_model.house_data_process import transform_one_house, transform_all_house, match_house, get_value_from_house_dict, one_hot_gender
 
-dotenv_path = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/.env'
-
+dotenv_path = '/home/ec2-user/Appworks_Personal/.env'
 load_dotenv(dotenv_path)
 
 log_filename = os.getenv("APP_LOG_FILE_NAME")
@@ -27,7 +26,6 @@ log_file_path = os.getenv("APP_LOG_FILE_PATH")
 logger = logging.getLogger(__name__)
 
 logging.basicConfig(filename=log_file_path, level=logging.INFO)
-
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET')
@@ -1368,6 +1366,7 @@ def monitor(user_id, access_token):
     count = 0
     while True:
         # Query MongoDB to get the latest houses
+        logger.info(f"Start to use line ")
 
         house_collection = db["house"]
         user_collection = db["user"]
@@ -1393,8 +1392,8 @@ def monitor(user_id, access_token):
 
             except Exception as e:
                 logger.info(f"No house available {e}")
-                lineNotifyMessage(
-                    access_token, f"No house is available")
+                # lineNotifyMessage(
+                #    access_token, f"No house is available")
                 time.sleep(10)
                 continue
 
@@ -1405,18 +1404,17 @@ def monitor(user_id, access_token):
                 house_price = last_house['price']
                 house_address = last_house['address']
                 house_age = last_house['age']
+                house_url = "https://rentright.info/user/house_detail/" + \
+                    str(last_house["id"])
                 lineNotifyMessage(
                     access_token, "New house ! ! !")
                 lineNotifyMessage(
                     access_token,
-                    f"{house_title}\n\
-                      Price: {house_price}\n\
-                      Address: {house_address}\n\
-                      Age: {house_age}"
+                    f"{house_title}\n{house_url}"
                 )
 
-        lineNotifyMessage(
-            access_token, f"No house is available .......")
+        # lineNotifyMessage(
+        #    access_token, f"No house is available .......")
 
         time.sleep(10)
         count += 1

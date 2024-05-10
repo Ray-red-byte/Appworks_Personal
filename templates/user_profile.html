@@ -55,14 +55,14 @@
 
         
         .profile {
-            width: 800px;
+            width: 40%;
             margin: 0 auto;
             padding: 20px;
         }
         
         h1 {
             text-align: center;
-            font-size: 36px;
+            font-size: 50px;
             color: #333;
             margin-bottom: 20px;
         }
@@ -94,31 +94,28 @@
             
         }
         .user-img {
-            width: 100px; /* Adjust width as needed */
-            height: 100px; /* Adjust height as needed */
-            border-radius: 50%; /* Make the border radius 50% to create a circle */
-            overflow: hidden; /* Hide any content outside the circle */
+            width: 20%; /* Adjust width as needed */
+            height: 20%; /* Adjust height as needed */
+            margin-left: 40%;
+            margin-bottom: 50px;
         }
 
-        .user-img img {
-            width: 100%; /* Make the image fill the container */
-            height: 100%; /* Make the image fill the container */
-            object-fit: cover; /* Cover the entire container with the image */
-        }
+
     </style>    
 </head>
 <body>
     <h2 id="chat-user_id" style="display: none;">{{ chat_user_id }}</h2>
     <div class="header">
         <a href="/main" class="change-main" >HOME</a>
-        <h1 class="greeting">Hello, {{ username }}</h1>
+        <h1>User Profile</h1>
+        
         <a class="logout-text" onclick="handleLogout()">LOGOUT</a> 
     </div>
 
     <div class="profile">
-        <h1>User Profile</h1>
-        <div class="user-img">
-            
+        <h1 class="greeting">Hello, {{ username }}</h1>
+        <div >
+            <img class="user-img" src="https://appworks-ray.s3.ap-northeast-1.amazonaws.com/personal_project/icons/user-profile-4255.png" alt="User Image">
         </div>
         <div class="basic-info">
             <h2>Basic Information</h2>
@@ -136,7 +133,7 @@
         </div>
         <div class="introduction">
             <h2>Introduction</h2>
-            <p><strong>Introduction:</strong> <span id="introduction"></span></p>
+            <p><span id="introduction"></span></p>
         </div>
     </div>
     <script>

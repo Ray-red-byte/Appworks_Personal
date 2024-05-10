@@ -62,9 +62,10 @@
         
         h1 {
             text-align: center;
-            font-size: 50px;
+            font-size: 70px;
             color: #333;
-            margin-bottom: 20px;
+            margin-top: 100px;
+            margin-bottom: 40px;
         }
         
         .basic-info, .house-preference, .introduction {
@@ -74,10 +75,17 @@
             padding: 20px;
             margin-bottom: 20px;
         }
+
+        strong {
+            font-size: 25px;
+            color:#d4d4d4;
+            font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+        }
         
         h2 {
-            font-size: 24px;
-            color: #555;
+            font-size: 30px;
+            
+            color: #2b1d1d;
             margin-bottom: 10px;
         }
         
@@ -86,6 +94,10 @@
             color: #777;
             margin-bottom: 8px;
         }
+        span {
+            font-size: 20px;
+            color: #333;
+        }
         
         strong {
             font-weight: bold;
@@ -93,6 +105,12 @@
 
             
         }
+
+        .greeting {
+            font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+            font-size: 70px;
+        }
+
         .user-img {
             width: 20%; /* Adjust width as needed */
             height: 20%; /* Adjust height as needed */
@@ -107,7 +125,7 @@
     <h2 id="chat-user_id" style="display: none;">{{ chat_user_id }}</h2>
     <div class="header">
         <a href="/main" class="change-main" >HOME</a>
-        <h1>User Profile</h1>
+        <h1 style="font-size: 70px;">User Profile</h1>
         
         <a class="logout-text" onclick="handleLogout()">LOGOUT</a> 
     </div>

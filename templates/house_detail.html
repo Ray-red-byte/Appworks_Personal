@@ -19,44 +19,34 @@
 
         .header {
             display: flex;
-            justify-content: space-between;
             align-items: center;
             width: 100%;
             background-color: #a18ba1;
         }
 
         .header h1 {
-            margin-left: 1000px; /* Remove default margin */
+            margin-left: 1700px; /* Remove default margin */
             color: #f0eff0;
             font-size: 110px;
             margin-bottom: 100px;
         }
 
         
-        .logout-text {
-            color: #f0eff0;
-            margin-left: 800px;
-            margin-right: 200px;
-            margin-top:100px;
-            cursor:pointer;
-            font-size: 40px;
-            z-index: 10001;
-            text-decoration: underline;
-        }
 
         .previous-page {
-            color: #f0eff0;
-            margin-left: 100px;
-            margin-top:100px;
-            font-size: 40px;
-            cursor:pointer;
-            z-index: 10001;
+            width: 100px; /* Adjusted width for responsiveness */
+            height: 100px; /* Adjusted height for responsiveness */
+            margin-left: 100px; /* Adjusted margin for responsiveness */
+            margin-bottom: -100px;
         }
+
 
         .image {
             width: 300px;
             height: 10px;
         }
+
+
 
         .house-details {
             background-color: #fff;
@@ -261,9 +251,11 @@
 <body>
     
     <div class="header">
-        <a href="/main" class="previous-page">HOME</a>
+        <a href="/main">
+            <img class="previous-page" src="https://appworks-ray.s3.ap-northeast-1.amazonaws.com/personal_project/icons/previous-button-icon.png" alt="main">
+        </a>  
+
         <h1 class="greeting">House Detail</h1>
-        <a href="/logout" class="logout-text">LOGOUT</a>       
     </div>
     <div class="house-details">
         <div class="house-info"></div>

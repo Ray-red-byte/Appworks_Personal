@@ -26,44 +26,32 @@
         }
 
         .header h1 {
-            margin-left: 1800px; /* Remove default margin */
+            margin-left:40%; /* Adjusted to percentage */
             color: #f0eff0;
+            font-size: 2em; /* Adjusted font size for responsiveness */
         }
 
-        .line-text {
-            color: #f0eff0;
-            margin-left: 100px;
-            margin-top: 100px;
-            font-size: 40px;
-            z-index: 10001;
+        .top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-right: 13%; /* Adjusted margin for responsiveness */
+            gap: 25%; /* Adjusted gap for responsiveness */
         }
-        
+
+
+        .line-text,
+        .user-info,
+        .save-house-text,
         .logout-text {
-            color: #f0eff0;
-            margin-top:100px;
-            margin-left: -600px;
-            cursor:pointer;
-            font-size: 40px;
-            z-index: 10001;
-            text-decoration: underline;
+            width: 100px; /* Adjusted width for responsiveness */
+            height: 100px; /* Adjusted height for responsiveness */
+            margin-right: 50px; /* Adjusted margin for responsiveness */
+            margin-top: 150px;
         }
 
-        .user-info {
-            color: #f0eff0;
-            margin-top:100px;
-            margin-left: -600px;
-            font-size: 40px;
-            cursor:pointer;
-            z-index: 10001;
-        }
-
-        .save-house-text {
-            color: #f0eff0;
-            margin-right: 100px;
-            margin-left: -600px;
-            margin-top:100px;
-            font-size: 40px;
-            cursor:pointer;
+        a img {
+            cursor: pointer;
             z-index: 10001;
         }
 
@@ -75,18 +63,18 @@
             height: 100%;
             margin: 20px;
             display: flex;
-            flex-direction: column; /* Arrange children vertically */
+            flex-direction: row; /* Arrange children vertically */
             align-items: stretch;
+            overflow-y: auto;
         }
 
         .left-main-section {
             flex-direction: column;
-            position: fixed;
             font-size: large;
-            width: 15%;
-            height: 1600px;
+            width: 65%;
+            height: 100%;
             padding: 20px;
-            margin-top: 0px;
+            margin-top: 100px;
             margin-left: 60px;
             background-color: #fffcfc;
             border-radius: 10px;
@@ -99,10 +87,10 @@
             display: flex;
             
             flex-direction: column;
-            margin-left: 300px;
+            margin-left: 8%;
             width: 80%;
             padding: 10px;
-            margin-top: -120px;
+            margin-top: -2800px;
             background-attachment: fixed;
             align-items: center;
         }
@@ -233,7 +221,7 @@
         }
 
         .house-info {
-            flex: 1; /* Allow it to grow to fill available space */
+            flex: 1; 
         }
 
         .house img {
@@ -287,7 +275,7 @@
             flex-direction: column;
             align-items: flex-end;
             top: 150px; /* Adjust as needed */
-            right: 40px; /* Adjust as needed */
+            right: -10px; /* Adjust as needed */
             width: 1000px;
             height: calc(100% - 100px); 
         }
@@ -302,13 +290,14 @@
             margin-top: 300px;
             margin-right: 100px;
             padding: 20px;
+            padding-bottom: 40px;
             z-index: 9999;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         #match-type{
             margin-top: 15px;
-            margin-left:55px;
+            margin-left:100px;
             font-size: 40px;
             width: 800px;
             border-radius: 10px;
@@ -317,7 +306,7 @@
         #matchType{
             width: 800px;
             height: 50px;
-            margin-left:55px;
+            margin-left:100px;
             border-radius: 10px;
             font-size: 30px;
         }
@@ -334,31 +323,58 @@
 
         .chat-user-history {
             position: fixed;
-            width: 560px;
-            font-size: 30px;
+            width: 1010px;
+            font-size: 60px;
             background-color: #d3c7d3;
             border: 2px solid #7d7777;
-            margin-left: 366px;
-            margin-top: 0px;
+            margin-left: -85px;
+            margin-top: 3%;
             padding: 12.5px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         .match-list {
             position: fixed;
-            width: 410px;
-            font-size: 30px;
+            width: 995px;
+            font-size: 60px;
             background-color: #d3c7d3;
             border: 2px solid #7d7777;
             padding: 20px;
+            margin-top: 3%;
             margin-left: -85px;
             margin-bottom: 100px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #matchListButton {
+            font-size: 40px;
+            width: 400px;
+            height: 70px;
+            margin-left: 9.5%;
+            margin-top: 50px;
+            border-radius: 20px;
+        }
+
+        #matchListButton:hover {
+            background-color: #cec9d1;
+            cursor: pointer;
+        }
+
+        #friendsButton {
+            font-size: 40px;
+            width: 400px;
+            height: 70px;
+            border-radius: 20px;
+        }
+
+        #friendsButton:hover {
+            background-color: #cec9d1;
+            cursor: pointer;
         }
         
 
         .chat-user-history h2 {
             color: #ffffff;
-            font-size: 30px;
+            font-size: 70px;
             margin-bottom: 15px;
         }
 
@@ -383,8 +399,8 @@
 
         .match-list h2 {
             color: #ffffff;
-            font-size: 45px;
-            margin-bottom: 15px;
+            font-size: 70px;
+            margin-bottom: 100px;
         }
 
 
@@ -414,36 +430,49 @@
 
         .match-username {
             padding-bottom: 10px;
-            margin-left: 20px;
+            margin-left: 100px;
+            margin-top: -10px;
+            height: 30px;
             cursor: pointer;
         }
         .match-username:hover{
             color: gray;
         }
 
-        /* Online icon style */
-        .fa-circle.text-success {
-            color: green; /* Change the color as needed */
-            margin-right: 2px;
+        .online {
+            height: 50px;
+            width: 50px;
+            margin-left: 50px;
+            margin-top: -35px;
         }
 
-        /* Offline icon style */
-        .fa-circle.text-danger {
-            color: red; /* Change the color as needed */
-            margin-right: 2px;
+        .offline {
+            height: 50px;
+            width: 50px;
+            margin-left: 50px;
+            margin-top: -35px;
+        }
+
+        .user-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-left: -10%;
+            margin-top: -13px;
         }
 
         li{
             margin-top: 30px;
+            height: 100px;
         }
 
         .allocate-button {
             margin-left: auto;
-            margin-top: 5px;
+            margin-top: 2%;
             display: block;
-            width: 100px;
-            height: 25px;
-            font-size: 18px;
+            width: 200px;
+            height: 50px;
+            font-size: 40px;
             color:#f6f7f9;
             background-color:#a2a2a2;
         }
@@ -455,11 +484,11 @@
         .allocate-button-hist {
             
             display: inline-block;
-            width: 100px;
-            height: 25px;
-            font-size: 18px;
-            margin-left: 450px;
-            margin-top: 0px;
+            width: 200px;
+            height: 50px;
+            font-size: 40px;
+            margin-left: auto;
+            margin-top: 2%;
             color:#f6f7f9;
             background-color:#a2a2a2;
         }
@@ -695,10 +724,21 @@
 <body>
     <div class="header">
         <h1 style="font-size: 150px;">Rent Right</h1>
-        <a  href="/line_register" style="cursor:pointer" class="line-text">LINE</a>
-        <a class="logout-text" onclick="handleLogout()">LOGOUT</a>
-        <a href="/user/information" class="user-info">PROFILE</a>
-        <a href="/user/save_house" class="save-house-text">SAVE</a>
+
+        <div class="top">
+            <a href="/line_register" >
+                <img class="line-text" src="https://appworks-ray.s3.ap-northeast-1.amazonaws.com/personal_project/icons/line_icon.png" alt="Line">
+            </a>
+            <a href="/user/information" >
+                <img class="user-info" src="https://appworks-ray.s3.ap-northeast-1.amazonaws.com/personal_project/icons/1564535_customer_user_userphoto_account_person_icon.png" alt="User Info">
+            </a>
+            <a href="/user/save_house" >
+                <img class="save-house-text" src="https://appworks-ray.s3.ap-northeast-1.amazonaws.com/personal_project/icons/9004777_house_home_building_property_icon.png" alt="Save House">
+            </a>
+            <a href="#" onclick="handleLogout()">
+                <img class="logout-text" src="https://appworks-ray.s3.ap-northeast-1.amazonaws.com/personal_project/icons/3994382_access_close_exit_logout_sign+out_icon.png" alt="Logout">
+            </a>
+        </div>
     </div>
 
     <div class="page-user-id" style="display: none;" >{{ user_id }}</div>
@@ -866,7 +906,6 @@
     </div>
 
     <div class="right-main-section">
-        <h2 style="font-size: 70px; margin-top: 150px;">Hello {{ username }} !</h2>
         <div class="search-ai">
             <button id="ai-recommend" type="submit">AI Go !</button>
         </div>
@@ -874,7 +913,49 @@
             <h1 class="cur-userId" style="display: none;">{{ user_id }}</h1>
 
             <div class="houses-container">
-                <!-- House cards will be displayed here -->
+                <!-- House cards will be displayed here 
+                    <div class="house">
+                        <div class="house-details">
+                            <img src="house1.jpg" alt="Beautiful House 1">
+                        </div>
+                        <div class="house-info">
+                            <h3 style="font-size: 60px" class="1" style="cursor:pointer">Beautiful House 1</h3>
+                            <p style="font-size: 50px">租金: 2000 元/月</p>
+                            <p style="font-size: 50px">屋齡: 5 年</p>
+                            <p style="font-size: 50px">地址: 123 Main Street</p>
+                        </div>
+                    </div>
+                    <div class="save-house" style="z-index:10002;">
+                        <button class="save-house-btn" id="1">Save</button>
+                    </div>
+                    <div class="house">
+                        <div class="house-details">
+                            <img src="house1.jpg" alt="Beautiful House 1">
+                        </div>
+                        <div class="house-info">
+                            <h3 class="1" style="cursor:pointer">Beautiful House 1</h3>
+                            <p>租金: 2000 元/月</p>
+                            <p>屋齡: 5 年</p>
+                            <p>地址: 123 Main Street</p>
+                        </div>
+                    </div>
+                    <div class="save-house" style="z-index:10002;">
+                        <button class="save-house-btn" id="1">Save</button>
+                    </div>
+                    <div class="house">
+                        <div class="house-details">
+                            <img src="house1.jpg" alt="Beautiful House 1">
+                        </div>
+                        <div class="house-info">
+                            <h3 class="1" style="cursor:pointer">Beautiful House 1</h3>
+                            <p>租金: 2000 元/月</p>
+                            <p>屋齡: 5 年</p>
+                            <p>地址: 123 Main Street</p>
+                        </div>
+                    </div>
+                    <div class="save-house" style="z-index:10002;">
+                        <button class="save-house-btn" id="1">Save</button>
+                    </div>
                     <div class="house">
                         <div class="house-details">
                             <img src="house1.jpg" alt="Beautiful House 1">
@@ -917,6 +998,35 @@
                     <div class="save-house" style="z-index:10002;">
                         <button class="save-house-btn" id="1">Save</button>
                     </div>
+                    <div class="house">
+                        <div class="house-details">
+                            <img src="house1.jpg" alt="Beautiful House 1">
+                        </div>
+                        <div class="house-info">
+                            <h3 class="1" style="cursor:pointer">Beautiful House 1</h3>
+                            <p>租金: 2000 元/月</p>
+                            <p>屋齡: 5 年</p>
+                            <p>地址: 123 Main Street</p>
+                        </div>
+                    </div>
+                    <div class="save-house" style="z-index:10002;">
+                        <button class="save-house-btn" id="1">Save</button>
+                    </div>
+                    <div class="house">
+                        <div class="house-details">
+                            <img src="house1.jpg" alt="Beautiful House 1">
+                        </div>
+                        <div class="house-info">
+                            <h3 class="1" style="cursor:pointer">Beautiful House 1</h3>
+                            <p>租金: 2000 元/月</p>
+                            <p>屋齡: 5 年</p>
+                            <p>地址: 123 Main Street</p>
+                        </div>
+                    </div>
+                    <div class="save-house" style="z-index:10002;">
+                        <button class="save-house-btn" id="1">Save</button>
+                    </div>
+                -->
             </div>
         </div>
     </div>
@@ -930,20 +1040,24 @@
                 <option value="same_gender">Same Gender</option>
             </select>
             <input id="match-type" type="submit" value="Search">
+
+            <div>
+                <button id="matchListButton">Match List</button>
+                <button id="friendsButton">Friends</button>
+            </div>
         </div>
 
         <div class="matchlist-history">
             <div class="match-list" id="match-list">
-                <h2>Match List</h2>
                 <!-- Match User -->
                 
             </div>
             
-            
+      
             <div class="chat-user-history" id="chat-user-history">
-                <h2 style="font-size: 45px;">Chat History</h2>
-                <!-- Existing content will be here -->
+
             </div>
+           
         </div>
 
         <div class="chat-room-container">
@@ -998,8 +1112,24 @@
         let chatUserName = '';
         let roomId = '';
         
+        // Button to show match list and chat history
+        const matchListButton = document.getElementById('matchListButton');
+        matchListButton.addEventListener('click', () => {
+            // Show chat history hide match list
+            const matchList = document.getElementById('match-list');
+            const chatUserHistory = document.getElementById('chat-user-history');
+            matchList.style.display = 'block';
+            chatUserHistory.style.display = 'none';
+        });
 
-
+        const friendsButton = document.getElementById('friendsButton');
+        friendsButton.addEventListener('click', () => {
+            // Show chat history hide match list
+            const matchList = document.getElementById('match-list');
+            const chatUserHistory = document.getElementById('chat-user-history');
+            matchList.style.display = 'none';
+            chatUserHistory.style.display = 'block';
+        });
 
         // AI Recommendation
         const aiRecommend = document.getElementById('ai-recommend');
@@ -1026,18 +1156,18 @@
 
 
         socket.on('show', function(online_users) {
-            online_users.forEach(user_id =>  {
-                const iconMatch = document.getElementById(`match-${user_id}`);     
-                if (iconMatch) {
-                    iconMatch.textContent = 'online  ';
-                    iconMatch.className = `fas fa-circle text-success`;
+            online_users.forEach(user_id =>  {   
+                const iconMatchImg = document.getElementById(`match-${user_id}`);     
+                if (iconMatchImg) {
+                    iconMatchImg.src = "https://appworks-ray.s3.ap-northeast-1.amazonaws.com/personal_project/icons/circle_11762483.png";
+                    iconMatchImg.className = `online`;
                 }
 
-                const iconHist = document.getElementById(`hist-${user_id}`);
-                if (iconHist) {
-                    iconHist.textContent = 'online  ';
-                    iconHist.className = `fas fa-circle text-success`;
-                }
+                const iconHistImg = document.getElementById(`hist-${user_id}`);
+                if (iconHistImg) {
+                    iconHistImg.src = "https://appworks-ray.s3.ap-northeast-1.amazonaws.com/personal_project/icons/circle_11762483.png";
+                    iconHistImg.className = `online`;
+                }  
             });
 
    
@@ -1049,17 +1179,17 @@
             // Find the corresponding list item and update its online status
             console.log(offline_user_id)
     
-            const iconMatch = document.getElementById(`match-${offline_user_id}`);     
-            if (iconMatch) {
-                iconMatch.textContent = 'offline  ';
-                iconMatch.className = `fas fa-circle text-danger`;
+            const iconMatchImg = document.getElementById(`match-${offline_user_id}`);     
+            if (iconMatchImg) {
+                iconMatchImg.src = "https://appworks-ray.s3.ap-northeast-1.amazonaws.com/personal_project/icons/ellipse_12101495.png";
+                iconMatchImg.className = `offline`;
             }
 
             // Chat History
-            const iconHist = document.getElementById(`hist-${offline_user_id}`);
-            if (iconHist) {
-                iconHist.textContent = 'offline  ';
-                iconHist.className = `fas fa-circle text-danger`;
+            const iconHistImg = document.getElementById(`hist-${offline_user_id}`);
+            if (iconHistImg) {
+                iconHistImg.src = "https://appworks-ray.s3.ap-northeast-1.amazonaws.com/personal_project/icons/ellipse_12101495.png";
+                iconHistImg.className = `offline`;
             }   
         });
 
@@ -1075,17 +1205,18 @@
         ];
 
         // Function to render match list
-        function renderMatchList(matches) {
+        function  renderMatchList(matches) {
 
             const matchList = document.getElementById('match-list');
-            matchList.innerHTML = '';
-            matchList.innerHTML = '<h2>Match List</h2>';
-
-
+            
+            console.log(matches);
             if (matches.length === 0) {
-                matchList.innerHTML += '<p>Check out profile!</p>';
+                matchList.innerHTML += '<p style="margin-left: 200px; font-family: Roboto, sans-serif; ">Check out profile First !</p>';
                 return;
             }
+
+            matchList.innerHTML = '<h2>Match !</h2>';
+
 
             matches.forEach(userList => {
 
@@ -1099,12 +1230,15 @@
                         
                         
                         // Creating an icon element
-                        const icon = document.createElement('i');
-
                         // Initially, assuming user is offline
-                        icon.className = `fas fa-circle text-danger`;
-                        icon.id = `match-${match["user_id"]}`;
-                        icon.textContent = 'offline';
+                        const iconImg = document.createElement('img');
+                        iconImg.src = "https://appworks-ray.s3.ap-northeast-1.amazonaws.com/personal_project/icons/ellipse_12101495.png";
+                        iconImg.id = `match-${match["user_id"]}`;
+                        iconImg.className = `offline`;
+
+                        const userImg = document.createElement('img');
+                        userImg.src = "https://appworks-ray.s3.ap-northeast-1.amazonaws.com/personal_project/icons/account.png";
+                        userImg.className = `user-img`;
 
                         const usernameSpan = document.createElement('span');
                         usernameSpan.className = 'match-username';
@@ -1113,7 +1247,8 @@
                             window.location.href = `/user/profile/${match["user_id"]}`;
                         });
 
-                        listItem.appendChild(icon);
+                        listItem.appendChild(iconImg);
+                        listItem.appendChild(userImg);
                         listItem.appendChild(usernameSpan);
 
                         const allocateButton = document.createElement('button');
@@ -1143,11 +1278,8 @@
 
             const matchList = document.getElementById('chat-user-history');
             matchList.innerHTML = '';
-            matchList.innerHTML = '<h2>Chat History</h2>';
 
             if (matches.length === 0) {
-                matchList.innerHTML += '<p>Check out profile to get matches!</p>';
-                matchList.style = "margin-top: 10px; margin-left: 170px;"
                 return;
             }
 
@@ -1163,16 +1295,16 @@
                     if (match["user_id"] !== userId1.toString()) {
                         const listItem = document.createElement('li');
                         listItem.style.display = 'flex';
-                        listItem.style.alignItems = 'center';
-                        listItem.style = "cursor: pointer;"
 
                         // Creating an icon element
-                        const icon = document.createElement('i');
+                        const iconImg = document.createElement('img');
+                        iconImg.className = `offline`;
+                        iconImg.id = `hist-${match["user_id"]}`;
+                        iconImg.src = "https://appworks-ray.s3.ap-northeast-1.amazonaws.com/personal_project/icons/ellipse_12101495.png";
 
-                        // Initially, assuming user is offline
-                        icon.className = `fas fa-circle text-danger`;
-                        icon.id = `hist-${match["user_id"]}`;
-                        icon.textContent = 'offline';
+                        const userImg = document.createElement('img');
+                        userImg.src = "https://appworks-ray.s3.ap-northeast-1.amazonaws.com/personal_project/icons/account.png";
+                        userImg.className = `user-img`;
 
                         const usernameSpan = document.createElement('span');
                         usernameSpan.className = 'match-username';
@@ -1181,7 +1313,8 @@
                             window.location.href = `/user/profile/${match["user_id"]}`;
                         });
 
-                        listItem.appendChild(icon);
+                        listItem.appendChild(iconImg);
+                        listItem.appendChild(userImg);
                         listItem.appendChild(usernameSpan);
 
                         const messageStatusSpan = document.createElement('span');
@@ -1245,6 +1378,9 @@
 
         // Function to fetch user matches from Flask API
         function fetchUserMatches(match_type) {
+            const chatUserHistory = document.getElementById('chat-user-history');
+            chatUserHistory.style.display = 'none';
+
             fetch('/matches/' + match_type)
             .then(response => {
                 if (response.status === 200) {
@@ -1255,6 +1391,7 @@
             .then(matches => {
                 // Update the match list with fetched matches data
                 // Need to re fresh online user status if user change match type
+                console.log(matches);
                 renderMatchList(matches);
                 socket.emit('online', { user_id: userId });
             })
@@ -1382,10 +1519,10 @@
                                         <img src="${house["img_url"]}" alt="${house["title"]}" >
                                     </div>
                                     <div class="house-info">
-                                        <h3 class="${house["id"]}" style="cursor:pointer">${house["title"]}</h3>
-                                        <p>租金: ${house["price"]} 元/月</p>
-                                        <p>屋齡: ${house["age"]} 年</p>
-                                        <p>地址: ${house["address"]}</p>
+                                        <h3 style="font-size: 60px" class="${house["id"]}" style="cursor:pointer">${house["title"]}</h3>
+                                        <p style="font-size: 60px">租金: ${house["price"]} 元/月</p>
+                                        <p style="font-size: 60px">屋齡: ${house["age"]} 年</p>
+                                        <p style="font-size: 30px">地址: ${house["address"]}</p>
                                     </div>
                                 </div>
                                 <div class="save-house" style="z-index:10002;">
@@ -1501,10 +1638,7 @@
             fetchUserMatches(selectedValue);
         });
 
-        // Default match list
-        fetchUserMatches("All");
 
-        //renderMatchList(matches);
 
 
 
@@ -1712,6 +1846,11 @@
         
         // Initially
         fetchChatHistory()
+        // Default match list
+        fetchUserMatches("All");
+
+        //renderMatchList(matches);
+        //renderChatHistoryList(matches);
     </script>
 </body>
 </html>

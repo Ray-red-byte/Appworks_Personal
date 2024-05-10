@@ -306,7 +306,7 @@ def user_routine_insert():
                 {'$set': {'routine': routine_data}}
             )
 
-            return redirect(url_for('house_type_page'))
+            return redirect(url_for('main_page'))
 
         logger.warning(f"Login timeout")
 

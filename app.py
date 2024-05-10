@@ -181,12 +181,16 @@ def register_validate():
         # Generate the user ID
         user_id = get_next_user_id()
 
+        timestamp = datetime.now()
+
         # Isnert into mongoDB
         user_info = {
             "user_id": user_id,
             "username": user_name,
             "email": user_email,
-            "password": hashed_password
+            "password": hashed_password,
+            "active_status": 0,
+            'timestamp': timestamp
         }
         user_collection = client['personal_project']['user']
 
@@ -792,7 +796,6 @@ def get_matches(match_type):
 
         user_active_statuses = user_collection.find(
             {"user_id": {"$in": transform_id_list}},
-            # Projection to include only active_status field
             {"active_status": 1, "user_id": 1}
         )
 
@@ -802,6 +805,8 @@ def get_matches(match_type):
             user_active_status_list, key=lambda x: x[1], reverse=True)[:500]
 
         sorted_user_ids = [user[0] for user in sorted_user_active_status_list]
+
+        print(sorted_user_ids)
 
         transform_id_list, transform_value_list = get_value_from_user_dict(transform_all_user_collection.find(
             {"user_id": {"$in": sorted_user_ids}}))
@@ -1412,6 +1417,15 @@ def monitor(user_id, access_token):
                     access_token,
                     f"{house_title}\n{house_url}"
                 )
+                '''
+                lineNotifyMessage(
+                    access_token,
+                    f"{house_title}\n\
+                      Price: {house_price}\n\
+                      Address: {house_address}\n\
+                      Age: {house_age}"
+                )
+                '''
 
         # lineNotifyMessage(
         #    access_token, f"No house is available .......")

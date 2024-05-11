@@ -11,8 +11,11 @@ import pymongo
 import logging
 import os
 
+
+'''
 dotenv_path = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/.env'
 load_dotenv(dotenv_path)
+'''
 
 log_filename = os.getenv("APP_LOG_FILE_NAME")
 log_file_path = os.getenv("APP_LOG_FILE_PATH")

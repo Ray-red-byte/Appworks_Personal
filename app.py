@@ -17,10 +17,10 @@ from flask_cors import CORS
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from user_model.user_data_process import transform_one_user, transform_all_user, match_user, get_value_from_user_dict
 from user_model.house_data_process import transform_one_house, transform_all_house, match_house, get_value_from_house_dict, one_hot_gender
-
+'''
 dotenv_path = '/home/ec2-user/Appworks_Personal/.env'
 load_dotenv(dotenv_path)
-
+'''
 log_filename = os.getenv("APP_LOG_FILE_NAME")
 log_file_path = os.getenv("APP_LOG_FILE_PATH")
 logger = logging.getLogger(__name__)

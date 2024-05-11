@@ -12,6 +12,7 @@
             margin: 0;
             padding: 0;
             background-color: #f9f7f7;
+            zoom: 30%;
         }
 
 
@@ -382,14 +383,15 @@
             flex-shrink: 0;
             flex-grow: 1;
             bottom: 0;
-            right: 20px;
-            width: 1000px;
+            right: 2%;
+            width: 22.5%;
+            height: 59%;
             font-size: 30px;
             background-color: #fdfdfd;
             border: 3px solid #656565;
             border-radius: 10px;
             padding: 20px;
-            margin-top: 600px;
+            margin-top: 590px;
 
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
@@ -414,15 +416,18 @@
         }
 
         .message-status {
-            font-size: 18px; /* Adjust font size */
-             /* Set background color */
+            font-size: 50px;
             color: white; /* Set text color */
-            padding: 3px 8px; /* Add padding */
-            display: block;
-            width: 65px;
-            margin-left: 300px;
-            margin-top: -40px;
-            border-radius: 8px; /* Add border radius for rounded corners */
+            padding-top: 3px;
+            padding-bottom: 20px;
+            padding-left: 20px;
+            padding-right: 20px;
+            width: 16%;
+            height: 40px;
+            margin-left: auto;
+            position: absolute;
+            right: 250px;
+            border-radius: 20px; /* Add border radius for rounded corners */
         }
 
 
@@ -590,7 +595,7 @@
         }
 
         .message {
-            padding: 10px;
+            padding: 15px;
             margin: 5px;
             border-radius: 10px;
             background-color: #e6f2ff;
@@ -629,8 +634,8 @@
         #chatForm {
             display: flex;
             flex-direction: column;
-            width: 950px;
-            height: 1000px;
+            width: 95%;
+            height: 78%;
             margin-left: 5px;
             margin-bottom: 40px;
             border-radius: 20px;
@@ -645,7 +650,8 @@
         .chat-input-container {
             display: flex;
             align-items: center;
-            width: 1000px; /* Adjust the width as needed */
+            margin-top: -10px;
+            width: 100%; /* Adjust the width as needed */
         }
 
         #chatInput {
@@ -665,7 +671,7 @@
             border: none;
             border-radius: 0 5px 5px 0;
             cursor: pointer;
-            height: 80px;
+            height: 85px;
             transition: background-color 0.3s;
             font-size: 30px;
         }
@@ -686,7 +692,7 @@
         #cancel-btn {
             position: absolute;
             right: 20px;
-            top: 100px;
+            top: 8.5%;
             height: 60px;
             font-size: 30px;
             color: #fff;
@@ -1068,7 +1074,7 @@
             <h2 class="room_id" style="display: none;"></h2>
 
             <div class="chatroom-top">
-                <h2 style="margin-left: 470px;" id="chat-username">Ray</h2>
+                <h2 style="margin: 50px auto; font-size: 50px;" id="chat-username">Ray</h2>
 
                 <button id="leave-btn" type="submit">X</button>
                 <button id="cancel-btn" type="submit">cancel</button>
@@ -1270,6 +1276,25 @@
                 matchList.appendChild(row);
             });
         }
+  
+        const chatHist = [
+            
+                { user_id: "1", 
+                  username: "Aliceeeee", 
+                  message_status: "unread", 
+                  other_user: [{ user_id: "2", username: "Bob" }]
+                },
+                { user_id: "3", 
+                  username: "Charlie", 
+                  message_status: "unread", 
+                  other_user: [{ user_id: "4", username: "David" }] 
+                },
+                { user_id: "5", 
+                  username: "Eve", 
+                  message_status: "unread", 
+                  other_user: [{ user_id: "6", username: "Frank" }]
+                }
+        ];
 
         // Function to render match list
         function renderChatHistoryList(matches) {
@@ -1843,12 +1868,12 @@
         }
         
         // Initially
-        fetchChatHistory()
+        //fetchChatHistory()
         // Default match list
-        fetchUserMatches("All");
+        //fetchUserMatches("All");
 
         //renderMatchList(matches);
-        //renderChatHistoryList(matches);
+        renderChatHistoryList(chatHist);
     </script>
 </body>
 </html>

@@ -6,9 +6,10 @@ import os
 from flask import jsonify
 import pymongo
 
-
+'''
 dotenv_path = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/.env'
 load_dotenv(dotenv_path)
+'''
 
 # Mongo atlas
 CONNECTION_STRING = os.getenv("MONGO_ATLAS_USER")

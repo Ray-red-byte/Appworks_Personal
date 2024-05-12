@@ -47,11 +47,16 @@
             height: 100px; /* Adjusted height for responsiveness */
             margin-right: 50px; /* Adjusted margin for responsiveness */
             margin-top: 150px;
+            
+            z-index: 30000;
         }
 
-        a img {
+        .line-text:hover,
+        .user-info:hover,
+        .save-house-text:hover,
+        .logout-text:hover {
             cursor: pointer;
-            z-index: 10001;
+            transform: translateY(-10px);
         }
 
         .container {
@@ -255,7 +260,7 @@
 
         .save-house-btn {
             color:#ffffff;
-            font-size: 25px;
+            font-size: 30px;
             border-radius: 10px;
             background-color: #909090;
             width: 150px;
@@ -271,8 +276,10 @@
         .right-section {
             display: flex;
             position: fixed;
+            pointer-events: none;
             flex-direction: column;
             align-items: flex-end;
+            padding-top: 20px;
             top: 150px; /* Adjust as needed */
             right: -10px; /* Adjust as needed */
             width: 1000px;
@@ -1426,6 +1433,12 @@
 
         // Send user info to the chat room
         function allocateChatRoom(userId) {
+
+            //block match list or chat history
+            const matchList = document.getElementById('match-list');
+            const chatUserHistory = document.getElementById('chat-user-history');
+            matchList.style.display = 'none';
+            chatUserHistory.style.display = 'none';
 
             const constants = {
                 userId1: '',

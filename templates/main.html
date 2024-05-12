@@ -1266,7 +1266,12 @@
                         allocateButton.textContent = 'Chat';
                         allocateButton.className = 'allocate-button';
                         allocateButton.addEventListener('click', (event) => {
-                            event.stopPropagation(); // Prevent the click event from bubbling to the list item
+                            event.stopPropagation(); 
+
+                            const matchList = document.getElementById('match-list');
+                            const chatUserHistory = document.getElementById('chat-user-history');
+                            matchList.style.display = 'none';
+                            chatUserHistory.style.display = 'none';
                             allocateChatRoom(match["user_id"]);
                         });
 
@@ -1362,6 +1367,11 @@
                         allocateButton.className = 'allocate-button-hist';
                         allocateButton.addEventListener('click', (event) => {
                             event.stopPropagation(); 
+                            
+                            const matchList = document.getElementById('match-list');
+                            const chatUserHistory = document.getElementById('chat-user-history');
+                            matchList.style.display = 'none';
+                            chatUserHistory.style.display = 'none';
                             allocateChatRoom(match["user_id"]);
                         });
 
@@ -1434,11 +1444,7 @@
         // Send user info to the chat room
         function allocateChatRoom(userId) {
 
-            //block match list or chat history
-            const matchList = document.getElementById('match-list');
-            const chatUserHistory = document.getElementById('chat-user-history');
-            matchList.style.display = 'none';
-            chatUserHistory.style.display = 'none';
+
 
             const constants = {
                 userId1: '',

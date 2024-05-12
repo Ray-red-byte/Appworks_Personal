@@ -1267,11 +1267,6 @@
                         allocateButton.className = 'allocate-button';
                         allocateButton.addEventListener('click', (event) => {
                             event.stopPropagation(); 
-
-                            const matchList = document.getElementById('match-list');
-                            const chatUserHistory = document.getElementById('chat-user-history');
-                            matchList.style.display = 'none';
-                            chatUserHistory.style.display = 'none';
                             allocateChatRoom(match["user_id"]);
                         });
 
@@ -1368,10 +1363,6 @@
                         allocateButton.addEventListener('click', (event) => {
                             event.stopPropagation(); 
                             
-                            const matchList = document.getElementById('match-list');
-                            const chatUserHistory = document.getElementById('chat-user-history');
-                            matchList.style.display = 'none';
-                            chatUserHistory.style.display = 'none';
                             allocateChatRoom(match["user_id"]);
                         });
 

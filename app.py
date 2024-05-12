@@ -25,7 +25,8 @@ log_filename = os.getenv("APP_LOG_FILE_NAME")
 log_file_path = os.getenv("APP_LOG_FILE_PATH")
 logger = logging.getLogger(__name__)
 
-logging.basicConfig(filename=log_file_path, level=logging.INFO)
+logging.basicConfig(filename=log_file_path,
+                    format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET')
@@ -88,7 +89,8 @@ def logout():
         return response
 
     except Exception as e:
-        logger.error(f"Log out error : {e}")
+        cur_time = datetime.now()
+        logger.error(f"{cur_time} Logout error : {e}")
 
 
 @app.route('/user/login_token', methods=['POST'])
@@ -97,6 +99,8 @@ def login_token():
         content_type = request.headers.get('Content-Type')
 
         if content_type != 'application/json':
+            cur_time = datetime.now()
+            logger.error(f"{cur_time} Login error : Invalid Content-Type")
             return jsonify({'error': 'wrong Content-type'}, 400)
 
         form_data = request.get_json()
@@ -105,6 +109,8 @@ def login_token():
         user_email = form_data["email"]
 
         if not validate_email(user_email):
+            cur_time = datetime.now()
+            logger.error(f"{cur_time} Login error : Invalid email")
             response_data = {"Error": 'Invalid email'}
             return response_data, 400
 
@@ -113,11 +119,15 @@ def login_token():
         if user_id:
             user_password = get_user_password(user_id)
         else:
+            cur_time = datetime.now()
+            logger.error(f"{cur_time} Login error : Invalid User Name")
             response_data = {"Error": 'Invalid username or email'}
             return response_data, 400
 
         # Check if password is correct
         if not check_password_hash(user_password, user_login_password):
+            cur_time = datetime.now()
+            logger.error(f"{cur_time} Login error : Invalid password")
             response_data = {"Error": 'Invalid password'}
             return response_data, 400
 
@@ -131,7 +141,8 @@ def login_token():
         return response, 200
 
     else:
-        logger.error(f"Log out error : Invalid Content-Type")
+        cur_time = datetime.now()
+        logger.error(f"{cur_time} Login error : Invalid Content-Type")
         response_data = {"Error": "Invalid Content-Type"}
         return response_data, 400
 
@@ -199,6 +210,8 @@ def register_validate():
         return jsonify({'message': 'Register is valid'}), 200
 
     else:
+        cur_time = datetime.now()
+        logger.error(f"{cur_time} Register error : Invalid Content-Type")
         response_data = {"Error": "Invalid Content-Type"}
         return response_data, 400
 
@@ -218,7 +231,8 @@ def user_information():
         username = get_user_name(user_id)
         return render_template('user_information.html', username=username, user_id=user_id)
 
-    logger.warning(f"Login timeout")
+    cur_time = datetime.now()
+    logger.warning(f"{cur_time} Login timeout")
 
     return redirect(url_for('login'))
 
@@ -259,7 +273,8 @@ def user_info_insert():
 
             return redirect(url_for('routine_page'))
 
-        logger.warning(f"Login timeout")
+        cur_time = datetime.now()
+        logger.warning(f"{cur_time} Login timeout")
 
         return redirect(url_for('login'))
 
@@ -308,7 +323,8 @@ def user_routine_insert():
 
             return redirect(url_for('main_page'))
 
-        logger.warning(f"Login timeout")
+        cur_time = datetime.now()
+        logger.warning(f"{cur_time} Login timeout")
 
         return redirect(url_for('login'))
 
@@ -340,7 +356,8 @@ def furniture_insert():
         logger.info(f"house type saved successfully")
         return redirect(url_for('main_page'))
 
-    logger.warning(f"Login timeout")
+    cur_time = datetime.now()
+    logger.warning(f"{cur_time} Login timeout")
     return redirect(url_for('login'))
 
 
@@ -382,7 +399,16 @@ def user_filter_insert():
 
             return "House preference saved successfully", 200
 
+        cur_time = datetime.now()
+        logger.warning(f"{cur_time} Login timeout")
+
         return redirect(url_for('login'))
+
+    else:
+        cur_time = datetime.now()
+        logger.error(
+            f"{cur_time} User filter insert error : Invalid Content-Type")
+        return jsonify({'error': 'Invalid Content-Type'}, 400)
 
 # -------------------------------------------------------User information page-------------------------------------------------------
 
@@ -419,10 +445,17 @@ def save_house():
                 {'$set': {'saved_house': save_house_ls}},
                 upsert=True
             )
-            print("-------------------------------", cur_user_save_house_ls)
+
             return "House saved successfully", 200
 
-        logger.warning(f"Login timeout")
+        cur_time = datetime.now()
+        logger.warning(f"{cur_time} Login timeout")
+        return redirect(url_for('login'))
+
+    else:
+        cur_time = datetime.now()
+        logger.error(f"{cur_time} Save house error : Invalid Content-Type")
+        return jsonify({'error': 'Invalid Content-Type'}, 400)
 
 
 @app.route('/search/hot', methods=['GET'])
@@ -494,13 +527,12 @@ def search():
             {**house, '_id': str(house['_id'])}  # Convert ObjectId to string
             for house in matching_houses
         ]
-        print(search_houses_json)
 
-        # You may want to process the matching houses list further or send it directly to the frontend
-
+        logger.info(f"Search houses: {len(search_houses_json)}")
         return jsonify(search_houses_json), 200
 
-    logger.warning(f"Login timeout")
+    cur_time = datetime.now()
+    logger.warning(f"{cur_time} Login timeout")
     return redirect(url_for('login'))
 
 
@@ -589,8 +621,11 @@ def ai_recommend():
                 for house in match_houses
             ]
 
+            logger.info(f"AI recommend houses: {len(search_houses_json)}")
+
         except Exception as e:
-            logger.error("AI recommend error : ", e)
+            cur_time = datetime.now()
+            logger.error(f"{cur_time} AI recommend error : ", e)
             return jsonify({'error': 'No match'}), 500
 
         return jsonify(search_houses_json), 200
@@ -668,7 +703,7 @@ def get_user_recommend_house(house_id):
             {"house_id": house_id})
         cur_house = house_collection.find_one({"id": house_id})
 
-        print("-----------------Start Search-----------------")
+        logger.info(f"-----------------Start Search-----------------")
         cur_house_zone = cur_house["address"]
         district = cur_house_zone.split('市')[-1]
         district = district.split('區')[0]
@@ -677,7 +712,7 @@ def get_user_recommend_house(house_id):
         matching_zone_houses = house_collection.find({
             "address": {"$regex": regex_pattern},
         })
-        print("matching_zone_houses", matching_zone_houses)
+        logger.info(f"matching_zone_houses {matching_zone_houses}")
 
         house_ids = [matching_zone_house["id"]
                      for matching_zone_house in matching_zone_houses]
@@ -704,11 +739,10 @@ def get_user_recommend_house(house_id):
             match_houses = house_collection.find(
                 {"id": {"$in": nearest_neighbors_id_list}})
 
-            print(nearest_neighbors_id_list)
-
             matches_houses_data = [{'house_id': match_house['id'], 'title': match_house['title'], 'price': match_house['price'], 'address': match_house['address'], 'age': match_house['age'], 'size': match_house['size'], 'img_url': match_house['img_url']}
                                    for match_house in match_houses if int(match_house['id']) != int(house_id)]
 
+            logger.info(f"Detail recommend houses: {len(matches_houses_data)}")
         except Exception as e:
             logger.warning("Recommend house not found", e)
             return jsonify({'error': 'No match'}), 500
@@ -845,13 +879,12 @@ def get_matches(match_type):
         matches_data = [[{'user_id': user['user_id'], 'username': user['username']}]
                         for user in match_users if int(user['user_id']) != int(user_id)]
 
+        logger.info(f"{match_type}: {len(matches_data)}")
     except Exception as e:
         logger.warning("No match users", e)
         return jsonify({'error': 'No match'}), 500
 
     return jsonify(matches_data), 200
-
-# Route to enter chat room with a specific user
 
 
 @ app.route('/allocate_chat_room', methods=['GET', 'POST'])
@@ -866,6 +899,9 @@ def allocate_chat_room():
         cur_username = get_user_name(cur_user_id)
 
         return jsonify({'cur_user_id': cur_user_id, 'cur_username': cur_username, 'chat_user_id': chat_user_id, 'chat_username': chat_user_name}), 200
+
+    cur_time = datetime.now()
+    logger.warning(f"{cur_time} Login timeout")
     return redirect(url_for('login'))
 
 
@@ -881,6 +917,8 @@ def chat(user_id):
         chat_user_name = get_user_name(user_id)
         return render_template('chatroom.html', cur_user=cur_user, cur_user_id=cur_user_id, chat_user_id=user_id, chat_user_name=chat_user_name)
 
+    cur_time = datetime.now()
+    logger.warning(f"{cur_time} Login timeout")
     return redirect(url_for('login'))
 
 # ------------------------------------- Render template-------------------------------------
@@ -897,6 +935,8 @@ def main_page():
         username = get_user_name(user_id)
         return render_template('main.html', username=username, user_id=user_id)
 
+    cur_time = datetime.now()
+    logger.warning(f"{cur_time} Login timeout")
     return redirect(url_for('login'))
 
 
@@ -911,6 +951,8 @@ def routine_page():
         username = get_user_name(user_id)
         return render_template('routine.html', username=username)
 
+    cur_time = datetime.now()
+    logger.warning(f"{cur_time} Login timeout")
     return redirect(url_for('login'))
 
 
@@ -925,6 +967,8 @@ def house_type_page():
         username = get_user_name(user_id)
         return render_template('house_type.html', username=username)
 
+    cur_time = datetime.now()
+    logger.warning(f"{cur_time} Login timeout")
     return redirect(url_for('login'))
 
 
@@ -938,6 +982,8 @@ def house_detail_page(houseId):
         username = get_user_name(user_id)
         return render_template('house_detail.html', username=username, houseId=houseId)
 
+    cur_time = datetime.now()
+    logger.warning(f"{cur_time} Login timeout")
     return redirect(url_for('login'))
 
 
@@ -952,6 +998,8 @@ def line_page():
         username = get_user_name(user_id)
         return render_template('line.html')
 
+    cur_time = datetime.now()
+    logger.warning(f"{cur_time} Login timeout")
     return redirect(url_for('login'))
 
 
@@ -964,6 +1012,8 @@ def line_register_page():
         username = get_user_name(user_id)
         return render_template('line_register.html', username=username)
 
+    cur_time = datetime.now()
+    logger.warning(f"{cur_time} Login timeout")
     return redirect(url_for('login'))
 
 
@@ -977,6 +1027,8 @@ def user_profile(chat_user_id):
         chat_username = get_user_name(chat_user_id)
         return render_template('user_profile.html', chat_user_id=chat_user_id, username=chat_username)
 
+    cur_time = datetime.now()
+    logger.warning(f"{cur_time} Login timeout")
     return redirect(url_for('login'))
 
 
@@ -989,6 +1041,8 @@ def save_house_page():
     if isinstance(user_id, int):
         return render_template('save_house.html', user_id=user_id)
 
+    cur_time = datetime.now()
+    logger.warning(f"{cur_time} Login timeout")
     return redirect(url_for('login'))
 # ------------------------------------- Render template-------------------------------------
 
@@ -1011,6 +1065,8 @@ def chat_user_data(chat_user_id):
         }
         return jsonify(chat_user_data), 200
 
+    cur_time = datetime.now()
+    logger.warning(f"{cur_time} Login timeout")
     return redirect(url_for('login'))
 
 
@@ -1417,18 +1473,6 @@ def monitor(user_id, access_token):
                     access_token,
                     f"{house_title}\n{house_url}"
                 )
-                '''
-                lineNotifyMessage(
-                    access_token,
-                    f"{house_title}\n\
-                      Price: {house_price}\n\
-                      Address: {house_address}\n\
-                      Age: {house_age}"
-                )
-                '''
-
-        # lineNotifyMessage(
-        #    access_token, f"No house is available .......")
 
         time.sleep(10)
         count += 1
@@ -1440,8 +1484,12 @@ def line_register():
     token = request.cookies.get('token')
     user_id = authentication(token, jwt_secret_key)
 
-    authorizeCode = request.args.get('code')
-    token = getNotifyToken(authorizeCode, user_id)
+    try:
+        authorizeCode = request.args.get('code')
+        token = getNotifyToken(authorizeCode, user_id)
+    except Exception as e:
+        cur_time = datetime.now()
+        logger.error(f"{cur_time} Error in getting token {e}")
 
     # Save in mongo DB
     db = client["personal_project"]

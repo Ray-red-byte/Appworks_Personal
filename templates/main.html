@@ -47,7 +47,6 @@
             height: 100px; /* Adjusted height for responsiveness */
             margin-right: 50px; /* Adjusted margin for responsiveness */
             margin-top: 150px;
-            
             z-index: 30000;
         }
 
@@ -276,14 +275,11 @@
         .right-section {
             display: flex;
             position: fixed;
-            pointer-events: none;
             flex-direction: column;
             align-items: flex-end;
-            padding-top: 20px;
             top: 150px; /* Adjust as needed */
             right: -10px; /* Adjust as needed */
             width: 1000px;
-            height: calc(100% - 100px); 
         }
 
         .select-match-type {
@@ -324,7 +320,7 @@
             margin-top: 650px; 
             margin-right: 255px;
             width: 800px;
-            height:800px; /* Ensure the right-section takes up the full height */
+            height:800px; 
         }
 
         .chat-user-history {
@@ -1362,6 +1358,12 @@
                         allocateButton.className = 'allocate-button-hist';
                         allocateButton.addEventListener('click', (event) => {
                             event.stopPropagation(); 
+
+                            // hide match list or chat history
+                            //const matchList = document.getElementById('match-list');
+                            //const chatUserHistory = document.getElementById('chat-user-history');
+                            //matchList.style.display = 'none';
+                            //chatUserHistory.style.display = 'none';
                             
                             allocateChatRoom(match["user_id"]);
                         });

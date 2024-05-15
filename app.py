@@ -587,8 +587,6 @@ def ai_recommend():
         lowest_size = (lowest_save_size * 2 + lowest_click_size) / 3
         highest_size = (highest_save_size * 2 + highest_click_size) / 3
 
-        # Base on above information to search for house
-
         # Search similar zone
         zones = []
         for address in user_house_address_dict['address']:

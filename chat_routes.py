@@ -214,13 +214,9 @@ def get_matches(match_type):
     logger.info(f"-----------------Start Search-----------------")
 
     if match_type == 'zone':
-        users_share_zone = user_collection.find(
-            {"house_preference.zone": {"$in": user_prefer_zone}},
-            {"_id": 0, "user_id": 1}
-        )
 
-        users_share_zone_id_dict = [user["user_id"]
-                                    for user in users_share_zone]
+        users_share_zone_id_dict = user_collection.distinct(
+            "user_id", {"house_preference.zone": {"$in": user_prefer_zone}})
 
         transform_users_share_zone_dict = transform_all_user_collection.find(
             {"user_id": {"$in": users_share_zone_id_dict}})
@@ -230,16 +226,15 @@ def get_matches(match_type):
 
         user_active_statuses = user_collection.find(
             {"user_id": {"$in": transform_id_list}},
-            # Projection to include only active_status field
             {"active_status": 1, "user_id": 1}
         )
 
-        user_active_status_list = [[user["user_id"], user["active_status"]]
-                                   for user in user_active_statuses]
+        user_active_status_list = list(user_active_statuses)
         sorted_user_active_status_list = sorted(
-            user_active_status_list, key=lambda x: x[1], reverse=True)[:500]
+            user_active_status_list, key=lambda x: x['active_status'], reverse=True)[:500]
 
-        sorted_user_ids = [user[0] for user in sorted_user_active_status_list]
+        sorted_user_ids = [user['user_id']
+                           for user in sorted_user_active_status_list]
 
         transform_id_list, transform_value_list = get_value_from_user_dict(transform_all_user_collection.find(
             {"user_id": {"$in": sorted_user_ids}}))
@@ -248,11 +243,10 @@ def get_matches(match_type):
                                                transform_cur_user_data["value"], 11)
 
     elif match_type == 'same_gender':
-        users_share_gender_dict = user_collection.find(
-            {"basic_info.gender": cur_user["basic_info"]["gender"]})
 
-        users_share_gender_id_dict = [user["user_id"]
-                                      for user in users_share_gender_dict]
+        users_share_gender_id_dict = user_collection.distinct("user_id",
+                                                              {"basic_info.gender": cur_user["basic_info"]["gender"]})
+
         transform_users_share_gender_dict = transform_all_user_collection.find(
             {"user_id": {"$in": users_share_gender_id_dict}})
 
@@ -264,12 +258,12 @@ def get_matches(match_type):
             {"active_status": 1, "user_id": 1}
         )
 
-        user_active_status_list = [[user["user_id"], user["active_status"]]
-                                   for user in user_active_statuses]
+        user_active_status_list = list(user_active_statuses)
         sorted_user_active_status_list = sorted(
-            user_active_status_list, key=lambda x: x[1], reverse=True)[:500]
+            user_active_status_list, key=lambda x: x['active_status'], reverse=True)[:500]
 
-        sorted_user_ids = [user[0] for user in sorted_user_active_status_list]
+        sorted_user_ids = [user['user_id']
+                           for user in sorted_user_active_status_list]
 
         transform_id_list, transform_value_list = get_value_from_user_dict(transform_all_user_collection.find(
             {"user_id": {"$in": sorted_user_ids}}))
@@ -289,12 +283,13 @@ def get_matches(match_type):
             # Projection to include only active_status field
             {"active_status": 1, "user_id": 1}
         )
-        user_active_status_list = [[user["user_id"], user["active_status"]]
-                                   for user in user_active_statuses]
-        sorted_user_active_status_list = sorted(
-            user_active_status_list, key=lambda x: x[1], reverse=True)[:500]
 
-        sorted_user_ids = [user[0] for user in sorted_user_active_status_list]
+        user_active_status_list = list(user_active_statuses)
+        sorted_user_active_status_list = sorted(
+            user_active_status_list, key=lambda x: x['active_status'], reverse=True)[:500]
+
+        sorted_user_ids = [user['user_id']
+                           for user in sorted_user_active_status_list]
 
         transform_id_list, transform_value_list = get_value_from_user_dict(transform_all_user_collection.find(
             {"user_id": {"$in": sorted_user_ids}}))

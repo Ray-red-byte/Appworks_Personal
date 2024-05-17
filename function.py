@@ -2,6 +2,7 @@ import jwt
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import re
+import numpy as np
 import os
 from flask import jsonify
 import logging
@@ -27,6 +28,35 @@ client = pymongo.MongoClient(CONNECTION_STRING)
 db = client["personal_project"]
 user_collection = db["user"]
 house_collection = db["house"]
+
+
+def calculate_house_metrics(user_house_transform_dict):
+    np_save = np.array(user_house_transform_dict['save'])
+    np_click = np.array(user_house_transform_dict['click'])
+
+    highest_save_price = np_save[:, 0].max()
+    lowest_save_price = np_save[:, 0].min()
+    highest_click_price = np_click[:, 0].max()
+    lowest_click_price = np_click[:, 0].min()
+
+    highest_save_age = np_save[:, 1].max()
+    lowest_save_age = np_save[:, 1].min()
+    highest_click_age = np_click[:, 1].max()
+    lowest_click_age = np_click[:, 1].min()
+
+    highest_save_size = np_save[:, 2].max()
+    lowest_save_size = np_save[:, 2].min()
+    highest_click_size = np_click[:, 2].max()
+    lowest_click_size = np_click[:, 2].min()
+
+    lowest_price = (lowest_save_price * 2 + lowest_click_price) / 3
+    highest_price = (highest_save_price * 2 + highest_click_price) / 3
+    lowest_age = (lowest_save_age * 2 + lowest_click_age) / 3
+    highest_age = (highest_save_age * 2 + highest_click_age) / 3
+    lowest_size = (lowest_save_size * 2 + lowest_click_size) / 3
+    highest_size = (highest_save_size * 2 + highest_click_size) / 3
+
+    return lowest_price, highest_price, lowest_age, highest_age, lowest_size, highest_size
 
 
 def get_next_user_id():

@@ -1,7 +1,7 @@
 from flask import render_template, request, redirect, url_for, jsonify
 from datetime import datetime
 from dotenv import load_dotenv
-from function import authentication, get_user_name
+from function import authentication, get_user_name, calculate_house_metrics
 import os
 import re
 import pymongo
@@ -282,21 +282,9 @@ def ai_recommend():
         logger.info(
             f"------------------Start AI search-------------------------")
 
-        np_save, np_click = np.array(user_house_transform_dict['save']), np.array(
-            user_house_transform_dict['click'])
-        highest_save_price, lowest_save_price, highest_click_price, lowest_click_price = np_save[:, 0].max(
-        ), np_save[:, 0].min(), np_click[:, 0].max(), np_click[:, 0].min()
-        highest_save_age, lowest_save_age, highest_click_age, lowest_click_age = np_save[:, 1].max(
-        ), np_save[:, 1].min(), np_click[:, 1].max(), np_click[:, 1].min()
-        highest_save_size, lowest_save_size, highest_click_size, lowest_click_size = np_save[:, 2].max(
-        ), np_save[:, 2].min(), np_click[:, 2].max(), np_click[:, 2].min()
-
-        lowest_price = (lowest_save_price * 2 + lowest_click_price) / 3
-        highest_price = (highest_save_price * 2 + highest_click_price) / 3
-        lowest_age = (lowest_save_age * 2 + lowest_click_age) / 3
-        highest_age = (highest_save_age * 2 + highest_click_age) / 3
-        lowest_size = (lowest_save_size * 2 + lowest_click_size) / 3
-        highest_size = (highest_save_size * 2 + highest_click_size) / 3
+        # Get the highest and lowest price, age, and size from user's save and click house
+        lowest_price, highest_price, lowest_age, highest_age, lowest_size, highest_size = calculate_house_metrics(
+            user_house_transform_dict)
 
         # Search similar zone
         zones = []

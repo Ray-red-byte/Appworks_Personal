@@ -12,6 +12,10 @@ log_filename = os.getenv("APP_LOG_FILE_NAME")
 log_file_path = os.getenv("APP_LOG_FILE_PATH")
 logger = logging.getLogger(__name__)
 
+logging.basicConfig(filename=log_file_path,
+                    format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
+
+
 # JWT secret key
 jwt_secret_key = os.getenv('JWT_SECRET_KEY')
 
@@ -127,4 +131,23 @@ def save_house_page():
 
     cur_time = datetime.now()
     logger.warning(f"{cur_time} Login timeout")
+    return redirect(url_for('login'))
+
+
+def user_information():
+    # Retrieve the parameters from the query string
+    token = request.cookies.get('token')
+
+    logger.info(f"-----------------User information page-----------------")
+
+    # Call the authentication function to verify the token
+    user_id = authentication(token, jwt_secret_key)
+
+    if isinstance(user_id, int):
+        username = get_user_name(user_id)
+        return render_template('user_information.html', username=username, user_id=user_id)
+
+    cur_time = datetime.now()
+    logger.warning(f"{cur_time} Login timeout")
+
     return redirect(url_for('login'))

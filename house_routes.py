@@ -5,6 +5,7 @@ from function import authentication, get_user_name
 import os
 import re
 import pymongo
+import numpy as np
 import logging
 from user_model.house_data_process import transform_one_house, transform_all_house, match_house, get_value_from_house_dict, one_hot_gender
 

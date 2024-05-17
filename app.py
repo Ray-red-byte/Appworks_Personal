@@ -4,6 +4,8 @@ from chat_routes import chat_user_data, cancel, save_messages, chat_history, sav
 from info_insert_routes import user_info_insert, user_routine_insert, user_filter_insert
 from initial_routes import login, logout, register, register_validate, login_token
 from house_routes import remove_house, get_user_save_house, get_user_house, get_user_recommend_house, save_house, search_hot, search, ai_recommend
+from track_routes import track_click
+from line_routes import line_house_preference, line_register
 from flask import Flask, render_template, request, jsonify, make_response, redirect, url_for
 import requests
 import os
@@ -15,10 +17,8 @@ import pymongo
 import numpy as np
 import time
 import logging
-import signal
-import subprocess
 from werkzeug.security import generate_password_hash, check_password_hash
-from function import get_user_id, check_exist_user, validate_email, create_token, authentication, get_user_password, get_user_name, calculate_active_status, get_next_user_id
+from function import get_user_id, check_exist_user, validate_email, create_token, authentication, get_user_password, get_user_name, calculate_active_status, get_next_user_id, lineNotifyMessage, getNotifyToken
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from user_model.user_data_process import transform_one_user, transform_all_user, match_user, get_value_from_user_dict
@@ -95,48 +95,7 @@ app.add_url_rule('/search', 'search', search)
 app.add_url_rule('/ai_recommend', 'ai_recommend', ai_recommend)
 
 # -------------------------------------------------------User house-------------------------------------------------------
-
-
-@ app.route('/track/click', methods=['POST'])
-def track_click():
-    house_id = request.json.get('house_id')
-
-    token = request.cookies.get('token')
-    user_id = authentication(token, jwt_secret_key)
-
-    # Save house click
-    house_collection = client['personal_project']['house']
-    house_collection.update_one(
-        {'id': int(house_id)},
-        {'$inc': {'click': 1}},
-        upsert=True
-    )
-
-    # Save user click
-    click_house_ls = []
-    if isinstance(user_id, int):
-        user_collection = client['personal_project']['user']
-        cur_user = user_collection.find_one({"user_id": user_id})
-        cur_user_click_house_ls = cur_user.get('click_house', [])
-
-        if int(house_id) not in cur_user_click_house_ls:
-            click_house_ls.append(int(house_id))
-
-        click_house_ls.extend(cur_user_click_house_ls)
-
-        user_collection.update_one(
-            {'user_id': user_id},
-            {'$set': {'click_house': click_house_ls}},
-            upsert=True
-        )
-
-    return "Click tracked", 200
-
-# ------------------------------------------------------Track user click house------------------------------------------------------
-
-# ------------------------------------------------------house detail page------------------------------------------------------
-
-    # ------------------------------------------------------Get user house------------------------------------------------------
+app.add_url_rule('/track/click', 'track_click', track_click, methods=['POST'])
 
 
 # ------------------------------------- Render template-------------------------------------
@@ -172,53 +131,12 @@ app.add_url_rule('/chat/<int:user_id>', 'chat', chat)
 
 
 # --------------------------------------------------------LINE Notify--------------------------------------------------------
-def getNotifyToken(AuthorizeCode, user_id):
-    body = {
-        "grant_type": "authorization_code",
-        "code": AuthorizeCode,
-        "redirect_uri": f'https://rentright.info',
-        "client_id": 'bvtTFwMkqG5LiWFJIq3aXb',
-        "client_secret": 'saHb9IQBraM3Rm76iNMModraELZAjx7YJUiibpfEfUh'
-    }
-    r = requests.post("https://notify-bot.line.me/oauth/token", data=body)
-    return r.json()["access_token"]
+app.add_url_rule('/line/preference', 'line_house_preference',
+                 line_house_preference, methods=['POST'])
+app.add_url_rule('/', 'line_register', line_register, methods=['POST', 'GET'])
 
 
-def lineNotifyMessage(token, msg):
-    headers = {
-        "Authorization": "Bearer " + token,
-        "Content-Type": "application/x-www-form-urlencoded"
-    }
-
-    payload = {'message': msg}
-    r = requests.post("https://notify-api.line.me/api/notify",
-                      headers=headers, data=payload)
-    return r.status_code
-
-
-@ app.route('/line/preference', methods=['POST'])
-def line_house_preference():
-    token = request.cookies.get('token')
-    user_id = authentication(token, jwt_secret_key)
-
-    if isinstance(user_id, int):
-        price = request.form.get('price')
-        house_age = request.form.get('houseAge')
-        zone = request.form.getlist('zone')
-        stay_with_landlord = request.form.get('stayWithLandlord')
-        park_nearby = request.form.get('park')
-
-        db = client["personal_project"]
-        user_collection = db["user"]
-        user_collection.update_one(
-            {"user_id": user_id},
-            {"$set": {'line_preference': {'price': price, 'house_age': house_age, 'zone': zone,
-                                          'stay_with_landlord': stay_with_landlord, 'park_nearby': park_nearby}}}
-        )
-    return jsonify("Line preference saved successfully"), 200
-
-
-@ app.route('/send', methods=['GET', 'POST'])
+@app.route('/send', methods=['GET', 'POST'])
 def send():
     token = request.cookies.get('token')
     user_id = authentication(token, jwt_secret_key)
@@ -292,30 +210,6 @@ def monitor(user_id, access_token):
 
         time.sleep(10)
         count += 1
-
-
-@ app.route('/', methods=['POST', 'GET'])
-def line_register():
-    # Get user id from cookies
-    token = request.cookies.get('token')
-    user_id = authentication(token, jwt_secret_key)
-
-    try:
-        authorizeCode = request.args.get('code')
-        token = getNotifyToken(authorizeCode, user_id)
-    except Exception as e:
-        cur_time = datetime.now()
-        logger.error(f"{cur_time} Error in getting token {e}")
-
-    # Save in mongo DB
-    db = client["personal_project"]
-    user_collection = db["user"]
-    user_collection.update_one(
-        {"user_id": int(user_id)},
-        {"$set": {'access_token': token}},
-        upsert=True)
-
-    return redirect(url_for('line_page'))
 
 
 # Add URL routes using add_url_rule

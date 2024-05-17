@@ -4,10 +4,20 @@ from dotenv import load_dotenv
 import re
 import os
 from flask import jsonify
+import logging
+import requests
 import pymongo
 
 dotenv_path = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/.env'
 load_dotenv(dotenv_path)
+
+log_filename = os.getenv("APP_LOG_FILE_NAME")
+log_file_path = os.getenv("APP_LOG_FILE_PATH")
+logger = logging.getLogger(__name__)
+
+logging.basicConfig(filename=log_file_path,
+                    format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
+
 
 # Mongo atlas
 CONNECTION_STRING = os.getenv("MONGO_ATLAS_USER")
@@ -144,3 +154,27 @@ def authentication(token, jwt_secret_key):
         return jsonify({'message': 'Token has expired'}), 401
     except jwt.InvalidTokenError:
         return jsonify({'message': 'Invalid token'}), 500
+
+
+def getNotifyToken(AuthorizeCode, user_id):
+    body = {
+        "grant_type": "authorization_code",
+        "code": AuthorizeCode,
+        "redirect_uri": f'https://rentright.info',
+        "client_id": 'bvtTFwMkqG5LiWFJIq3aXb',
+        "client_secret": 'saHb9IQBraM3Rm76iNMModraELZAjx7YJUiibpfEfUh'
+    }
+    r = requests.post("https://notify-bot.line.me/oauth/token", data=body)
+    return r.json()["access_token"]
+
+
+def lineNotifyMessage(token, msg):
+    headers = {
+        "Authorization": "Bearer " + token,
+        "Content-Type": "application/x-www-form-urlencoded"
+    }
+
+    payload = {'message': msg}
+    r = requests.post("https://notify-api.line.me/api/notify",
+                      headers=headers, data=payload)
+    return r.status_code

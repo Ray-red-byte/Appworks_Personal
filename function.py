@@ -6,10 +6,8 @@ import os
 from flask import jsonify
 import pymongo
 
-'''
 dotenv_path = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/.env'
 load_dotenv(dotenv_path)
-'''
 
 # Mongo atlas
 CONNECTION_STRING = os.getenv("MONGO_ATLAS_USER")
@@ -19,6 +17,17 @@ client = pymongo.MongoClient(CONNECTION_STRING)
 db = client["personal_project"]
 user_collection = db["user"]
 house_collection = db["house"]
+
+
+def get_next_user_id():
+    # Find and update the user_id counter
+    counter_doc = client['personal_project']['user'].counters.find_one_and_update(
+        {"_id": "user_id"},
+        {"$inc": {"seq": 1}},
+        upsert=True,  # Create the counter if it doesn't exist
+        return_document=True
+    )
+    return counter_doc["seq"]
 
 
 def calculate_active_status(be_cancel, be_chatted_user, chat_user, saved_house, click_house):

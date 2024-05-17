@@ -1,3 +1,5 @@
+from page_routes import main_page, routine_page, house_type_page, house_detail_page, line_page, line_register_page, user_profile, save_house_page
+from socketio_routes import handle_online, handle_offline, on_join, on_leave, handle_message
 from flask import Flask, render_template, request, jsonify, make_response, redirect, url_for
 import requests
 import os
@@ -12,15 +14,15 @@ import logging
 import signal
 import subprocess
 from werkzeug.security import generate_password_hash, check_password_hash
-from function import get_user_id, check_exist_user, validate_email, create_token, authentication, get_user_password, get_user_name, calculate_active_status
+from function import get_user_id, check_exist_user, validate_email, create_token, authentication, get_user_password, get_user_name, calculate_active_status, get_next_user_id
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from user_model.user_data_process import transform_one_user, transform_all_user, match_user, get_value_from_user_dict
 from user_model.house_data_process import transform_one_house, transform_all_house, match_house, get_value_from_house_dict, one_hot_gender
-'''
-dotenv_path = '/home/ec2-user/Appworks_Personal/.env'
+
+dotenv_path = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/.env'
 load_dotenv(dotenv_path)
-'''
+
 log_filename = os.getenv("APP_LOG_FILE_NAME")
 log_file_path = os.getenv("APP_LOG_FILE_PATH")
 logger = logging.getLogger(__name__)
@@ -33,6 +35,9 @@ app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET')
 app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379/0'
 app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/0'
 
+# JWT secret key
+jwt_secret_key = os.getenv('JWT_SECRET_KEY')
+
 # Initialize Celery
 celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
 celery.conf.update(app.config)
@@ -40,10 +45,6 @@ celery.conf.update(app.config)
 CORS(app)
 
 socketio = SocketIO(app, cors_allowed_origins="*")
-
-
-# JWT secret key
-jwt_secret_key = os.getenv('JWT_SECRET_KEY')
 
 
 # Mongo atlas
@@ -150,17 +151,6 @@ def login_token():
 @app.route('/register')
 def register():
     return render_template('register.html')
-
-
-def get_next_user_id():
-    # Find and update the user_id counter
-    counter_doc = client['personal_project']['user'].counters.find_one_and_update(
-        {"_id": "user_id"},
-        {"$inc": {"seq": 1}},
-        upsert=True,  # Create the counter if it doesn't exist
-        return_document=True
-    )
-    return counter_doc["seq"]
 
 
 @app.route("/user/register_validate", methods=['GET', 'POST'])
@@ -501,7 +491,6 @@ def search():
     user_id = authentication(token, jwt_secret_key)
 
     if isinstance(user_id, int):
-        print("user", user_id)
         user_collection = client['personal_project']['user']
         house_collection = client['personal_project']['house']
         user = user_collection.find_one({"user_id": user_id})
@@ -717,17 +706,6 @@ def get_user_recommend_house(house_id):
         transform_select_house_data_dicts = list(
             transform_all_house_collection.find({"house_id": {"$in": house_ids}}))
 
-        '''
-        transform_select_house_data_dicts = []
-
-        for matching_zone_house in matching_zone_houses:
-            house_id = matching_zone_house["id"]
-            transform_house_data = transform_all_house_collection.find_one(
-                {"house_id": int(house_id)})
-            if transform_house_data:
-                transform_select_house_data_dicts.append(transform_house_data)
-        '''
-
         transform_house_id_list, transform_house_value_list = get_value_from_house_dict(
             transform_select_house_data_dicts)
 
@@ -784,7 +762,9 @@ def get_matches(match_type):
 
     if match_type == 'zone':
         users_share_zone = user_collection.find(
-            {"house_preference.zone": {"$in": user_prefer_zone}})
+            {"house_preference.zone": {"$in": user_prefer_zone}},
+            {"_id": 0, "user_id": 1}
+        )
 
         users_share_zone_id_dict = [user["user_id"]
                                     for user in users_share_zone]
@@ -837,8 +817,6 @@ def get_matches(match_type):
             user_active_status_list, key=lambda x: x[1], reverse=True)[:500]
 
         sorted_user_ids = [user[0] for user in sorted_user_active_status_list]
-
-        print(sorted_user_ids)
 
         transform_id_list, transform_value_list = get_value_from_user_dict(transform_all_user_collection.find(
             {"user_id": {"$in": sorted_user_ids}}))
@@ -919,129 +897,17 @@ def chat(user_id):
     logger.warning(f"{cur_time} Login timeout")
     return redirect(url_for('login'))
 
+
 # ------------------------------------- Render template-------------------------------------
-
-
-@ app.route('/main')
-def main_page():
-    token = request.cookies.get('token')
-
-    # Call the authentication function to verify the token
-    user_id = authentication(token, jwt_secret_key)
-
-    if isinstance(user_id, int):
-        username = get_user_name(user_id)
-        return render_template('main.html', username=username, user_id=user_id)
-
-    cur_time = datetime.now()
-    logger.warning(f"{cur_time} Login timeout")
-    return redirect(url_for('login'))
-
-
-@ app.route('/routine')
-def routine_page():
-    token = request.cookies.get('token')
-
-    # Call the authentication function to verify the token
-    user_id = authentication(token, jwt_secret_key)
-
-    if isinstance(user_id, int):
-        username = get_user_name(user_id)
-        return render_template('routine.html', username=username)
-
-    cur_time = datetime.now()
-    logger.warning(f"{cur_time} Login timeout")
-    return redirect(url_for('login'))
-
-
-@ app.route('/house_type')
-def house_type_page():
-    token = request.cookies.get('token')
-
-    # Call the authentication function to verify the token
-    user_id = authentication(token, jwt_secret_key)
-
-    if isinstance(user_id, int):
-        username = get_user_name(user_id)
-        return render_template('house_type.html', username=username)
-
-    cur_time = datetime.now()
-    logger.warning(f"{cur_time} Login timeout")
-    return redirect(url_for('login'))
-
-
-@ app.route('/user/house_detail/<int:houseId>')
-def house_detail_page(houseId):
-    token = request.cookies.get('token')
-
-    # Call the authentication function to verify the token
-    user_id = authentication(token, jwt_secret_key)
-    if isinstance(user_id, int):
-        username = get_user_name(user_id)
-        return render_template('house_detail.html', username=username, houseId=houseId)
-
-    cur_time = datetime.now()
-    logger.warning(f"{cur_time} Login timeout")
-    return redirect(url_for('login'))
-
-
-@ app.route('/line_page', methods=['GET', 'POST'])
-def line_page():
-    token = request.cookies.get('token')
-
-    # Call the authentication function to verify the token
-    user_id = authentication(token, jwt_secret_key)
-
-    if isinstance(user_id, int):
-        username = get_user_name(user_id)
-        return render_template('line.html')
-
-    cur_time = datetime.now()
-    logger.warning(f"{cur_time} Login timeout")
-    return redirect(url_for('login'))
-
-
-@ app.route('/line_register', methods=['GET', 'POST'])
-def line_register_page():
-    token = request.cookies.get('token')
-    user_id = authentication(token, jwt_secret_key)
-
-    if isinstance(user_id, int):
-        username = get_user_name(user_id)
-        return render_template('line_register.html', username=username)
-
-    cur_time = datetime.now()
-    logger.warning(f"{cur_time} Login timeout")
-    return redirect(url_for('login'))
-
-
-@ app.route('/user/profile/<int:chat_user_id>')
-def user_profile(chat_user_id):
-    token = request.cookies.get('token')
-
-    # Call the authentication function to verify the token
-    user_id = authentication(token, jwt_secret_key)
-    if isinstance(user_id, int):
-        chat_username = get_user_name(chat_user_id)
-        return render_template('user_profile.html', chat_user_id=chat_user_id, username=chat_username)
-
-    cur_time = datetime.now()
-    logger.warning(f"{cur_time} Login timeout")
-    return redirect(url_for('login'))
-
-
-@ app.route('/user/save_house', methods=['GET', 'POST'])
-def save_house_page():
-    token = request.cookies.get('token')
-
-    # Call the authentication function to verify the token
-    user_id = authentication(token, jwt_secret_key)
-    if isinstance(user_id, int):
-        return render_template('save_house.html', user_id=user_id)
-
-    cur_time = datetime.now()
-    logger.warning(f"{cur_time} Login timeout")
-    return redirect(url_for('login'))
+app.add_url_rule('/main', 'main_page', main_page)
+app.add_url_rule('/routine', 'routine_page', routine_page)
+app.add_url_rule('/user/house_detail/<int:houseId>',
+                 'house_detail_page', house_detail_page)
+app.add_url_rule('/line_page', 'line_page', line_page)
+app.add_url_rule('/line_register', 'line_register_page', line_register_page)
+app.add_url_rule('/user/profile/<int:chat_user_id>',
+                 'user_profile', user_profile)
+app.add_url_rule('/user/save_house', 'save_house_page', save_house_page)
 # ------------------------------------- Render template-------------------------------------
 
 
@@ -1158,7 +1024,6 @@ def save_messages():
         else:
             room_id = f"{chat_user_id}_{user_id}"
 
-        room_collection = client['personal_project']['room']
         if room_collection.find_one({"room_id": room_id}) is None:
             user_collection = client['personal_project']['user']
             cur_user = user_collection.find_one({"user_id": user_id})
@@ -1251,109 +1116,7 @@ def get_user_save_house():
     return jsonify(houses_json), 200
 
 
-# ------------------------Show online users------------------------
-online_users = []
-
-
-@ socketio.on('online')
-def handle_online(data):
-    user_id = data['user_id']
-    if user_id not in online_users and user_id is not None:
-        online_users.append(user_id)
-    logger.info(f"{online_users} is online")
-    emit('show', online_users, broadcast=True)
-
-
-@ socketio.on('offline')
-def handle_offline(data):
-    user_id = data['user_id']
-    online_users.remove(user_id)
-    logger.info(f"{online_users} is remove")
-    emit('hide', user_id, broadcast=True)
-
-# ------------------------Show online users------------------------
-
-
-room_count = {}
-
-
-@ socketio.on('join_room')
-def on_join(data):
-    user_id = data['user_id']
-    username = get_user_name(int(user_id))
-    logger.info(f"new user join room {username}")
-    room_id = data['room_id']
-    join_room(room_id)
-    room_count.setdefault(room_id, 0)
-    room_count[room_id] += 1
-
-    logger.info(f'{username} has join {room_id} the room.')
-
-    emit('message', {'senderId': username,
-                     "recipientId": "None",  "message": 'joined the room.', 'room_status': "join room"}, room=room_id)
-
-
-@ socketio.on('leave')
-def on_leave(data):
-    user_id = data['userId1']
-    username = get_user_name(int(user_id))
-    room_id = data['roomId']
-
-    room_count[room_id] -= 1
-    user_count = room_count[room_id]
-
-    # if the last one leave the room
-
-    logger.info(f'{username} has left the {room_id} room.')
-    if user_count == 0:
-        logger.info("last user left the room.")
-
-    emit('message', {'senderId': username,
-                     "recipientId": "None",  "message": 'leave  room.', 'room_status': "leave_room"}, room=room_id)
-    leave_room(room_id)
-
-
-@ socketio.on('send_message')
-def handle_message(data):
-    senderId = data['senderId']
-    recipientId = data['recipientId']
-    room_id = data['room']
-    message = data['message']
-
-    logger.info(f"{senderId} : {message}")
-
-    # Get all users from the room_id
-    total_user = len(room_id.split("_"))
-    user_count = room_count[room_id]
-
-    emit('message', {'senderId': senderId,
-                     'recipientId': recipientId, 'message': message, 'room_status': "save_messages"}, room=room_id)
-
-
 # --------------------------------------------------------LINE Notify--------------------------------------------------------
-# Function to start the Celery worker
-def start_celery():
-    # Check if Celery is already running
-    if not is_celery_running():
-        subprocess.Popen(['celery', '-A', 'app.celery',
-                         'worker', '--loglevel=info', '--concurrency=2'])
-
-
-# Check if Celery worker is running
-def is_celery_running():
-    pid = get_celery_pid()
-    return pid is not None
-
-
-# Get Celery worker process ID
-def get_celery_pid():
-    ps_output = subprocess.check_output(['ps', 'aux'])
-    for line in ps_output.decode().split('\n'):
-        if 'celery worker' in line and 'python3' in line:
-            return int(line.split()[1])
-    return None
-
-
 def getNotifyToken(AuthorizeCode, user_id):
     body = {
         "grant_type": "authorization_code",
@@ -1500,6 +1263,13 @@ def line_register():
     return redirect(url_for('line_page'))
 
 
+# Add URL routes using add_url_rule
+socketio.on_event('online', handle_online)
+socketio.on_event('offline', handle_offline)
+socketio.on_event('join_room', on_join)
+socketio.on_event('leave', on_leave)
+socketio.on_event('send_message', handle_message)
+
+
 if __name__ == '__main__':
-    # start_celery()
     socketio.run(app)

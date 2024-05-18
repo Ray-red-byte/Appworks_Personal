@@ -1,104 +1,96 @@
 import pytest
-from unittest.mock import patch, MagicMock
-from app import app  # Make sure your Flask app is imported correctly
+import requests
+import os
+import numpy as np
+from dotenv import load_dotenv
+import pymongo
+import warnings
+from app import app
+from function import calculate_house_metrics, calculate_active_status
 
 
-@pytest.fixture
+# Suppress pymongo deprecation warnings
+warnings.filterwarnings(
+    "ignore", category=DeprecationWarning, module="pymongo.srv_resolver")
+
+
+# Mongo atlas
+dotenv_path = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/.env'
+load_dotenv(dotenv_path)
+JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
+TEST_MONGO_URI = os.getenv("MONGO_ATLAS_USER")
+
+
+@ pytest.fixture
 def client():
     with app.test_client() as client:
         yield client
 
 
-@pytest.fixture
-def mock_db():
-    with patch('app.client') as mock_client:
-        yield mock_client
+@ pytest.fixture
+def set_test_db():
+    # Use the test database for the duration of the test
+    app.config['MONGO_URI'] = TEST_MONGO_URI
+    yield
 
 
-@pytest.fixture
-def mock_auth():
-    with patch('app.authentication') as mock_authentication:
-        yield mock_authentication
-
-
-def test_get_matches_success(client, mock_db, mock_auth):
-    mock_auth.return_value = '123'  # Mock authenticated user_id
-
-    # Mock current user data
-    mock_db["personal_project"]["user"].find_one.return_value = {
-        "user_id": 123,
-        "house_preference": {"zone": ["Zone1", "Zone2"]},
-        "basic_info": {"gender": "male"}
+def test_calculate_house_metrics():
+    # Prepare test data
+    user_house_transform_dict = {
+        'save': [
+            [100, 10, 50],
+            [200, 20, 60],
+            [150, 15, 55]
+        ],
+        'click': [
+            [300, 30, 70],
+            [250, 25, 65],
+            [350, 35, 75]
+        ]
     }
 
-    # Mock transformed user data
-    mock_db["personal_project"]["transform_all_user"].find_one.return_value = {
-        "user_id": 123,
-        "value": [0.1, 0.2, 0.3]
-    }
+    # Expected results
+    expected_lowest_price = (100 * 2 + 250) / 3
+    expected_highest_price = (200 * 2 + 350) / 3
+    expected_lowest_age = (10 * 2 + 25) / 3
+    expected_highest_age = (20 * 2 + 35) / 3
+    expected_lowest_size = (50 * 2 + 65) / 3
+    expected_highest_size = (60 * 2 + 75) / 3
 
-    # Mock users sharing the same zone
-    mock_db["personal_project"]["user"].find.return_value = [
-        {"user_id": 234},
-        {"user_id": 345}
-    ]
+    # Call the function
+    lowest_price, highest_price, lowest_age, highest_age, lowest_size, highest_size = calculate_house_metrics(
+        user_house_transform_dict)
 
-    # Mock transformed users sharing the same zone
-    mock_db["personal_project"]["transform_all_user"].find.return_value = [
-        {"user_id": 234, "value": [0.4, 0.5, 0.6]},
-        {"user_id": 345, "value": [0.7, 0.8, 0.9]}
-    ]
-
-    # Mock user active statuses
-    mock_db["personal_project"]["user"].find.return_value = [
-        {"user_id": 234, "active_status": 10},
-        {"user_id": 345, "active_status": 20}
-    ]
-
-    # Call the endpoint
-    response = client.get('/matches/zone')
-
-    # Verify the response
-    assert response.status_code == 200
-    assert response.json == [
-        {'user_id': 234, 'username': 'username234'},
-        {'user_id': 345, 'username': 'username345'}
-    ]
+    # Assertions
+    assert np.isclose(
+        lowest_price, expected_lowest_price), f"Expected {expected_lowest_price}, got {lowest_price}"
+    assert np.isclose(
+        highest_price, expected_highest_price), f"Expected {expected_highest_price}, got {highest_price}"
+    assert np.isclose(
+        lowest_age, expected_lowest_age), f"Expected {expected_lowest_age}, got {lowest_age}"
+    assert np.isclose(
+        highest_age, expected_highest_age), f"Expected {expected_highest_age}, got {highest_age}"
+    assert np.isclose(
+        lowest_size, expected_lowest_size), f"Expected {expected_lowest_size}, got {lowest_size}"
+    assert np.isclose(
+        highest_size, expected_highest_size), f"Expected {expected_highest_size}, got {highest_size}"
 
 
-def test_get_matches_no_match(client, mock_db, mock_auth):
-    mock_auth.return_value = '123'  # Mock authenticated user_id
+def test_calculate_active_status():
+    # Test cases with different input values
 
-    # Mock current user data
-    mock_db["personal_project"]["user"].find_one.return_value = {
-        "user_id": 123,
-        "house_preference": {"zone": ["Zone1", "Zone2"]},
-        "basic_info": {"gender": "male"}
-    }
+    # Test case 1: All activities are zero
+    assert calculate_active_status(0, 0, 0, 0, 0) == 0
 
-    # Mock transformed user data
-    mock_db["personal_project"]["transform_all_user"].find_one.return_value = {
-        "user_id": 123,
-        "value": [0.1, 0.2, 0.3]
-    }
+    # Test case 2: Only one activity has a value
+    assert calculate_active_status(1, 0, 0, 0, 0) == 0
+    assert calculate_active_status(0, 1, 0, 0, 0) == 0.5
+    assert calculate_active_status(0, 0, 1, 0, 0) == 0.2
+    assert calculate_active_status(0, 0, 0, 1, 0) == 0.24
+    assert calculate_active_status(0, 0, 0, 0, 1) == 0.05
 
-    # Mock no users sharing the same zone
-    mock_db["personal_project"]["user"].find.return_value = []
+    # Test case 3: All activities have equal values
+    assert calculate_active_status(1, 1, 1, 1, 1) == 0.98
 
-    # Call the endpoint
-    response = client.get('/matches/zone')
-
-    # Verify the response
-    assert response.status_code == 500
-    assert response.json == {'error': 'No match'}
-
-
-def test_get_matches_invalid_token(client, mock_db, mock_auth):
-    mock_auth.side_effect = Exception("Invalid token")  # Mock invalid token
-
-    # Call the endpoint
-    response = client.get('/matches/zone')
-
-    # Verify the response
-    assert response.status_code == 500
-    assert response.json == {'error': 'No match'}
+    # Test case 4: Random values for activities
+    assert calculate_active_status(2, 5, 3, 4, 1) == 4.090000000000001

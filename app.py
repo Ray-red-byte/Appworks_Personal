@@ -1,11 +1,11 @@
-from page_routes import main_page, routine_page, house_type_page, house_detail_page, line_page, line_register_page, user_profile, save_house_page, user_information
-from socketio_routes import handle_online, handle_offline, on_join, on_leave, handle_message
-from chat_routes import chat_user_data, cancel, save_messages, chat_history, save_messages, get_messages, get_matches, allocate_chat_room, chat
-from info_insert_routes import user_info_insert, user_routine_insert, user_filter_insert
-from initial_routes import login, logout, register, register_validate, login_token
-from house_routes import remove_house, get_user_save_house, get_user_house, get_user_recommend_house, save_house, search_hot, search, ai_recommend
-from track_routes import track_click
-from line_routes import line_house_preference, line_register
+from router.page_routes import main_page, routine_page, house_type_page, house_detail_page, line_page, line_register_page, user_profile, save_house_page, user_information
+from router.socketio_routes import handle_online, handle_offline, on_join, on_leave, handle_message
+from router.chat_routes import chat_user_data, cancel, save_messages, chat_history, save_messages, get_messages, get_matches, allocate_chat_room, chat
+from router.info_insert_routes import user_info_insert, user_routine_insert, user_filter_insert
+from router.initial_routes import login, logout, register, register_validate, login_token
+from router.house_routes import remove_house, get_user_save_house, get_user_house, get_user_recommend_house, save_house, search_hot, search, ai_recommend
+from router.track_routes import track_click
+from router.line_routes import line_house_preference, line_register
 from flask import Flask, render_template, request, jsonify, make_response, redirect, url_for
 import requests
 import os

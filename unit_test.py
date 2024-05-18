@@ -7,7 +7,7 @@ import pymongo
 import warnings
 from app import app
 from function import calculate_house_metrics, calculate_active_status
-
+from user_model.house_data_process import transform_one_house
 
 # Suppress pymongo deprecation warnings
 warnings.filterwarnings(
@@ -94,3 +94,31 @@ def test_calculate_active_status():
 
     # Test case 4: Random values for activities
     assert calculate_active_status(2, 5, 3, 4, 1) == 4.090000000000001
+
+
+def test_transform_one_house():
+    # Sample house data
+    house_data = {
+        "_id": {"$oid": "662253af2b1b2f13455e2ff8"},
+        "id": 2,
+        "title": "近捷運三房美寓(房屋編號：035215)",
+        "price": 32800.0,
+        "age": 43,
+        "size": 28.0,
+        "cook": True,
+        "pet": "不可",
+        "stay_landlord": True,
+        "park": False,
+        "gender": "男女皆可"
+    }
+
+    # Expected transformed data
+    expected_row = [32800.0, 43, 28.0, 1, 0, 1, 0, 1, 0, 0]
+    expected_house_dict = {"house_id": 2, "value": expected_row}
+
+    # Call the function to transform the house data
+    actual_row, actual_house_dict = transform_one_house(house_data)
+
+    # Verify if the transformation is correct
+    assert actual_row == expected_row
+    assert actual_house_dict == expected_house_dict

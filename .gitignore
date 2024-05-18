@@ -9,3 +9,4 @@ schedule/.env
 schedule/config/
 fake/
 dump/
+.pytest_cache/

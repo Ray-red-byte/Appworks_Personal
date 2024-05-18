@@ -8,3 +8,4 @@ schedule/plugins/
 schedule/.env
 schedule/config/
 fake/
+dump/

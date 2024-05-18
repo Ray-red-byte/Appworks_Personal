@@ -5,7 +5,7 @@ import numpy as np
 from dotenv import load_dotenv
 import pymongo
 import warnings
-from app import app
+from Appworks_Personal.app import app
 from function import calculate_house_metrics, calculate_active_status
 from user_model.house_data_process import transform_one_house
 

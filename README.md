@@ -34,7 +34,7 @@ Test account :
 
 #### AI model
 * KD tree
-
+---
 
 ## Structure
 ![Structure](image/structure.png)

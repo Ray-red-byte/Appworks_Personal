@@ -4,7 +4,7 @@ FROM umihico/aws-lambda-selenium-python:3.12.2-selenium4.20.0-chrome124.0.6367.9
 RUN mkdir -m 777 log/
 RUN mkdir -m 777 data/
 
-COPY .env ./
+
 COPY main.py ./
 COPY hap_info_mgdb.py ./
 COPY house_data_process.py ./

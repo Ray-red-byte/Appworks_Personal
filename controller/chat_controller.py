@@ -1,7 +1,7 @@
 from flask import render_template, request, redirect, url_for, jsonify
 from datetime import datetime
 from dotenv import load_dotenv
-from function import authentication, get_user_name
+from Appworks_Personal.utils import authentication, get_user_name
 from user_model.user_data_process import transform_one_user, transform_all_user, match_user, get_value_from_user_dict
 import os
 import pymongo
@@ -198,7 +198,7 @@ def get_matches(match_type):
         user_prefer_zone = cur_user["house_preference"]["zone"]
     except Exception as e:
         logger.warning(f"User not found", e)
-        return jsonify({'error': 'No match'}), 500
+        return jsonify({'error': 'User not found'}), 404
 
     # No matter what transform first
     row, transform_cur_user_dat_dict = transform_one_user(cur_user)
@@ -224,6 +224,9 @@ def get_matches(match_type):
         transform_id_list, transform_value_list = get_value_from_user_dict(
             transform_users_share_zone_dict)
 
+        '''
+        mongo sort 
+        '''
         user_active_statuses = user_collection.find(
             {"user_id": {"$in": transform_id_list}},
             {"active_status": 1, "user_id": 1}
@@ -243,6 +246,9 @@ def get_matches(match_type):
                                                transform_cur_user_data["value"], 11)
 
     elif match_type == 'same_gender':
+        '''
+            pack a function
+        '''
 
         users_share_gender_id_dict = user_collection.distinct("user_id",
                                                               {"basic_info.gender": cur_user["basic_info"]["gender"]})
@@ -306,7 +312,11 @@ def get_matches(match_type):
         logger.info(f"{match_type}: {len(matches_data)}")
     except Exception as e:
         logger.warning("No match users", e)
-        return jsonify({'error': 'No match'}), 500
+
+        '''
+            error format 
+        '''
+        return jsonify({'error': 'No match users'}), 404
 
     return jsonify(matches_data), 200
 

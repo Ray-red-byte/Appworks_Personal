@@ -6,7 +6,7 @@ import pymongo
 import warnings
 import json
 from app import app
-from function import authentication, create_token
+from Appworks_Personal.utils import authentication, create_token
 
 
 # Suppress pymongo deprecation warnings
@@ -36,10 +36,10 @@ def set_test_db():
 
 def test_get_user_recommend_house(client, set_test_db):
     # Set up a valid token for authentication
-    valid_token = create_token(8, JWT_SECRET_KEY)
+    valid_token = create_token(100000, JWT_SECRET_KEY)
 
     # Set a test house_id that exists in your test database
-    test_house_id = 1  # Replace with an actual house_id from your test data
+    test_house_id = 100000
 
     # Set a cookie with the valid token
     client.set_cookie('localhost', 'token', valid_token)
@@ -60,18 +60,14 @@ def test_get_user_recommend_house(client, set_test_db):
     assert 'title' in data[0]
     assert 'price' in data[0]
 
-    # Optionally, you can add more assertions based on the expected data
-
 
 def test_ai_recommend(client, set_test_db):
     # Generate a valid token for authentication
-    valid_token = create_token(8, JWT_SECRET_KEY)
+    valid_token = create_token(100000, JWT_SECRET_KEY)
 
     # Set a cookie with the valid token for the request
     client.set_cookie('localhost', 'token', valid_token)
 
-    # Make a request to your endpoint
-    # Adjust the URL to match your route
     response = client.get('/ai_recommend')
 
     # Print the response status and data for debugging
@@ -95,7 +91,7 @@ def test_ai_recommend(client, set_test_db):
 def test_get_matches_zone(client, set_test_db):
 
     # Create a valid token and set it as a cookie
-    valid_token = create_token(8, JWT_SECRET_KEY)
+    valid_token = create_token(100000, JWT_SECRET_KEY)
     client.set_cookie('localhost', 'token', valid_token)
 
     response = client.get('/matches/zone')

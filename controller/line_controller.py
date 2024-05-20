@@ -1,11 +1,11 @@
 from flask import render_template, request, redirect, url_for, jsonify
 from datetime import datetime
 from dotenv import load_dotenv
-from function import authentication, get_user_name
+from Appworks_Personal.utils import authentication, get_user_name
 import os
 import pymongo
 import logging
-from function import getNotifyToken, authentication
+from Appworks_Personal.utils import getNotifyToken, authentication
 
 dotenv_path = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/.env'
 load_dotenv(dotenv_path)

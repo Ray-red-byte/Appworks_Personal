@@ -4,6 +4,7 @@ import os
 from dotenv import load_dotenv
 import pymongo
 import warnings
+import json
 from app import app
 from function import authentication, create_token
 
@@ -89,3 +90,16 @@ def test_ai_recommend(client, set_test_db):
     assert 'id' in data[0], "Expected 'house_id' in response data"
     assert 'address' in data[0], "Expected 'title' in response data"
     assert 'price' in data[0], "Expected 'price' in response data"
+
+
+def test_get_matches_zone(client, set_test_db):
+
+    # Create a valid token and set it as a cookie
+    valid_token = create_token(8, JWT_SECRET_KEY)
+    client.set_cookie('localhost', 'token', valid_token)
+
+    response = client.get('/matches/zone')
+
+    assert response.status_code == 200
+    data = json.loads(response.data)
+    assert isinstance(data, list)

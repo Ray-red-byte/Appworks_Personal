@@ -61,7 +61,7 @@ LINE_SUBSCRIBE_URL = os.getenv("LINE_SUBSCRIBE_URL")
 LINE_CLIENT_ID = os.getenv("LINE_CLIENT_ID")
 LINE_CLIENT_SECRET = os.getenv("LINE_CLIENT_SECRET")
 
-
+# -------------------------------------------------------Initial page---------------------------------------------------------- #
 app.add_url_rule('/login', 'login', login)
 app.add_url_rule('/logout', 'logout', logout, methods=['GET'])
 app.add_url_rule('/register', 'register', register)
@@ -69,17 +69,18 @@ app.add_url_rule('/user/register_validate', 'register_validate',
                  register_validate, methods=['GET', 'POST'])
 app.add_url_rule('/user/login_token', 'login_token',
                  login_token, methods=['POST'])
+# ------------------------------------------------------------------------------------------------------------------------------ #
 
-# -------------------------------------------------------User insert page-------------------------------------------------------
+# -------------------------------------------------------User insert page------------------------------------------------------- #
 app.add_url_rule('/user/info_insert', 'user_info_insert',
                  user_info_insert, methods=["GET", "POST"])
 app.add_url_rule('/user/routine_insert', 'user_routine_insert',
                  user_routine_insert, methods=["GET", "POST"])
 app.add_url_rule('/user/filter', 'user_filter_insert',
                  user_filter_insert, methods=["GET", "POST"])
-# -------------------------------------------------------User insert page-------------------------------------------------------
+# ------------------------------------------------------------------------------------------------------------------------------ #
 
-# -------------------------------------------------------User house-------------------------------------------------------
+# ----------------------------------------------------------User house---------------------------------------------------------- #
 app.add_url_rule('/remove_house', 'remove_house',
                  remove_house, methods=['POST'])
 app.add_url_rule('/user/house/', 'get_user_save_house',
@@ -93,12 +94,13 @@ app.add_url_rule('/save_house', 'save_house',
 app.add_url_rule('/search/hot', 'search_hot', search_hot)
 app.add_url_rule('/search', 'search', search)
 app.add_url_rule('/ai_recommend', 'ai_recommend', ai_recommend)
+# ------------------------------------------------------------------------------------------------------------------------------ #
 
-# -------------------------------------------------------User house-------------------------------------------------------
+# -------------------------------------------------------------track------------------------------------------------------------ #
 app.add_url_rule('/track/click', 'track_click', track_click, methods=['POST'])
 
 
-# ------------------------------------- Render template-------------------------------------
+# ------------------------------------------------------- Render template ------------------------------------------------------ #
 app.add_url_rule('/main', 'main_page', main_page)
 app.add_url_rule('/routine', 'routine_page', routine_page)
 app.add_url_rule('/user/house_detail/<int:houseId>',
@@ -110,10 +112,10 @@ app.add_url_rule('/user/profile/<int:chat_user_id>',
 app.add_url_rule('/user/save_house', 'save_house_page', save_house_page)
 app.add_url_rule('/user/information', 'user_information',
                  user_information, methods=['GET', 'POST'])
-# ------------------------------------- Render template-------------------------------------
+# ------------------------------------------------------------------------------------------------------------------------------ #
 
 
-# -----------------------------------------Chat room----------------------------------------
+# -----------------------------------------------------------Chat room---------------------------------------------------------- #
 app.add_url_rule('/user/current/<int:chat_user_id>',
                  'chat_user_data', chat_user_data)
 app.add_url_rule('/cancel', 'cancel', cancel, methods=['POST'])
@@ -127,10 +129,10 @@ app.add_url_rule('/matches/<string:match_type>', 'get_matches', get_matches)
 app.add_url_rule('/allocate_chat_room', 'allocate_chat_room',
                  allocate_chat_room, methods=['GET', 'POST'])
 app.add_url_rule('/chat/<int:user_id>', 'chat', chat)
-# ------------------------User Save House------------------------
+# ------------------------------------------------------------------------------------------------------------------------------ #
 
 
-# --------------------------------------------------------LINE Notify--------------------------------------------------------
+# ---------------------------------------------------------- LINE Notify-------------------------------------------------------- #
 app.add_url_rule('/line/preference', 'line_house_preference',
                  line_house_preference, methods=['POST'])
 app.add_url_rule('/', 'line_register', line_register, methods=['POST', 'GET'])
@@ -210,15 +212,16 @@ def monitor(user_id, access_token):
 
         time.sleep(10)
         count += 1
+# ------------------------------------------------------------------------------------------------------------------------ #
 
 
-# Add URL routes using add_url_rule
+# --------------------------------------------------------------SocketIO----------------------------------------------------#
 socketio.on_event('online', handle_online)
 socketio.on_event('offline', handle_offline)
 socketio.on_event('join_room', on_join)
 socketio.on_event('leave', on_leave)
 socketio.on_event('send_message', handle_message)
-
+# ------------------------------------------------------------------------------------------------------------------------ #
 
 if __name__ == '__main__':
     socketio.run(app)

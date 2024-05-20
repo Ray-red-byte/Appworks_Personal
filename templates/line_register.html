@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Registration and House Preference Update</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+            zoom: 40%;
+        }
+
+        .banner {
+            text-align: center;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 500px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .container {
+            max-width: 2000px;
+            margin: 300px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn {
+            display: inline-block;
+            width: 500px;
+            height: 150px;
+            padding-top: 80px;
+            text-align: center;
+            background-color: #8b878d;
+            color: #fff;
+            border: 3px solid #100f10;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+            margin-left: 300px;
+            text-decoration: none;
+            
+        }
+        .btn:hover {
+            background-color: #48b934;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="banner">
+        <h1 style="font-size: 200px; color:#48b934;">Welcome {{ username }}</h1>
+        <h2 style="font-size: 100px; color:#48b934;">LINE WILL HELP YOU !</h2>
+    </div>
+    <div class="container">
+        <a href="https://notify-bot.line.me/oauth/authorize?response_type=code&client_id=bvtTFwMkqG5LiWFJIq3aXb&redirect_uri=https://rentright.info&scope=notify&state=NO_STATE" class="btn" style="font-size: 60px;">Register !</a>
+        <a href="/line_page" class="btn" style="font-size: 60px;">Update !</a>
+    </div>
+</body>
+</html>

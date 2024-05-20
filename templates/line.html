@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LINE house preference</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f7f7;
+            zoom: 40%; 
+        }
+
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            background-color: #58c989;
+        }
+
+        .header h1 {
+            margin: 100px auto; /* Remove default margin */
+            color: #f0eff0;
+        }
+
+        .line-text {
+            color: #f0eff0;
+            margin-left: 700px;
+            margin-top:100px;
+            font-size: 40px;
+            z-index: 10001;
+        }
+
+
+        .container {
+            background-color: #fffcfc; /* Purple to orange gradient */
+            border-radius: 10px;
+            padding: 20px;
+            width: 1000px; /* Increased width */
+            height: 100%;
+            margin: 20px auto;
+            display: flex;
+            flex-direction: column; /* Arrange children vertically */
+            align-items: stretch;
+        }
+
+        #housePreferenceForm {
+            width: 30%;
+            margin: 60px auto;
+        }
+
+        h2 {
+            color: #800080;
+            text-align: center;
+        }
+
+        .filter {
+            margin-bottom: 20px;
+        }
+
+        .filter label {
+            display: block;
+            color: #58c989;
+            margin-bottom: 5px;
+        }
+
+        .filter select, .filter input[type="range"] {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 20px;
+            background-color: #d3d3e6;
+            color: #58c989;
+            font-size: 16px;
+            outline: none;
+            margin-bottom: 10px;
+        }
+
+        .filter select:hover, .filter input[type="range"]:hover {
+            background-color: #b3b3cc;
+        }
+
+        .filter select:focus, .filter input[type="range"]:focus {
+            background-color: #fff;
+        }
+
+        .filter input[type="range"] {
+            appearance: none;
+            height: 10px;
+            background-color: #d3d3e6;
+            border-radius: 10px;
+            outline: none;
+            margin-bottom: 10px;
+        }
+
+        .filter input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background-color: #800080;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .filter input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background-color: #800080;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+
+        .section {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap; /* Allow items to wrap */
+            border: 1px solid #111010; /* Add border */
+            border-radius: 5px; /* Add border radius */
+            padding: 10px; /* Add padding */
+            margin-bottom: 10px; /* Add bottom margin */
+        }
+        .section > div {
+            width: 48%; /* Adjust width as needed */
+        }
+
+
+        label {
+            display: flex;
+            margin-bottom: 5px;
+            color: #555; /* White color */
+            font-size: 45px;
+        }
+        input[type="range"],
+        select,
+        input[type="checkbox"] {
+            width: calc(100% - 22px); /* Adjust width */
+            height: 40px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+            box-sizing: border-box;
+            background-color: #c7bbc2;
+        }
+        input[type="checkbox"] {
+            width:30px;
+            vertical-align: middle; /* Align checkboxes vertically */
+            margin-right: 10px;
+            margin-left: 50px;
+        }
+        input[type="checkbox"] + label {
+            display: inline-block;
+            vertical-align: middle; /* Align labels vertically */
+        }
+
+        input[type="submit"] {
+            background-color: #584a58; /* Purple color */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        input[type="submit"]:hover {
+            background-color: #198d4b;
+        }
+
+
+        .price, .houseAge{
+            -webkit-appearance: none;
+            appearance: none;
+            width: 130px;
+            height: 5px;
+            background: rgb(28, 2, 2);
+            outline: none;
+            opacity: 0.7;
+            -webkit-transition: .2s;
+            transition: opacity .2s;
+            margin-top: -27px;
+        }
+
+        .price::-webkit-slider-thumb, .houseAge::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 35px;
+            height: 35px;
+            background: #198d4b;
+            cursor: pointer; 
+        }
+
+        #stayWithLandlord{
+            height: 60px;
+            border-radius: 10px;
+            font-size: 40px;
+        }
+
+        #park{
+            height: 60px;
+            border-radius: 10px;
+            font-size: 40px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 style="font-size: 100px;">LINE house preference</h1>
+    </div>
+    <h2></h2>
+    <form id="housePreferenceForm" method="POST">
+        <div class="left-section">
+            <div style="margin-bottom: 50px;">
+                <h3 style="font-size: 55px;">Price:</h3>
+                <input type="range" id="price" class="price" name="price" min="0" max="200000" step="1" value="50">
+                <span style="font-size: 40px; margin-left: 1200px;" id="priceValue">50
+            </div>
+
+            <div style="margin-bottom: 80px;">
+                <h3 style="font-size: 55px;">House Age:</h3>
+                <input type="range" id="houseAge" class="houseAge" name="houseAge" min="0" max="100" step="1" value="25">
+                <span style="font-size: 40px; margin-left: 1200px;" id="houseAgeValue">25</span>
+            </div>
+            
+            <div style="margin-bottom: 80px;">
+                <h3 style="font-size: 55px;">Taipei</h3>
+                <div class="taipei">
+                    
+                    <input type="checkbox" id="Zhongzheng" name="zone" value="中正區">
+                    <label for="Zhongzheng" >中正區</label>
+
+                    <input type="checkbox" id="Datong" name="zone" value="大同區">
+                    <label for="Datong">大同區</label>
+                    <br>
+                    <input type="checkbox" id="Zhongshan" name="zone" value="中山區">
+                    <label for="Zhongshan">中山區</label>
+
+                    <input type="checkbox" id="Songshan" name="zone" value="松山區">
+                    <label for="Songshan">松山區</label>
+                    <br>
+                    <input type="checkbox" id="Daan" name="zone" value="大安區">
+                    <label for="Daan">大安區</label>
+
+                    <input type="checkbox" id="Wanhua" name="zone" value="萬華區">
+                    <label for="Wanhua">萬華區</label>
+                    <br>
+                    <input type="checkbox" id="Xinyi" name="zone" value="信義區">
+                    <label for="Xinyi">信義區</label>
+
+                    <input type="checkbox" id="Shilin" name="zone" value="士林區">
+                    <label for="Shilin">士林區</label>
+                    <br>
+                    <input type="checkbox" id="Beitou" name="zone" value="北投區">
+                    <label for="Beitou">北投區</label>
+
+                    <input type="checkbox" id="Neihu" name="zone" value="內湖區">
+                    <label for="Neihu">內湖區</label>
+                    <br>
+                    <input type="checkbox" id="Nangang" name="zone" value="南港區">
+                    <label for="Nangang">南港區</label>
+
+                    <input type="checkbox" id="Wenshan" name="zone" value="文山區">
+                    <label for="Wenshan">文山區</label>
+                    <br>
+                </div>
+
+                <h3 style="font-size: 55px; margin-top: 100px;">New Taipei</h3>
+                <div class="new-taipei">
+                    <input type="checkbox" id="Banqiao" name="zone" value="板橋區">
+                    <label for="Banqiao">板橋區</label>
+                    
+                    <input type="checkbox" id="Xizhi" name="zone" value="汐止區">
+                    <label for="Xizhi">汐止區</label>
+                    <br>
+                    <input type="checkbox" id="Xindian" name="zone" value="新店區">
+                    <label for="Xindian">新店區</label>
+            
+                    <input type="checkbox" id="Tamsui" name="zone" value="淡水區">
+                    <label for="Tamsui">淡水區</label>
+                    <br>
+                    <input type="checkbox" id="Sanchong" name="zone" value="三重區">
+                    <label for="Sanchong">三重區</label>
+            
+                    <input type="checkbox" id="Yonghe" name="zone" value="永和區">
+                    <label for="Yonghe">永和區</label>
+                    <br>
+                    <input type="checkbox" id="Zhonghe" name="zone" value="中和區">
+                    <label for="Zhonghe">中和區</label>
+            
+                    <input type="checkbox" id="Yingge" name="zone" value="鶯歌區">
+                    <label for="Yingge">鶯歌區</label>
+                    <br>
+                    <input type="checkbox" id="Shulin" name="zone" value="樹林區">
+                    <label for="Shulin">樹林區</label>
+                
+                    <input type="checkbox" id="Taishan" name="zone" value="泰山區">
+                    <label for="Taishan">泰山區</label>
+                    <br>
+                    <input type="checkbox" id="Linkou" name="zone" value="林口區">
+                    <label for="Linkou">林口區</label>
+                
+                    <input type="checkbox" id="Bali" name="zone" value="八里區">
+                    <label for="Bali">八里區</label>
+                    <br>
+                    <input type="checkbox" id="Sanxia" name="zone" value="三峽區">
+                    <label for="Sanxia">三峽區</label>
+
+                    <input type="checkbox" id="Shenkeng" name="zone" value="深坑區">
+                    <label for="Shenkeng">深坑區</label>
+                    <br>
+                    <input type="checkbox" id="Shiding" name="zone" value="石碇區">
+                    <label for="Shiding">石碇區</label>
+
+                    <input type="checkbox" id="Pinglin" name="zone" value="坪林區">
+                    <label for="Pinglin">坪林區</label>
+                    <br>
+                    <input type="checkbox" id="Shuangxi" name="zone" value="雙溪區">
+                    <label for="Shuangxi">雙溪區</label>
+
+                    <input type="checkbox" id="Gongliao" name="zone" value="貢寮區">
+                    <label for="Gongliao">貢寮區</label>
+                    <br>
+                    <input type="checkbox" id="Jinshan" name="zone" value="金山區">
+                    <label for="Jinshan">金山區</label>
+
+                    <input type="checkbox" id="Wanli" name="zone" value="萬里區">
+                    <label for="Wanli">萬里區</label>
+                    <br>
+                    <input type="checkbox" id="Xizhi" name="zone" value="汐止區">
+                    <label for="Xizhi">汐止區</label>
+
+                    <input type="checkbox" id="Wugu" name="zone" value="五股區">
+                    <label for="Wugu">五股區</label>
+                    <br>
+                    <input type="checkbox" id="Tucheng" name="zone" value="土城區">
+                    <label for="Tucheng">土城區</label>
+
+                    <input type="checkbox" id="Xinzhuang" name="zone" value="新莊區">
+                    <label for="Xinzhuang">新莊區</label>
+                    <br>
+                </div>                 
+            </div>
+            
+
+            <div style="margin-bottom: 80px;">
+                <h3 style="font-size: 55px;">Stay with Landlord:</h3>
+                <select id="stayWithLandlord" name="stayWithLandlord" >
+                    <option value="yes" style="font-size: 50px;">Yes</option>
+                    <option value="no" style="font-size: 50px;">No</option>
+                </select>
+            </div>
+            
+            <div style="margin-bottom: 80px;">
+                <h3 style="font-size: 55px;">Park Nearby:</h3>
+                <select id="park" name="park">
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                </select>
+            </div>
+        </div>
+
+        
+        <input id="search-input" type="submit" value="SAVE" style="font-size: 40px;">
+    </form>
+
+    <script>
+
+        // Price range input
+        const priceInput = document.getElementById('price');
+        const priceValue = document.getElementById('priceValue');
+
+        priceInput.addEventListener('input', function() {
+            priceValue.textContent = this.value;
+            priceValue.style.fontSize = '30px';
+        });
+
+        // House Age range input
+        const houseAgeInput = document.getElementById('houseAge');
+        const houseAgeValue = document.getElementById('houseAgeValue');
+
+        houseAgeInput.addEventListener('input', function() {
+            houseAgeValue.textContent = this.value;
+            houseAgeValue.style.fontSize = '30px';
+        });
+
+        // Form submission event listener
+        const housePreferenceForm = document.getElementById('housePreferenceForm');
+
+        housePreferenceForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            fetch('line/preference', {
+                method: 'POST',
+                body: new FormData(housePreferenceForm)
+            })
+            .then(response => {
+                console.log(response)
+                if (response.status === 200) {
+                    fetch('/send')
+                    .then(response => {
+                        if (response.status === 200) {
+                            window.location.href = '/main';
+                        }
+                    })
+                } else {
+                    console.error('Form submission failed');
+                }
+            })
+            .catch(error => {
+                // Handle network errors or other exceptions
+                console.error('Error:', error);
+            });
+        });
+
+    </script>
+</body>
+</html>

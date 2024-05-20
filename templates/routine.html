@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Routine</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e4e1e1;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            zoom: 38%; 
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            background-color: #a18ba1;
+        }
+
+        .header h1 {
+            margin-left: 1450px; /* Remove default margin */
+            margin-right: auto; /* Remove default margin */
+            color: #f0eff0;
+            font-size: 150px;
+            font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+            margin-bottom: 100px;
+        }
+
+        
+        .logout-text {
+            color: #f0eff0;
+            margin-left: 800px;
+            margin-right: 200px;
+            margin-top:100px;
+            cursor:pointer;
+            font-size: 40px;
+            z-index: 10001;
+            text-decoration: underline;
+        }
+
+        .change-user-info{
+            color: #f0eff0;
+            margin-left: 100px;
+            margin-top:100px;
+            font-size: 40px;
+            cursor:pointer;
+            z-index: 10001;
+        }
+        
+        .container {
+            background-color: #d8d8d8; /* Purple to orange gradient */
+            border-radius: 30px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 1500px; 
+            height: 1500px;
+            margin:150px;
+            display: flex;
+            flex-direction: column; /* Arrange children vertically */
+            align-items: stretch;
+        }
+        h1 {
+            color: #555; 
+            text-align: center;
+            margin-bottom: 60px;
+            font-size: 80px;
+        }        
+        form {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Two equal columns */
+            gap: 80px;
+        }
+        label {
+            display: flex;
+            margin-bottom: 15px;
+            margin-top: 30px;
+            color: #555; /* White color */
+            font-weight: bold;
+            font-size: 50px;
+        }
+        input[type="text"],
+        input[type="number"],
+        input[type="time"],
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 30px;
+            font-size: 40px;
+            height: 80px;
+            border: none;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: none;
+            border-radius: 5px;
+            box-sizing: border-box;
+            resize: vertical; /* Allow vertical resizing */
+        }
+
+        textarea::placeholder {
+            font-size: 40px; /* Adjust the font size as needed */
+            color: #999; /* Optionally adjust the color */
+        }
+        input[type="submit"] {
+            background-color: #8a2be2; /* Purple color */
+            color: white;
+            border: none;
+            height: 75px;
+            padding: 10px 20px;
+            margin-top: 40px; /* Center the button */
+            cursor: pointer;
+            font-size: 45px;
+            border-radius: 20px;
+            transition: background-color 0.3s;
+            justify-self: end; /* Align to the end of the grid cell */
+        }
+        input[type="submit"]:hover {
+            background-color: #6b1d9e;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="/user/information" class="change-user-info">PREVIOUS</a>
+        <h1 class="greeting">Hello</h1>
+    </div>
+    <div class="container">
+        <h1>Daily Routine</h1>
+        <form id="routineForm" action='/user/routine_insert' method="POST">
+            <div>
+                <label for="sleepTime">Sleep Time:</label>
+                <input type="time" id="sleepTime" name="sleepTime" required>
+            </div>
+            <div>
+                <label for="wakeUpTime">Wake Up Time:</label>
+                <input type="time" id="wakeUpTime" name="wakeUpTime" required>
+            </div>
+            <div>
+                <label for="hygieneTolerance">Hygiene Tolerance (1-10):</label>
+                <input type="number" id="hygieneTolerance" name="hygieneTolerance" min="1" max="10" required>
+            </div>
+            <div>
+                <label for="noiseTolerance">Noise Tolerance (1-10):</label>
+                <input type="number" id="noiseTolerance" name="noiseTolerance" min="1" max="10" required>
+            </div>
+            <div>
+                <label for="cookOptions">Cook Options:</label>
+                <select id="cookOptions" name="cookOptions">
+                    <option value="seldoms">Seldom</option>
+                    <option value="sometimes">Sometimes</option>
+                    <option value="always">Always</option>
+                </select>
+            </div>
+            <div>
+                <label for="petOptions">Pet Options:</label>
+                <select id="petOptions" name="petOptions">
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                </select>
+            </div>
+            <div>
+                <label for="smokeOptions">Smoke Options:</label>
+                <select id="smokeOptions" name="smokeOptions">
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                </select>
+            </div>
+            <div>
+                <label for="additionalNotes">Additional Notes:</label>
+                <textarea style="height: 170px; font-size: 45px;"  id="additionalNotes" name="additionalNotes" rows="4" placeholder="Type here..."></textarea>
+            </div>
+            <input style="display: none;" type="submit" id="hiddenSubmit" value="trigger">
+        </form>
+        <input type="submit" id="visibleSubmit" value="Submit">
+    </div>
+
+    <script>
+        document.getElementById('visibleSubmit').addEventListener('click', function() {
+            document.getElementById('hiddenSubmit').click();
+        });
+    </script>
+
+</body>
+</html>

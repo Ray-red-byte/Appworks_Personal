@@ -1,12 +1,12 @@
 from flask import render_template, request, redirect, url_for, jsonify, make_response
 from datetime import datetime
 from dotenv import load_dotenv
-from Appworks_Personal.utils import authentication, get_user_name
+from utils import authentication, get_user_name
 import os
 import pymongo
 import logging
 from werkzeug.security import generate_password_hash, check_password_hash
-from Appworks_Personal.utils import validate_email, get_user_id, get_user_password, create_token, calculate_active_status, get_next_user_id
+from utils import validate_email, get_user_id, get_user_password, create_token, calculate_active_status, get_next_user_id
 
 dotenv_path = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/.env'
 load_dotenv(dotenv_path)

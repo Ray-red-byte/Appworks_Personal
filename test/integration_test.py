@@ -6,7 +6,7 @@ import pymongo
 import warnings
 import json
 from app import app
-from Appworks_Personal.utils import authentication, create_token
+from utils import authentication, create_token
 
 
 # Suppress pymongo deprecation warnings

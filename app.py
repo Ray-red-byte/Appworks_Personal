@@ -1,11 +1,11 @@
-from Appworks_Personal.views.page_view import main_page, routine_page, house_type_page, house_detail_page, line_page, line_register_page, user_profile, save_house_page, user_information
-from Appworks_Personal.controller.socketio_controller import handle_online, handle_offline, on_join, on_leave, handle_message
-from Appworks_Personal.controller.chat_controller import chat_user_data, cancel, save_messages, chat_history, save_messages, get_messages, get_matches, allocate_chat_room, chat
-from Appworks_Personal.controller.info_insert_controller import user_info_insert, user_routine_insert, user_filter_insert
-from Appworks_Personal.controller.initial_controller import login, logout, register, register_validate, login_token
-from Appworks_Personal.controller.house_controller import remove_house, get_user_save_house, get_user_house, get_user_recommend_house, save_house, search_hot, search, ai_recommend
-from Appworks_Personal.controller.track_controller import track_click
-from Appworks_Personal.controller.line_controller import line_house_preference, line_register
+from views.page_view import main_page, routine_page, house_type_page, house_detail_page, line_page, line_register_page, user_profile, save_house_page, user_information
+from controller.socketio_controller import handle_online, handle_offline, on_join, on_leave, handle_message
+from controller.chat_controller import chat_user_data, cancel, save_messages, chat_history, save_messages, get_messages, get_matches, allocate_chat_room, chat
+from controller.info_insert_controller import user_info_insert, user_routine_insert, user_filter_insert
+from controller.initial_controller import login, logout, register, register_validate, login_token
+from controller.house_controller import remove_house, get_user_save_house, get_user_house, get_user_recommend_house, save_house, search_hot, search, ai_recommend
+from controller.track_controller import track_click
+from controller.line_controller import line_house_preference, line_register
 from flask import Flask, render_template, request, jsonify, make_response, redirect, url_for
 import requests
 import os
@@ -18,7 +18,7 @@ import numpy as np
 import time
 import logging
 from werkzeug.security import generate_password_hash, check_password_hash
-from Appworks_Personal.utils import get_user_id, check_exist_user, validate_email, create_token, authentication, get_user_password, get_user_name, calculate_active_status, get_next_user_id, lineNotifyMessage, getNotifyToken
+from utils import get_user_id, check_exist_user, validate_email, create_token, authentication, get_user_password, get_user_name, calculate_active_status, get_next_user_id, lineNotifyMessage, getNotifyToken
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from user_model.user_data_process import transform_one_user, transform_all_user, match_user, get_value_from_user_dict

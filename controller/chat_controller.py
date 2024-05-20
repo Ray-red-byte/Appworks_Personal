@@ -1,7 +1,7 @@
 from flask import render_template, request, redirect, url_for, jsonify
 from datetime import datetime
 from dotenv import load_dotenv
-from Appworks_Personal.utils import authentication, get_user_name
+from utils import authentication, get_user_name
 from user_model.user_data_process import transform_one_user, transform_all_user, match_user, get_value_from_user_dict
 import os
 import pymongo

@@ -37,10 +37,16 @@ Track System
 * Track users’ number of friends and cancelled count
 * Above condition will be calculated as “active_status”
 
+Recommend Houses
+* Use KDTree to recommend similar houses base on user click
+* Base on information by track system to recommend customized houses "AI GO"
+![AI GO](image/track_user.png)
+
 Chatroom
 * Use **KDTree** model to find matched roommates
 * Match priority will be ranked by user’s active_status
 * Use **socketIO** to allow users communicate with each other
+![Match User](image/match_user.png)
 
 Line Notification
 * Send notification task through **Redis** served as a queue to organize tasks
@@ -51,6 +57,9 @@ Other
 * Use **Cloudwatch** Check EC2 CPU utilization and Memory usage as well as lambda health status
 * Use **Github Action** to auto deploy code to EC2
 * Use **NGINX** Load balance and reverse proxy
+
+----
+
 
 ----
 ## Structure

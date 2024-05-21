@@ -10,19 +10,19 @@ Test account :
 
 ----
 
-## Data Collection :
+## Data Collection 
 Extract
-* Use Selenium as a Web Crawler tool to get data from “好房網” “樂租網”
-* Put Selenium into AWS lambda which has event trigger and time schedule function
-* Use S3 to store rent house URL and house detail information as backup
+* Use **Selenium** as a Web Crawler tool to get data from “好房網” “樂租網”
+* Put Selenium into AWS **lambda** which has event trigger and time schedule function
+* Use **S3** to store rent house URL and house detail information as backup
 
 Transform
-* Houses data will be transformed into vector by one-hot encoding, and filter irrelevant content
+* Houses data will be transformed into vector by **one-hot encoding**, and filter irrelevant content
 
 Load
-* Load in Atlas MongoDB
+* Load in **Atlas MongoDB**
 
-## Website Feature :
+## Website Feature 
 
 Search
 * Filters to search houses such as “Budget”, “House Age”, “Zone”, “Park”
@@ -38,20 +38,20 @@ Track System
 * Above condition will be calculated as “active_status”
 
 Chatroom
-* Use KDTree model to find matched roommates
+* Use **KDTree** model to find matched roommates
 * Match priority will be ranked by user’s active_status
-* Use socket-IO to allow users communicate with each other
+* Use **socketIO** to allow users communicate with each other
 
 Line Notification
-* Send notification task through Redis served as a queue to organize tasks
-* Use Celery framework to run in background to get up-to-date houses from MongoDB, which can offload backend server
-* Use Line Notify API to send customized houses
+* Send notification task through **Redis** served as a queue to organize tasks
+* Use **Celery** framework to run in background to get up-to-date houses from MongoDB, which can offload backend server
+* Use **Line Notify API** to send customized houses
 
 Other 
-* Use Cloudwatch Check EC2 CPU utilization and Memory usage as well as lambda health status
-* Use Github Action to auto deploy code to EC2
-* Use NGINX Load balance and reverse proxy
+* Use **Cloudwatch** Check EC2 CPU utilization and Memory usage as well as lambda health status
+* Use **Github Action** to auto deploy code to EC2
+* Use **NGINX** Load balance and reverse proxy
 
-
+----
 ## Structure
 ![Structure](image/structure.png)

@@ -25,7 +25,7 @@ Load
 ## Website Feature 
 
     Search
-    * Filters to search houses such as “Budget”, “House Age”, “Zone”, “Park”
+* Filters to search houses such as “Budget”, “House Age”, “Zone”, “Park”
 
     User Profile
     * User basic information such as “Job”, “Gender”, “Introduction”

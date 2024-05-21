@@ -40,11 +40,13 @@ Load
     Recommend Houses
     * Use KDTree to recommend similar houses base on user click
     * Base on information by track system to recommend customized houses "AI GO"
+    <img src="image/track_user.png" alt="AI GO" width="400"/>
 
     Chatroom
     * Use **KDTree** model to find matched roommates
     * Match priority will be ranked by user’s active_status
     * Use **socketIO** to allow users communicate with each other
+    <img src="image/match_user.png" alt="Match User" width="400" height="500/>
 
     Line Notification
     * Send notification task through **Redis** served as a queue to organize tasks

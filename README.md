@@ -24,8 +24,8 @@ Load
 
 ## Website Feature 
 
-    Search
-* Filters to search houses such as “Budget”, “House Age”, “Zone”, “Park”
+[tab]Search
+[tab]* Filters to search houses such as “Budget”, “House Age”, “Zone”, “Park”
 
     User Profile
     * User basic information such as “Job”, “Gender”, “Introduction”
@@ -40,13 +40,11 @@ Load
     Recommend Houses
     * Use KDTree to recommend similar houses base on user click
     * Base on information by track system to recommend customized houses "AI GO"
-    <img src="image/track_user.png" alt="AI GO" width="400"/>
 
     Chatroom
     * Use **KDTree** model to find matched roommates
     * Match priority will be ranked by user’s active_status
     * Use **socketIO** to allow users communicate with each other
-    <img src="image/match_user.png" alt="Match User" width="400"/>
 
     Line Notification
     * Send notification task through **Redis** served as a queue to organize tasks

@@ -10,31 +10,57 @@ Test account :
 
 ----
 
-## Tool
-#### Database
-* MongoDB 
+## Data Collection :
+    Extract
 
-#### Web Crawler
-* Selenium
+    - Use Selenium as a Web Crawler tool to get data from “好房網” “樂租網”
+    - Put Selenium into AWS lambda which has event trigger and time schedule function
+    - Use S3 to store rent house URL and house detail information as backup
 
-#### Scheduler
-* AWS lambda
+    Transform
 
-#### Backend Server & real time chatting
-* Flask & SocketIO
+    - Houses data will be transformed into vector by one-hot encoding, and filter irrelevant content
 
-#### Notification 
-* Celery & line Notify
+    Load
 
-#### Monitor 
-* AWS Cloud Watch
+    - Load in Atlas MongoDB
 
-#### CI / CD
-* Github action
+**Website Feature :**
 
-#### AI model
-* KD tree
----
+    Search
+
+    - Filters to search houses such as “Budget”, “House Age”, “Zone”, “Park”
+
+    User Profile
+
+    - User basic information such as “Job”, “Gender”, “Introduction”
+    - User daily routine such as “Sleep time”, “Hygiene Tolerance”, “Noise Tolerance”
+    - Each user’s information will be transformed by one-hot encoding
+
+    Track System
+
+    - Track users’ saved and clicked houses
+    - Track users’ number of friends and cancelled count
+    - Above condition will be calculated as “active_status”
+
+    Chatroom
+
+    - Use KDTree model to find matched roommates
+    - Match priority will be ranked by user’s active_status
+    - Use socket-IO to allow users communicate with each other
+
+    Line Notification
+
+    - Send notification task through Redis served as a queue to organize tasks
+    - Use Celery framework to run in background to get up-to-date houses from MongoDB, which can offload backend server
+    - Use Line Notify API to send customized houses
+
+    **OtherMonitor (Cloudwatch):**
+
+    - Use Cloudwatch Check EC2 CPU utilization and Memory usage as well as lambda health status
+    - Use Github Action to auto deploy code to EC2
+    - Use NGINX Load balance and reverse proxy
+    
 
 ## Structure
 ![Structure](image/structure.png)

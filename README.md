@@ -24,8 +24,8 @@ Load
 
 ## Website Feature 
 
-[tab]Search
-[tab]* Filters to search houses such as “Budget”, “House Age”, “Zone”, “Park”
+Search
+* Filters to search houses such as “Budget”, “House Age”, “Zone”, “Park”
 
     User Profile
     * User basic information such as “Job”, “Gender”, “Introduction”

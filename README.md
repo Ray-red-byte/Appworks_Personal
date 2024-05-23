@@ -64,12 +64,19 @@ Test account :
 * Recommend Houses
     * Use KDTree to recommend similar houses base on user click
     * Base on information by track system to recommend customized houses "AI GO"
-    ![AI GO](video/AI_GO.mov)
+
+    https://github.com/Ray-red-byte/Appworks_Personal/assets/72739609/05ced9b5-2c36-4c0a-9d1d-e287a13e7c90
 
 * Chatroom
     * Use **KDTree** model to find matched roommates
     * Match priority will be ranked by user’s active_status
     * Use **socketIO** to allow users communicate with each other
+
+    https://github.com/Ray-red-byte/Appworks_Personal/assets/72739609/5315d624-7327-44e2-983e-ccc8bab81c00
+    
+
+
+    https://github.com/Ray-red-byte/Appworks_Personal/assets/72739609/2d1217b2-f54b-420c-bb6d-e4bb4daf464c
 
 * Line Notification
     * Send notification task through **Redis** served as a queue to organize tasks

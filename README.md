@@ -64,6 +64,7 @@ Test account :
 * Recommend Houses
     * Use KDTree to recommend similar houses base on user click
     * Base on information by track system to recommend customized houses "AI GO"
+    ![AI GO](video/AI_GO.mov)
 
 * Chatroom
     * Use **KDTree** model to find matched roommates

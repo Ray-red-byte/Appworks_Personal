@@ -1,4 +1,11 @@
 # Roommate Matching and Renting Website
+![Static Badge](https://img.shields.io/badge/python%20-%20I%20like
+)
+![Static Badge](https://img.shields.io/badge/Socket.IO%20-%20blue)
+![Static Badge](https://img.shields.io/badge/Data%20-%20red
+)
+
+
 
 This is a renting webiste which uses AI model match roommates. It also provide real-time notification about latest suitable houses for users. 
 
@@ -8,62 +15,62 @@ Test account :
 * Email : ray67672@gmail.com
 * password : 12345678
 
-----
+
 
 ## Data Collection 
-Extract
-* Use **Selenium** as a Web Crawler tool to get data from “好房網” “樂租網”
-* Put Selenium into AWS **lambda** which has event trigger and time schedule function
-* Use **S3** to store rent house URL and house detail information as backup
+* Extract
+    * Use **Selenium** as a Web Crawler tool to get data from “好房網” “樂租網”
+    * Put Selenium into AWS **lambda** which has event trigger and time schedule function
+    * Use **S3** to store rent house URL and house detail information as backup
 
-Transform
-* Houses data will be transformed into vector by **one-hot encoding**, and filter irrelevant content
+* Transform
+    * Houses data will be transformed into vector by **one-hot encoding**, and filter irrelevant content
 
-Load
-* Load in **Atlas MongoDB**
+* Load
+    * Load in **MongoDB Atlas**
 
 ## Website Feature 
 
-Search
-* Filters to search houses such as “Budget”, “House Age”, “Zone”, “Park”
+* Search
+    * Filters to search houses such as “Budget”, “House Age”, “Zone”, “Park”
+    * User Profile
+    * User basic information such as “Job”, “Gender”, “Introduction”
+    * User daily routine such as “Sleep time”, “Hygiene Tolerance”, “Noise Tolerance”
+    * Each user’s information will be transformed by one-hot encoding
 
-User Profile
-* User basic information such as “Job”, “Gender”, “Introduction”
-* User daily routine such as “Sleep time”, “Hygiene Tolerance”, “Noise Tolerance”
-* Each user’s information will be transformed by one-hot encoding
+* Tracking System
+    * Track users’ saved and clicked houses
+    * Track users’ number of friends and cancelled count
+    * Above condition will be calculated as “active_status”
 
-Tracking System
-* Track users’ saved and clicked houses
-* Track users’ number of friends and cancelled count
-* Above condition will be calculated as “active_status”
+* Recommend Houses
+    * Use KDTree to recommend similar houses base on user click
+    * Base on information by track system to recommend customized houses "AI GO"
 
-Recommend Houses
-* Use KDTree to recommend similar houses base on user click
-* Base on information by track system to recommend customized houses "AI GO"
+* Chatroom
+    * Use **KDTree** model to find matched roommates
+    * Match priority will be ranked by user’s active_status
+    * Use **socketIO** to allow users communicate with each other
 
-Chatroom
-* Use **KDTree** model to find matched roommates
-* Match priority will be ranked by user’s active_status
-* Use **socketIO** to allow users communicate with each other
+* Line Notification
+    * Send notification task through **Redis** served as a queue to organize tasks
+    * Use **Celery** framework to run in background to get up-to-date houses from MongoDB, which can offload backend server
+    * Use **Line Notify API** to send customized houses
 
-Line Notification
-* Send notification task through **Redis** served as a queue to organize tasks
-* Use **Celery** framework to run in background to get up-to-date houses from MongoDB, which can offload backend server
-* Use **Line Notify API** to send customized houses
-
-Other 
-* Use **Cloudwatch** Check EC2 CPU utilization and Memory usage as well as lambda health status
-* Use **Github Action** to auto deploy code to EC2
-* Use **NGINX** Load balance and reverse proxy
-
-----
+* Other 
+    * Use **Cloudwatch** Check EC2 CPU utilization and Memory usage as well as lambda health status
+    * Use **Github Action** to auto deploy code to EC2
+    * Use **NGINX** Load balance and reverse proxy
 
 
-----
-## Structure
+## Monitor (CloudWatch)
+![CloudWatch](image/monitor.png)
+
+
+## Architecture
 ![Structure](image/structure.png)
 
 
-## Video
-[![Watch the video](https://youtu.be/IXN778xn8X8/maxresdefault.jpg)](https://youtu.be/IXN778xn8X8)
 
+## Video
+[Demo Link](https://youtu.be/IXN778xn8X8)

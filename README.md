@@ -13,8 +13,25 @@ This is a renting webiste which uses AI model match roommates. It also provide r
 Website : https://rentright.info/login
 
 Test account :
+* Username : Ray
 * Email : ray67672@gmail.com
 * password : 12345678
+
+## Table of Content
+- [Data Collection](#data-collection)
+  - [Extract](#extract)
+  - [Transform](#transform)
+  - [Load](#load)
+- [Website Features](#website-feature)
+  - [Search](#search)
+  - [Tracking System](#tracking-system)
+  - [Recommend Houses](#recommend-houses)
+  - [Chatroom](#chatroom)
+  - [Line Notification](#line-notification)
+  - [Other Features](#other-features)
+- [Monitoring (CloudWatch)](#monitoring-cloudwatch)
+- [Architecture](#architecture)
+- [Video](#demo-video)
 
 
 
@@ -73,5 +90,9 @@ Test account :
 
 
 
-## Video
+## Demo Video
 [Demo Link](https://youtu.be/IXN778xn8X8)
+
+
+
+

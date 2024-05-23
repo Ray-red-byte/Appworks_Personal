@@ -1,7 +1,8 @@
 # Roommate Matching and Renting Website
 ![Static Badge](https://img.shields.io/badge/python%20-%20I%20like
 )
-![Static Badge](https://img.shields.io/badge/Socket.IO%20-%20blue)
+![Static Badge](https://img.shields.io/badge/Socket.IO%20-%20purple
+)
 ![Static Badge](https://img.shields.io/badge/Data%20-%20red
 )
 

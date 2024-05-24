@@ -36,10 +36,10 @@ def set_test_db():
 
 def test_get_user_recommend_house(client, set_test_db):
     # Set up a valid token for authentication
-    valid_token = create_token(100000, JWT_SECRET_KEY)
+    valid_token = create_token(8, JWT_SECRET_KEY)
 
     # Set a test house_id that exists in your test database
-    test_house_id = 100000
+    test_house_id = 1
 
     # Set a cookie with the valid token
     client.set_cookie('localhost', 'token', valid_token)
@@ -63,7 +63,7 @@ def test_get_user_recommend_house(client, set_test_db):
 
 def test_ai_recommend(client, set_test_db):
     # Generate a valid token for authentication
-    valid_token = create_token(100000, JWT_SECRET_KEY)
+    valid_token = create_token(8, JWT_SECRET_KEY)
 
     # Set a cookie with the valid token for the request
     client.set_cookie('localhost', 'token', valid_token)
@@ -91,7 +91,7 @@ def test_ai_recommend(client, set_test_db):
 def test_get_matches_zone(client, set_test_db):
 
     # Create a valid token and set it as a cookie
-    valid_token = create_token(100000, JWT_SECRET_KEY)
+    valid_token = create_token(8, JWT_SECRET_KEY)
     client.set_cookie('localhost', 'token', valid_token)
 
     response = client.get('/matches/zone')

@@ -24,6 +24,7 @@ jobs:
           pip install pytest
           pip install python-dotenv
           pip install numpy
+          pip install flask
           pytest test/unit_test.py
           pytest test/integration_test.py
 

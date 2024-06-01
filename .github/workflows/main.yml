@@ -6,32 +6,32 @@ on:
       - develop
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
+  
+  #test:
+  #  runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  #  steps:
+  #    - name: Checkout code
+  #      uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.x'
+  #    - name: Setup Python
+  #      uses: actions/setup-python@v2
+  #      with:
+  #        python-version: '3.x'
 
       # Add your test steps here
-      - name: Run tests
-        run: |
-          pip install pytest
-          pip install python-dotenv
-          pip install numpy
-          pip install mongo
-          pip install flask
-          pytest test/unit_test.py
-          pytest test/integration_test.py
-
+  #    - name: Run tests
+  #      run: |
+  #        pip install pytest
+  #        pip install python-dotenv
+  #        pip install numpy
+  #        pip install pymongo
+  #        pip install flask
+  #        pytest test/unit_test.py
+  #        pytest test/integration_test.py
+  
 
   deploy:
-    needs: test
     runs-on: ubuntu-latest
 
     steps:

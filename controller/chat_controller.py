@@ -183,6 +183,8 @@ def get_messages():
 
 
 def get_matches(match_type):
+    # Start time to calculate the time and set in logger
+    start_time = datetime.now()
 
     # Get all users from mongodb
     db = client["personal_project"]
@@ -308,6 +310,10 @@ def get_matches(match_type):
             {"user_id": {"$in": nearest_neighbors_id_list}})
         matches_data = [[{'user_id': user['user_id'], 'username': user['username']}]
                         for user in match_users if int(user['user_id']) != int(user_id)]
+
+        logger.info(f"-----------------End Search-----------------")
+        end_time = datetime.now()
+        logger.info(f"Time: {end_time - start_time}")
 
         logger.info(f"{match_type}: {len(matches_data)}")
     except Exception as e:

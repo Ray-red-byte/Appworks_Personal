@@ -90,11 +90,17 @@ Test account :
 
 
 ## Monitor (CloudWatch)
+* EC2 Alarm
+    * If EC2 CPU and Memory exceed certain threshold then I will receive email
+* Lambda alarm
+    * If invocation is less than 1 within 30 minutes then I will reseive email
+* Login alarm
+    * If login error occur more than 5 within 30 seconds then I will receive email
 ![CloudWatch](image/monitor.png)
 
 
 ## Architecture
-![Structure](image/structure.png)
+![Structure](image/new_structure.png)
 
 
 

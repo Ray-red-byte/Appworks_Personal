@@ -25,13 +25,14 @@ def handle_online(data):
     if user_id not in online_users and user_id is not None:
         online_users.append(user_id)
     logger.info(f"{online_users} is online")
+    logger.info(f"Total online users : {len(online_users)}")
     emit('show', online_users, broadcast=True)
 
 
 def handle_offline(data):
     user_id = data['user_id']
     online_users.remove(user_id)
-    logger.info(f"{online_users} is remove")
+    logger.info(f"{user_id} is remove")
     emit('hide', user_id, broadcast=True)
 
 # ------------------------Show online users------------------------

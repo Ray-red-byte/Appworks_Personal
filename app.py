@@ -23,6 +23,8 @@ from flask_cors import CORS
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from user_model.user_data_process import transform_one_user, transform_all_user, match_user, get_value_from_user_dict
 from user_model.house_data_process import transform_one_house, transform_all_house, match_house, get_value_from_house_dict, one_hot_gender
+from celery_tasks import monitor
+
 
 dotenv_path = '/Users/hojuicheng/Desktop/personal_project/Appworks_Personal/.env'
 load_dotenv(dotenv_path)
@@ -155,63 +157,6 @@ def send():
     return jsonify("Start to send"), 200
 
 
-@ celery.task
-def monitor(user_id, access_token):
-    db = client["personal_project"]
-
-    last_update_at = ''
-    count = 0
-    while True:
-        # Query MongoDB to get the latest houses
-        logger.info(f"Start to use line ")
-
-        house_collection = db["house"]
-        user_collection = db["user"]
-        cur_user = user_collection.find_one({"user_id": user_id})
-        cur_user_house_preference = cur_user["line_preference"]
-
-        zones = cur_user_house_preference['zone']
-        zone_pattern = '|'.join(zones)
-        regex_pattern = re.compile(f'({zone_pattern})', re.IGNORECASE)
-
-        if count == 0:  # At first find the last one
-            last_house_list = house_collection.find().sort(
-                [("updated_at", -1)]).limit(1)
-            for i in last_house_list:
-                last_update_at = i['updated_at']
-        else:
-
-            try:
-                last_house_list = house_collection.find(
-                    {"updated_at": {"$gt": last_update_at}})
-                last_update_at = house_collection.find().sort(
-                    [("updated_at", -1)]).limit(1)[0]['updated_at']
-
-            except Exception as e:
-                logger.info(f"No house available {e}")
-                # lineNotifyMessage(
-                #    access_token, f"No house is available")
-                time.sleep(10)
-                continue
-
-        # Check if last house match user's preference
-        for last_house in last_house_list:
-            if float(last_house['price']) <= float(cur_user_house_preference['price']) and int(last_house['age']) <= int(cur_user_house_preference['house_age']) and re.search(regex_pattern, last_house['address']) and last_house['stay_landlord'] == (cur_user_house_preference['stay_with_landlord'] == "yes") and last_house['park'] == (cur_user_house_preference['park_nearby'] == "yes"):
-                house_title = last_house["title"]
-                house_price = last_house['price']
-                house_address = last_house['address']
-                house_age = last_house['age']
-                house_url = "https://rentright.info/user/house_detail/" + \
-                    str(last_house["id"])
-                lineNotifyMessage(
-                    access_token, "New house ! ! !")
-                lineNotifyMessage(
-                    access_token,
-                    f"{house_title}\n{house_url}"
-                )
-
-        time.sleep(10)
-        count += 1
 # ------------------------------------------------------------------------------------------------------------------------ #
 
 

@@ -96,10 +96,14 @@ Test account :
     * If invocation is less than 1 within 30 minutes then I will reseive email
 * Login alarm
     * If login error occur more than 5 within 30 seconds then I will receive email
+      
 ![CloudWatch](image/monitor.png)
 
 
 ## Architecture
+* Upper section is data pipeline , using selenium in lambda to web crawler data then send in Mongo DB
+* Lower section has three main EC2, first is flask back-end server, second is redis server, third is celery server. Seperating three servers in three instances achieve HA
+    
 ![Structure](image/new_structure.png)
 
 

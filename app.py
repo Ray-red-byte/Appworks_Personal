@@ -38,8 +38,8 @@ logging.basicConfig(filename=log_file_path,
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET')
-app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379/0'
-app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/0'
+app.config['CELERY_BROKER_URL'] = 'redis://13.230.180.151:6379/0'
+app.config['CELERY_RESULT_BACKEND'] = 'redis://13.230.180.151:6379/0'
 
 # JWT secret key
 jwt_secret_key = os.getenv('JWT_SECRET_KEY')

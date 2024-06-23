@@ -17,6 +17,9 @@ Test account :
 * Email : ray67672@gmail.com
 * password : 12345678
 
+## Demo Video
+[Demo Link](https://youtu.be/IXN778xn8X8)
+
 ## Table of Content
 - [Data Collection](#data-collection)
   - [Extract](#extract)
@@ -102,14 +105,13 @@ Test account :
 
 ## Architecture
 * Upper section is data pipeline , using selenium in lambda to web crawler data then send in Mongo DB
-* Lower section has three main EC2, first is flask back-end server, second is redis server, third is celery server. Seperating three servers in three instances achieve HA
+* Lower section has three main EC2, first is flask back-end server, second is redis server, third is celery server. Seperating three servers in three instances achieve High Availability
     
 ![Structure](image/new_structure.png)
 
 
 
-## Demo Video
-[Demo Link](https://youtu.be/IXN778xn8X8)
+
 
 
 
